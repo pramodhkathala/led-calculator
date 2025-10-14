@@ -80,10 +80,9 @@
     #downloadPdfLink { grid-column: 1 / -1; margin-top: 15px; text-align: center; cursor: pointer; color: #1B5E20; text-decoration: underline; padding: 8px 0; font-weight: 600; }
     #downloadPdfLink:hover { color: #2E7D32; }
 
-
     /* Modal/Popup Styles */
     .modal { position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); display: none; }
-    .modal-content { background-color: #fefefe; margin: 10% auto; padding: 30px; border-radius: 10px; width: 80%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .modal-content { background-color: #fefefe; margin: 5% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 700px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
     .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
     .close-btn { color: #aaa; font-size: 28px; font-weight: bold; }
     .close-btn:hover, .close-btn:focus { color: #000; text-decoration: none; cursor: pointer; }
@@ -91,6 +90,9 @@
     .modal-input-group label { font-weight: 600; color: #0D47A1; margin-bottom: 5px; }
     .modal-submit { background-color: #1B5E20; margin-top: 15px; }
     .modal-submit:hover { background-color: #2E7D32; }
+    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .modal-grid-span-2 { grid-column: 1 / -1; }
+    .modal-disclaimer { margin-top: 15px; padding: 10px; background: #fffde7; border: 1px solid #ffeb3b; border-radius: 5px; font-size: 0.85em; color: #616161; }
 
   </style>
 </head>
@@ -186,21 +188,28 @@
                 <span id="resolution">**Actual Final Resolution (WxH):** <strong>--</strong></span>
                 <span id="finalArea">Final Area: <strong>--</strong></span>
                 <span id="totalPixels">Total Pixels: <strong>--</strong></span>
-                <span id="cabinetWeight">Est. Total Wall Weight (incl. buffer): <strong>--</strong></span>
                 <span id="brightness">Brightness/Nits: <strong>--</strong></span>
             </div>
         </div>
 
         <div class="details-box">
             <h4>Control System Requirements <button class="edit-btn" onclick="openControllerModal()">Edit/View Components ⚙️</button></h4>
-            <div class="vis-details">
-                <span id="requiredRecCards">Total Receiving Cards Required: <strong>--</strong></span>
-                <span id="suggestedControllerModel">Suggested Controller Model: <strong>--</strong></span>
-                <span id="controllerPorts">Total Ethernet Ports Needed: <strong>--</strong></span>
-                <span id="requiredSendCards">Estimated Sending Cards: <strong>--</strong></span>
-                <span id="sendingCardModel">Sending Card Model: <strong>--</strong></span>
+            <div class="vis-details" id="controlSystemDetails">
+                <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 5px;">Power and Weight</span>
+                <span id="cabinetWeight">Est. Total Wall Weight (incl. buffer): <strong>--</strong></span>
                 <span id="wallPower">Estimated Max Power (W): <strong>--</strong></span>
                 <span id="wallCurrent">Estimated Max Current (A @220V): <strong>--</strong></span>
+                
+                <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Controllers</span>
+                <span id="suggestedControllerModel">Suggested Controller Model: <strong>--</strong></span>
+                <span id="requiredRecCards">Total Receiving Cards Required: <strong>--</strong></span>
+                <span id="controllerPorts">Total Ethernet Ports Needed: <strong>--</strong></span>
+
+                <div id="modularDetails" class="vis-details" style="grid-column: 1 / -1; gap: 5px; border-top: 1px dotted #e0e0e0; padding-top: 10px; margin-top: 5px;">
+                    <span id="splicerSolution">Recommended Splicer Solution: <strong>--</strong></span>
+                    <span id="sendingCardModel">Output Card: <strong>--</strong></span>
+                    <span id="inputCardModel">Input Card: <strong>--</strong></span>
+                </div>
             </div>
         </div>
       </div>
@@ -229,18 +238,41 @@
           <span class="close-btn" onclick="closeControllerModal()">&times;</span>
         </div>
         
-        <div class="modal-input-group">
-            <label for="modalControllerModel">Suggested Controller Model (Editable):</label>
-            <input type="text" id="modalControllerModel">
+        <div class="modal-grid">
+            <div class="modal-input-group modal-grid-span-2">
+                <label for="modalControllerModel">Suggested Controller/Processor Model (Editable):</label>
+                <input type="text" id="modalControllerModel" placeholder="e.g., VX600 Pro or H5 Modular Splicer">
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalSplicerSolution">Recommended Splicer Solution (Editable, if H-Series):</label>
+                <input type="text" id="modalSplicerSolution" placeholder="e.g., Novastar H-Series">
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalMaxPortsPerCard">Max Ports per Output Card:</label>
+                <input type="number" id="modalMaxPortsPerCard" min="1" step="1" placeholder="e.g., 20">
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalOutputCardModel">Output Card Model (Per Max Ports):</label>
+                <input type="text" id="modalOutputCardModel" placeholder="e.g., H_20xRJ45 Sending Card">
+            </div>
+
+            <div class="modal-input-group">
+                <label for="modalInputCardModel">Input Card Model (Default):</label>
+                <select id="modalInputCardModel">
+                    </select>
+            </div>
+            
+            <div class="modal-input-group">
+                <label for="modalInputCardQty">Input Card Quantity:</label>
+                <input type="number" id="modalInputCardQty" min="1" step="1" placeholder="e.g., 1">
+            </div>
         </div>
-        
-        <div class="modal-input-group">
-            <label for="modalSendCardModel">Sending Card Model (Per 9.2M Pixels):</label>
-            <input type="text" id="modalSendCardModel">
-        </div>
-        <div class="modal-input-group">
-            <label for="modalSendCardPorts">Sending Card Ports (Max Output):</label>
-            <input type="number" id="modalSendCardPorts" min="1" step="1">
+
+        <div class="modal-disclaimer">
+            <p><strong>Crucial Disclaimer:</strong> You can edit the types and quantities of input cards/sending cards and accessories as required. The system will regenerate a solution based on your pixel count and the *Max Ports per Output Card* value you enter.</p>
         </div>
 
         <button class="submit-btn modal-submit" onclick="applyModalChanges()">Apply Changes & Recalculate</button>
@@ -255,51 +287,64 @@
     const MM_PER_METER = 1000;
     const MM_PER_INCH = 25.4;
     const MM_PER_FOOT = MM_PER_INCH * 12;
-    const PIXELS_PER_PORT_DEFAULT_MODULAR = 920000; // Standard for high-end modular controllers
+    const PIXELS_PER_PORT_DEFAULT = 650000; // Standard for NovaStar Ethernet port bandwidth (approx 650K/port)
     
     // Safety Buffers (Requested by user)
     const POWER_BUFFER = 1.20; // 20%
     const WEIGHT_BUFFER = 1.20; // 20%
 
-    // --- PeopleLink LED Models (V12 - Updated Specs) ---
+    // --- PeopleLink LED Models (V13 - No Change from V12) ---
     const LED_PRODUCTS = {
-        // COB Models (16:9 Cabinet: 600mm x 337.5mm) - NO CHANGE
         'cob_09': { name: "PeopleLink COB (0.9375mm)", pitch_mm: 0.9375, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 640, cabPixH: 360, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-1000", maxPower_W_m2: 300 },
         'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 },
         'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, 
-        
-        // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm) - UPDATED
-        // Weight: 3.66kg + (0.43kg * 6 modules) = 6.24 kg (unbuffered)
-        // Power Density: 560 W/m² (from user's figures)
-        // Brightness: 450-600 nits
         'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
         'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
         'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
-        
-        // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm) - UPDATED
-        // Weight: (0.46kg * 18 modules) * 1.20 buffer = 9.936 kg -> 9.94 kg (unbuffered weight in object, buffer applied later)
-        // Power Density: (40W * 18 modules * 1.20 buffer) / (0.96*0.96 m²) = 937.5 W/m²
-        // Brightness: 4500-5000 nits
-        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, // Using 8.28kg unbuffered module weight, buffer applied in calculation
+        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, 
         'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, 
         'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, 
         'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 } 
     };
-
-    // --- Controller Tiers (Generic Naming) ---
+    
+    // --- New Controller Tiers (NovaStar Focus) ---
     const CONTROLLER_MODELS = [
-        { name: "Controller Lite (2.3M)", maxPixels: 2300000, maxPorts: 4, type: "All-in-One Processor" },
-        { name: "Controller Pro (3.9M)", maxPixels: 3900000, maxPorts: 6, type: "All-in-One Processor" },
-        { name: "Modular Controller System (MCS-1)", maxPixels: 9200000, maxPorts: 10, type: "Modular Controller System" }, 
-        { name: "Modular Controller System (MCS-2)", maxPixels: 18400000, maxPorts: 20, type: "Modular Controller System" }, 
-        { name: "Modular Controller System (MCS-4)", maxPixels: 36800000, maxPorts: 40, type: "Modular Controller System" }
-    ].sort((a, b) => a.maxPixels - b.maxPixels);
+        // Multimedia Players (Typically for simpler walls/small screens)
+        // TB40 recommended for outdoor/lesser size indoor
+        { name: "TB40", type: "Multimedia Player", ports: 2, maxPixels: 1300000, maxW: 10240, maxH: 8192, priority: 1 },
+        { name: "TB60", type: "Multimedia Player", ports: 4, maxPixels: 2300000, maxW: 4096, maxH: 4096, priority: 2 },
+        
+        // All-In-One Processors
+        { name: "VX400 Pro / DSP400 Pro", type: "All-in-One Processor", ports: 4, maxPixels: 2600000, maxW: 10240, maxH: 8192, priority: 3 },
+        { name: "VX600 Pro / DSP600 Pro", type: "All-in-One Processor", ports: 6, maxPixels: 3900000, maxW: 10240, maxH: 8192, priority: 4 },
+        { name: "VX1000 Pro / DSP1000 Pro", type: "All-in-One Processor", ports: 10, maxPixels: 6500000, maxW: 10240, maxH: 8192, priority: 5 },
 
-    // --- Modular Card Defaults (Used for port calculation) ---
-    const MODULAR_CARD_DEFAULTS = {
-        SENDING_CARD_MODEL: "Sending Card - MC9.2M", 
-        SENDING_CARD_PORTS: 10,       
-        PIXELS_PER_PORT: PIXELS_PER_PORT_DEFAULT_MODULAR
+        // High-End All-In-One
+        { name: "4K Prime", type: "All-in-One Processor", ports: 16, maxPixels: 10400000, maxW: 16384, maxH: 8192, priority: 6 },
+        { name: "4K Prime Pro", type: "All-in-One Processor", ports: 20, maxPixels: 13000000, maxW: 16384, maxH: 8192, priority: 7 },
+        
+        // Modular Splicers (Suggested for very large/complex walls > 13M)
+        { name: "H2 / H5 / H9 / H15 / H20", type: "Modular Splicer (H-Series)", ports: 20, maxPixels: 26000000, maxW: 16384, maxH: 8192, priority: 8 }, 
+    ].sort((a, b) => a.priority - b.priority);
+
+    // New H-Series Card Defaults and Splicer Info
+    const H_SERIES_DEFAULTS = {
+        SPLICER_NAME: "Novastar H-Series (H2/H5/H9/H15/H20)",
+        
+        INPUT_CARD_OPTIONS: [
+            { model: "H_1xHDMI2.0 input card (4K)", type: "4K Single Input" },
+            { model: "H_2xHDMI2.0 input card (4K)", type: "4K Dual Input" },
+            { model: "H_4xHDMI input card (1080P)", type: "HD Quad Input" },
+        ],
+        DEFAULT_INPUT_CARD_MODEL: "H_1xHDMI2.0 input card (4K)",
+        DEFAULT_INPUT_CARD_QTY: 1,
+
+        OUTPUT_CARD_20_PORTS: 20,
+        OUTPUT_CARD_20_MODEL: "H_20xRJ45 Sending Card",
+        
+        // Fallback/Alternate Output Card (for users choosing 16-port option)
+        OUTPUT_CARD_16_PORTS: 16,
+        OUTPUT_CARD_16_MODEL: "H_16xRJ45+2xfiber sending card",
     };
     
     // --- Global Store and Helpers ---
@@ -316,23 +361,18 @@
         const isDiagonal = (unit === 'inches');
         const isFeet = (unit === 'feet');
 
-        // Dynamic Label Update
         let unitText = ' (m)';
         if (isFeet) unitText = ' (ft)';
         if (isDiagonal) unitText = ' (in)';
 
         document.getElementById('widthLabel').textContent = `Desired Width${unitText}`;
         document.getElementById('heightLabel').textContent = `Desired Height${unitText}`;
-        
-        // Aspect Ratio label remains simple as it's optional for all
         document.getElementById('aspectRatioLabel').textContent = 'Target Aspect Ratio (Optional)';
 
-        // Toggle visibility
         document.getElementById('widthGroup').classList.toggle('hidden', isDiagonal);
         document.getElementById('heightGroup').classList.toggle('hidden', isDiagonal);
         document.getElementById('diagonalGroup').classList.toggle('hidden', !isDiagonal);
         
-        // Clear unused fields
         if (isDiagonal) {
             document.getElementById('width').value = '';
             document.getElementById('height').value = '';
@@ -342,11 +382,33 @@
         document.getElementById('errorMessage').classList.add('hidden');
     }
 
+    function populateModalInputCards() {
+        const select = document.getElementById('modalInputCardModel');
+        select.innerHTML = '';
+        H_SERIES_DEFAULTS.INPUT_CARD_OPTIONS.forEach(option => {
+            const opt = document.createElement('option');
+            opt.value = option.model;
+            opt.textContent = option.model;
+            select.appendChild(opt);
+        });
+    }
+
     function openControllerModal() {
+        populateModalInputCards(); // Ensure input card options are loaded
+
         // Load current calculated/stored values into the modal fields
-        document.getElementById('modalControllerModel').value = finalCalculationData.controllerOverrideName || document.getElementById('suggestedControllerModel').textContent.split('(')[0].trim();
-        document.getElementById('modalSendCardModel').value = finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL;
-        document.getElementById('modalSendCardPorts').value = finalCalculationData.sendCardPorts || MODULAR_CARD_DEFAULTS.SENDING_CARD_PORTS;
+        const isHSeries = finalCalculationData.controllerType && finalCalculationData.controllerType.includes('Modular');
+        
+        document.getElementById('modalControllerModel').value = finalCalculationData.controllerOverrideName || finalCalculationData.controllerName.split('(')[0].trim();
+        document.getElementById('modalSplicerSolution').value = finalCalculationData.splicerSolution || (isHSeries ? H_SERIES_DEFAULTS.SPLICER_NAME : 'N/A');
+        
+        document.getElementById('modalOutputCardModel').value = finalCalculationData.outputCardModel || H_SERIES_DEFAULTS.OUTPUT_CARD_20_MODEL;
+        document.getElementById('modalMaxPortsPerCard').value = finalCalculationData.outputCardPorts || H_SERIES_DEFAULTS.OUTPUT_CARD_20_PORTS;
+        
+        // Select the currently suggested/saved input card model
+        const inputCardSelect = document.getElementById('modalInputCardModel');
+        inputCardSelect.value = finalCalculationData.inputCardModel || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_MODEL;
+        document.getElementById('modalInputCardQty').value = finalCalculationData.inputCardQty || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_QTY;
 
         document.getElementById('controllerModal').style.display = 'block';
     }
@@ -356,47 +418,60 @@
     }
 
     function applyModalChanges() {
-        // Store controller/sending card overrides for use in the next calculation
+        // Store overrides
         finalCalculationData.controllerOverrideName = document.getElementById('modalControllerModel').value;
-        finalCalculationData.sendCardModel = document.getElementById('modalSendCardModel').value;
-        finalCalculationData.sendCardPorts = parseFloat(document.getElementById('modalSendCardPorts').value);
+        finalCalculationData.splicerSolution = document.getElementById('modalSplicerSolution').value;
+        finalCalculationData.outputCardModel = document.getElementById('modalOutputCardModel').value;
+        finalCalculationData.outputCardPorts = parseFloat(document.getElementById('modalMaxPortsPerCard').value);
+        finalCalculationData.inputCardModel = document.getElementById('modalInputCardModel').value;
+        finalCalculationData.inputCardQty = parseFloat(document.getElementById('modalInputCardQty').value);
 
-        closeControllerModal();
         // Force re-run visualization with new parameters
+        closeControllerModal();
         showVisualization(); 
     }
 
     // --- Core Calculation Logic ---
 
-    function getSuggestedControllerModel(totalPixels) {
+    function getSuggestedControllerModel(totalPixels, finalResW, finalResH, productKey) {
         
-        // Prioritize Modular Controller System (MCS) for larger walls (> 4M pixels)
-        if (totalPixels > 4000000) {
-            let controller = CONTROLLER_MODELS.find(c => c.type.includes("Modular") && c.maxPixels >= totalPixels);
-            
-            if (controller) {
-                return controller;
-            } else {
-                // If it exceeds MCS-4, suggest MCS-4 and note required scaling
-                const largestMCS = CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1];
-                return { 
-                    name: `${largestMCS.name} (Requires Multiple Units)`, 
-                    type: "Modular Controller System", 
-                    ports: largestMCS.maxPorts,
-                    maxPixels: largestMCS.maxPixels
-                };
+        const details = LED_PRODUCTS[productKey];
+        const isOutdoor = productKey.startsWith('outdoor');
+        const isSmallIndoor = totalPixels < 1500000; // Arbitrary definition of small indoor
+
+        let suggestedController = null;
+
+        // 1. Check for Multimedia Players (TB40/TB60)
+        // Suggest TB for outdoor or small indoor walls unless resolution limits are hit
+        if (isOutdoor || isSmallIndoor) {
+             const suitableTB = CONTROLLER_MODELS.find(c => c.type === "Multimedia Player" && c.maxPixels >= totalPixels && c.maxW >= finalResW && c.maxH >= finalResH);
+             if (suitableTB) {
+                suggestedController = suitableTB;
+             }
+        }
+
+        // 2. Check All-In-One Processors
+        if (!suggestedController) {
+            const suitableAIO = CONTROLLER_MODELS.find(c => c.type === "All-in-One Processor" && c.maxPixels >= totalPixels && c.maxW >= finalResW && c.maxH >= finalResH);
+            if (suitableAIO) {
+                suggestedController = suitableAIO;
             }
         }
         
-        // For smaller walls, suggest All-in-One Processors
-        let controller = CONTROLLER_MODELS.find(c => !c.type.includes("Modular") && c.maxPixels >= totalPixels);
-
-        // If even the smallest Modular System is too large, use the best AIO model
-        if (!controller) {
-            controller = CONTROLLER_MODELS.find(c => c.maxPixels >= totalPixels) || CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1]; 
+        // 3. Check High-End AIOs (4K Prime)
+        if (!suggestedController) {
+            const suitable4K = CONTROLLER_MODELS.find(c => c.name.includes('4K Prime') && c.maxPixels >= totalPixels && c.maxW >= finalResW && c.maxH >= finalResH);
+            if (suitable4K) {
+                suggestedController = suitable4K;
+            }
         }
 
-        return controller;
+        // 4. Default to Modular Splicer (H-Series) for massive walls or if no AIO/TB fits
+        if (!suggestedController) {
+            suggestedController = CONTROLLER_MODELS.find(c => c.type.includes("Modular")) || CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1]; 
+        }
+
+        return suggestedController;
     }
 
     function calculateLEDWall(){
@@ -416,50 +491,14 @@
         errorDiv.classList.add('hidden');
         
         // --- MANDATORY FIELD VALIDATION (WITH SCROLL FIX) ---
-        if (!productKey) {
-            errorDiv.textContent = 'ERROR: Please select an LED Model/Pitch to continue.';
-            errorDiv.classList.remove('hidden');
-            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            return null;
-        }
-        if (!unit) {
-            errorDiv.textContent = 'ERROR: Please select a Unit of Measurement to continue.';
+        if (!productKey || !unit || ((unit !== 'inches' && (!inputW && !inputH)) || (unit === 'inches' && !inputD))) {
+            errorDiv.textContent = 'ERROR: Please select a Model, Unit, and enter valid dimensions to continue.';
             errorDiv.classList.remove('hidden');
             errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return null;
         }
 
         const isDiagonal = (unit === 'inches');
-
-        // Input Validation based on mode
-        if (!isDiagonal) {
-            // Meters/Feet mode: requires W, H, or (W or H with AR)
-            const hasW = !isNaN(inputW) && inputW > 0;
-            const hasH = !isNaN(inputH) && inputH > 0;
-            
-            if (!hasW && !hasH) {
-                errorDiv.textContent = 'ERROR: Please enter valid positive numeric values for Width, Height, or Diagonal.';
-                errorDiv.classList.remove('hidden');
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return null;
-            }
-            if (aspectRatioKey && !hasW && !hasH) {
-                 errorDiv.textContent = 'ERROR: If an Aspect Ratio is selected, please enter either a Desired Width or a Desired Height.';
-                errorDiv.classList.remove('hidden');
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return null;
-            }
-        } else {
-            // Diagonal mode: requires Diagonal value
-            if (isNaN(inputD) || inputD <= 0) {
-                errorDiv.textContent = 'ERROR: Please enter a valid positive Diagonal value.';
-                errorDiv.classList.remove('hidden');
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return null;
-            }
-        }
-        // --- END VALIDATION ---
-
         const details = LED_PRODUCTS[productKey];
         const cabinetW_mm = details.cabW_mm;
         const cabinetH_mm = details.cabH_mm;
@@ -469,7 +508,6 @@
         let usedW_input, usedH_input, usedRatio = aspectRatioKey || 'None Specified';
         
         if (unit === 'inches') {
-            // Diagonal mode: AR is optional. Fallback to 16:9 if not provided.
             const ratioToUse = aspectRatioKey || '16:9'; 
             const [ratioW, ratioH] = ratioToUse.split(':').map(Number);
             const ratioDiagonal = Math.sqrt(ratioW * ratioW + ratioH * ratioH);
@@ -480,59 +518,45 @@
 
             usedW_input = ratioW; 
             usedH_input = ratioH;
-            usedRatio = aspectRatioKey || '16:9 (Assumed)'; // Update summary text for fallback
+            usedRatio = aspectRatioKey || '16:9 (Assumed)'; 
 
         } else {
-            // Meters/Feet Mode
             const unit_factor = (unit === 'meters') ? MM_PER_METER : MM_PER_FOOT;
             const hasW = !isNaN(inputW) && inputW > 0;
             const hasH = !isNaN(inputH) && inputH > 0;
             
             if (aspectRatioKey) {
-                // Aspect Ratio is selected (Precedence logic: W > H)
                 const [ratioW, ratioH] = aspectRatioKey.split(':').map(Number);
-
                 if (hasW) {
-                    // Priority 1: Use Desired Width (inputW) and AR to determine Desired Height
                     usedW_input = inputW;
                     usedH_input = (inputW / ratioW) * ratioH;
                 } else if (hasH) {
-                    // Priority 2: Use Desired Height (inputH) and AR to determine Desired Width
                     usedH_input = inputH;
                     usedW_input = (inputH / ratioH) * ratioW;
                 } else {
-                    // This scenario should be caught by validation, but just in case, fall back to W/H if both are missing
                     usedW_input = inputW;
                     usedH_input = inputH;
                 }
                 
-                // Convert AR-matched dimension to mm
                 desiredW_mm = usedW_input * unit_factor;
                 desiredH_mm = usedH_input * unit_factor;
 
             } else {
-                // No Aspect Ratio selected: Use entered W and H
-                usedW_input = hasW ? inputW : (inputH * (cabinetW_mm / cabinetH_mm)); // Infer missing dimension from Cabinet AR if only one is given
+                usedW_input = hasW ? inputW : (inputH * (cabinetW_mm / cabinetH_mm)); 
                 usedH_input = hasH ? inputH : (inputW * (cabinetH_mm / cabinetW_mm));
 
                 desiredW_mm = usedW_input * unit_factor;
                 desiredH_mm = usedH_input * unit_factor;
                 
-                // If only one dimension was given, note that the other was inferred from cabinet ratio
                 if(hasW && !hasH) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
                 if(hasH && !hasW) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
             }
         }
 
-        // 3. Calculate cabinets needed (round to nearest integer - Core Logic for "Best Match")
-        // Math.round() ensures the closest cabinet count is selected.
-        let numCabW = Math.round(desiredW_mm / cabinetW_mm);
-        let numCabH = Math.round(desiredH_mm / cabinetH_mm);
+        // 3. Calculate cabinets needed (round to nearest integer)
+        let numCabW = Math.max(1, Math.round(desiredW_mm / cabinetW_mm));
+        let numCabH = Math.max(1, Math.round(desiredH_mm / cabinetH_mm));
         
-        // Ensure a minimum of 1 cabinet in each dimension
-        numCabW = Math.max(1, numCabW);
-        numCabH = Math.max(1, numCabH);
-
         const totalCabinets = numCabW * numCabH;
         const totalModules = totalCabinets * details.modulesPerCab;
 
@@ -553,35 +577,36 @@
         const finalDiagonal_in = finalDiagonal_mm / MM_PER_INCH;
         const finalArea_m2 = (finalW_mm / MM_PER_METER) * (finalH_mm / MM_PER_METER);
 
-        // 7. Calculate Power (WITH 20% BUFFER)
+        // 7. Calculate Power & Weight (WITH 20% BUFFER)
         const maxPower_W_buffered = (finalArea_m2 * details.maxPower_W_m2) * POWER_BUFFER; 
-        const maxCurrent_A = maxPower_W_buffered / 220; // Assuming 220V standard
-
-        // 8. Calculate Receiving Cards (Assumed 1 per cabinet)
-        const totalRecCards = totalCabinets;
-
-        // 9. Calculate Controller Requirements (Ports & Sending Cards)
-        const suggestedController = getSuggestedControllerModel(totalPixels);
-        
-        // Use Modal/Default values for Ports/Card
-        const sendCardPorts = finalCalculationData.sendCardPorts || MODULAR_CARD_DEFAULTS.SENDING_CARD_PORTS;
-        const pixelsPerSendPort = MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT; 
-
-        const requiredPorts = Math.ceil(totalPixels / pixelsPerSendPort); // Total physical Ethernet ports needed
-        const requiredSendCards = Math.ceil(requiredPorts / sendCardPorts);
-
-        // Apply controller name override if set in modal
-        const controllerName = finalCalculationData.controllerOverrideName || suggestedController.name;
-
-        // 10. Calculate Total Weight (WITH 20% BUFFER)
+        const maxCurrent_A = maxPower_W_buffered / 220;
         const totalCabinetWeight_unbuffered = details.weight_kg * totalCabinets;
         const totalWallWeight_buffered = totalCabinetWeight_unbuffered * WEIGHT_BUFFER;
 
-        // Store data
+        // 8. Calculate Controller Requirements (Ports & Sending Cards)
+        const suggestedController = getSuggestedControllerModel(totalPixels, finalResW, finalResH, productKey);
+        const isHSeries = suggestedController.type.includes("Modular");
+        
+        // Use Modal/Default values for Output Cards
+        const outputCardPorts = finalCalculationData.outputCardPorts || H_SERIES_DEFAULTS.OUTPUT_CARD_20_PORTS;
+        const outputCardModel = finalCalculationData.outputCardModel || H_SERIES_DEFAULTS.OUTPUT_CARD_20_MODEL;
+        const inputCardModel = finalCalculationData.inputCardModel || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_MODEL;
+        const inputCardQty = finalCalculationData.inputCardQty || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_QTY;
+        const splicerSolution = finalCalculationData.splicerSolution || (isHSeries ? H_SERIES_DEFAULTS.SPLICER_NAME : 'N/A');
+
+        // Total required ports based on standard pixel bandwidth
+        const requiredPorts = Math.max(1, Math.ceil(totalPixels / PIXELS_PER_PORT_DEFAULT)); 
+
+        // Calculate required sending cards based on the selected/default output card
+        const requiredSendCards = Math.max(1, Math.ceil(requiredPorts / outputCardPorts));
+
+        // Apply controller name override if set in modal
+        const controllerName = finalCalculationData.controllerOverrideName || suggestedController.name;
+        
+        // 9. Store data
         finalCalculationData = {
             ...finalCalculationData, // Preserve overrides
             productName: details.name,
-            unit: unit,
             numCabW: numCabW,
             numCabH: numCabH,
             finalW_mm: finalW_mm,
@@ -592,29 +617,24 @@
             aspectRatioText: aspectRatioText,
             finalDiagonal_in: finalDiagonal_in,
             pixelPitch_mm: details.pitch_mm,
-            cabinetW_mm: cabinetW_mm,
-            cabinetH_mm: cabinetH_mm,
-            cabPixW: details.cabPixW,
-            cabPixH: details.cabPixH,
             totalCabinets: totalCabinets,
             totalModules: totalModules,
-            totalRecCards: totalRecCards, // 1 per cabinet
+            totalRecCards: totalCabinets,
+            maxPower_W: maxPower_W_buffered,
+            maxCurrent_A: maxCurrent_A,
+            totalWallWeight_buffered: totalWallWeight_buffered,
+            nits_range: details.nits_range,
+            
+            // Controller/Card Details
             controllerName: controllerName,
             controllerType: suggestedController.type,
             requiredPorts: requiredPorts,
+            outputCardPorts: outputCardPorts,
+            outputCardModel: outputCardModel,
             requiredSendCards: requiredSendCards,
-            sendCardModel: finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL,
-            sendCardPorts: sendCardPorts,
-            maxPower_W: maxPower_W_buffered,
-            maxCurrent_A: maxCurrent_A,
-            finalArea_m2: finalArea_m2,
-            nits_range: details.nits_range,
-            totalWallWeight_buffered: totalWallWeight_buffered, // NEW buffered weight
-            // Input data for summary
-            usedW_input: usedW_input,
-            usedH_input: usedH_input,
-            inputRatioKey: usedRatio, // Use the determined ratio text
-            inputDiagonal: inputD
+            inputCardModel: inputCardModel,
+            inputCardQty: inputCardQty,
+            splicerSolution: splicerSolution
         };
 
         return finalCalculationData;
@@ -630,7 +650,7 @@
 
     function showVisualization(){
         const data = calculateLEDWall();
-        if (!data) return; // Stop if calculation failed/validation error occurred
+        if (!data) return; 
 
         const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
 
@@ -641,10 +661,8 @@
         if (data.unit === 'inches') {
             summaryText = `Desired AR: <strong>${data.inputRatioKey}</strong>, Diag: <strong>${data.inputDiagonal.toFixed(1)} ${unitSymbol}</strong>`;
         } else if (data.inputRatioKey && data.inputRatioKey !== 'None Specified') {
-            // Show AR-matched inputs used for cabinet calculation
             summaryText = `Input AR: <strong>${data.inputRatioKey}</strong>, **Used WxH:** <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         } else {
-            // Show original inputs or inferred dimensions
             summaryText = `Desired WxH: <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         }
 
@@ -659,8 +677,6 @@
         document.getElementById('visualization').classList.add('visible');
 
         // 3. Update Details Section (Column 1 - Wall Specs)
-        const totalWeightText = `${formatNumber(data.totalWallWeight_buffered, 1)} kg`;
-
         document.getElementById('productName').innerHTML = `Product Model: <strong>${data.productName}</strong>`;
         document.getElementById('pixelPitchDisplay').innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
         document.getElementById('cabinetSize').innerHTML = `Cabinet Size (WxH): <strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong>`;
@@ -672,41 +688,53 @@
         document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${data.finalArea_m2.toFixed(2)} m²</strong>`;
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
-        document.getElementById('cabinetWeight').innerHTML = `Est. Total Wall Weight (incl. buffer): <strong>${totalWeightText}</strong><small> (Calculated with ${WEIGHT_BUFFER*100}% structural buffer)</small>`;
         document.getElementById('brightness').innerHTML = `Brightness/Nits: <strong>${data.nits_range || 'N/A'} cd/m²</strong>`;
         
-        // 4. Update Details Section (Column 2 - Control System)
-        document.getElementById('requiredRecCards').innerHTML = `Total Receiving Cards Required: <strong>${data.totalRecCards}</strong><small> (Assumes 1 card per cabinet)</small>`;
-        document.getElementById('suggestedControllerModel').innerHTML = `Suggested Controller Model: <strong>${data.controllerName}</strong><small> (${data.controllerType})</small>`;
-        document.getElementById('controllerPorts').innerHTML = `Total Ethernet Ports Needed: <strong>${data.requiredPorts}</strong><small> (based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)</small>`;
-        document.getElementById('requiredSendCards').innerHTML = `Estimated Sending Cards: <strong>${data.requiredSendCards}</strong><small> (based on ${data.sendCardPorts} ports/card)</small>`;
-        document.getElementById('sendingCardModel').innerHTML = `Sending Card Model: <strong>${data.sendCardModel}</strong><small> (${data.sendCardPorts} ports)</small>`;
+        // 4. Update Details Section (Column 2 - Control System & Power)
+        const totalWeightText = `${formatNumber(data.totalWallWeight_buffered, 1)} kg`;
+        
+        // Power and Weight
+        document.getElementById('cabinetWeight').innerHTML = `Est. Total Wall Weight: <strong>${totalWeightText}</strong><small> (Calculated with ${WEIGHT_BUFFER*100}% structural buffer)</small>`;
         document.getElementById('wallPower').innerHTML = `Estimated Max Power: <strong>${formatNumber(data.maxPower_W, 0)} W</strong><small> (Incl. ${POWER_BUFFER*100}% buffer)</small>`;
         document.getElementById('wallCurrent').innerHTML = `Estimated Max Current: <strong>${data.maxCurrent_A.toFixed(2)} A</strong><small> (@220V)</small>`;
+
+        // Controllers
+        document.getElementById('suggestedControllerModel').innerHTML = `Suggested Controller Model: <strong>${data.controllerName}</strong><small> (${data.controllerType})</small>`;
+        document.getElementById('requiredRecCards').innerHTML = `Total Receiving Cards Required: <strong>${data.totalRecCards}</strong><small> (Assumes 1 card per cabinet)</small>`;
+        document.getElementById('controllerPorts').innerHTML = `Total Ethernet Ports Needed: <strong>${data.requiredPorts}</strong><small> (Based on ${formatLargeNumber(PIXELS_PER_PORT_DEFAULT)} pixels/port)</small>`;
+
+        // Modular Details (Show/Hide based on controller type)
+        const modularDetailsDiv = document.getElementById('modularDetails');
+        const isHSeries = data.controllerType.includes("Modular");
+        modularDetailsDiv.style.display = isHSeries ? 'grid' : 'none';
+
+        if (isHSeries) {
+            document.getElementById('splicerSolution').innerHTML = `Recommended Splicer Solution: <strong>${data.splicerSolution}</strong>`;
+            document.getElementById('sendingCardModel').innerHTML = `Output Card: <strong>${data.requiredSendCards} x ${data.outputCardModel}</strong><small> (${data.outputCardPorts} ports/card)</small>`;
+            document.getElementById('inputCardModel').innerHTML = `Input Card: <strong>${data.inputCardQty} x ${data.inputCardModel}</strong><small> (As per site requirement/number of inputs actual requirement)</small>`;
+        }
+
 
         // 5. Update Visualization Grid
         const aspectRatio = data.finalW_mm / data.finalH_mm;
         const visualizationHeight = 300; 
-        // Max width limit to 800px for smaller screens
-        const visualizationWidth = Math.min(800, visualizationHeight * aspectRatio); 
         const visGrid = document.getElementById('visGrid');
-        const cabinetOverlay = document.getElementById('cabinetOverlay');
-
-        // Adjust height if width exceeds max for better fit
+        
         if (visualizationHeight * aspectRatio > 800) {
              visGrid.style.width = `800px`;
              visGrid.style.height = `${800 / aspectRatio}px`;
         } else {
              visGrid.style.height = `${visualizationHeight}px`;
-             visGrid.style.width = `${visualizationWidth}px`;
+             visGrid.style.width = `${visualizationHeight * aspectRatio}px`;
         }
         
-        // Center the visualization
         visGrid.style.margin = '0 auto';
 
         document.getElementById('visWidthLabel').textContent = `${finalW_M.toFixed(2)} m (W)`;
         document.getElementById('visHeightLabel').textContent = `${finalH_M.toFixed(2)} m (H)`;
 
+        // Cabinet Overlay Visualization
+        const cabinetOverlay = document.getElementById('cabinetOverlay');
         cabinetOverlay.innerHTML = '';
         cabinetOverlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
         cabinetOverlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
@@ -732,7 +760,7 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation (For brevity, using simple text-based terms) ---
+    // --- PDF Generation ---
     function downloadPdf() {
         if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
             alert("Please calculate the LED wall configuration first.");
@@ -770,8 +798,7 @@
             ['Cabinet Dimensions (mm)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
             ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
             ['Total Cabinets Required', `${data.totalCabinets}`],
-            ['Total Modules Required', `${data.totalModules} (${data.modulesPerCab} per cabinet)`],
-            ['Est. Total Wall Weight', `${formatNumber(data.totalWallWeight_buffered, 1)} kg (Incl. ${WEIGHT_BUFFER*100}% structural buffer)`],
+            ['Total Modules Required', `${data.totalModules}`],
             ['Brightness', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'],
         ];
 
@@ -796,69 +823,54 @@
         doc.autoTable({ startY: y + 3, body: performanceData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
         y = doc.lastAutoTable.finalY + lineHeight;
 
-        // 4. Control System Details
+        // 4. Power and Weight (New Section)
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
-        doc.text('3. Control System & Power Requirements', margin, y);
+        doc.text('3. Power and Weight', margin, y);
+        y += lineHeight;
+
+        const powerWeightData = [
+            ['Est. Total Wall Weight', `${formatNumber(data.totalWallWeight_buffered, 1)} kg (Incl. ${WEIGHT_BUFFER*100}% structural buffer)`],
+            ['Max Power Consumption', `${formatNumber(data.maxPower_W, 0)} W (Incl. ${POWER_BUFFER*100}% buffer)`],
+            ['Max Current Draw (@220V)', `${data.maxCurrent_A.toFixed(2)} A`],
+        ];
+
+        doc.autoTable({ startY: y + 3, body: powerWeightData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'striped', styles: { fontSize: 9 } });
+        y = doc.lastAutoTable.finalY + lineHeight;
+        
+        // 5. Control System Details (New Section)
+        doc.setFontSize(14);
+        doc.setTextColor(...secondaryColor); 
+        doc.text('4. Control System Requirements', margin, y);
         y += lineHeight;
 
         const controllerData = [
             ['Suggested Controller Model', `${data.controllerName} (${data.controllerType})`],
             ['Total Receiving Cards', `${data.totalRecCards} (Assumes 1 per cabinet)`],
-            ['Total Ethernet Ports Required', `${data.requiredPorts} (Based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)`],
-            ['Estimated Sending Cards', `${data.requiredSendCards} (Using ${data.sendCardModel} @ ${data.sendCardPorts} ports/card)`],
-            ['Max Power Consumption', `${formatNumber(data.maxPower_W, 0)} W (Incl. ${POWER_BUFFER*100}% buffer)`],
-            ['Max Current Draw (@220V)', `${data.maxCurrent_A.toFixed(2)} A`],
+            ['Total Ethernet Ports Required', `${data.requiredPorts} (Based on ${formatLargeNumber(PIXELS_PER_PORT_DEFAULT)}/port)`],
         ];
+        
+        if (data.controllerType.includes("Modular")) {
+            controllerData.push(['Recommended Splicer Solution', data.splicerSolution]);
+            controllerData.push(['Output Card', `${data.requiredSendCards} x ${data.outputCardModel}`]);
+            controllerData.push(['Input Card', `${data.inputCardQty} x ${data.inputCardModel} (As per site requirement/number of inputs actual requirement)`]);
+        }
 
-        doc.autoTable({ startY: y + 3, body: controllerData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'striped', styles: { fontSize: 9 } });
+
+        doc.autoTable({ startY: y + 3, body: controllerData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
         y = doc.lastAutoTable.finalY + 8; 
 
-        // 5. Connection Diagram (Conceptual)
-        doc.setFontSize(10);
-        doc.setTextColor(0, 0, 0);
-        doc.text('Conceptual System Connection Flow:', margin, y);
-        y += 5;
+        // 6. Disclaimer
+        doc.setFontSize(8);
+        doc.setTextColor(100, 100, 100);
+        doc.text('Crucial Disclaimer: The suggested control components are a best-fit recommendation based on total pixel count and maximum resolution limits. Actual requirements for input cards and total controller capacity may vary based on site-specific video source needs and redundancy planning. The default input card model and quantity can be modified via the "Edit/View Components" button.', margin, y, { maxWidth: pageW - 2 * margin });
 
-        const boxW = 55;
-        const boxH = 8;
-        const gap = 15;
-        let x = margin + 5;
-        
-        // Draw Diagram Blocks
-        doc.setFillColor(240, 240, 240);
-        doc.rect(x, y, boxW, boxH, 'F');
-        doc.text('Video Source (PC/Player)', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
-        y += boxH;
-
-        // Arrow 1 (HDMI/DP Signal)
-        doc.setLineWidth(0.3);
-        doc.line(x + boxW/2, y, x + boxW/2, y + gap - 2);
-        doc.text('HDMI/DP Signal', x + boxW + 2, y + gap/2 + 2);
-        y += gap;
-
-        // Controller Block
-        doc.setFillColor(200, 220, 250);
-        doc.rect(x, y, boxW, boxH, 'F');
-        doc.text(`${data.controllerName} (${data.controllerType})`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
-        y += boxH;
-
-        // Arrow 2 (CAT6/Fiber)
-        doc.line(x + boxW/2, y, x + boxW/2, y + gap - 2);
-        doc.text('CAT6/Fiber Data (Ports: ' + data.requiredPorts + ')', x + boxW + 2, y + gap/2 + 2);
-        y += gap;
-
-        // LED Cabinet Block
-        doc.setFillColor(220, 250, 220);
-        doc.rect(x, y, boxW, boxH, 'F');
-        doc.text('PeopleLink LED Cabinets', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
-        y += boxH + 5;
-        
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}.pdf`);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
         toggleMeasurementFields();
+        populateModalInputCards(); // Initialize input card options
 
         // Close modal when clicking outside
         window.onclick = function(event) {
@@ -870,7 +882,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink _ Pramodh
+    © PeopleLink
 </footer>
 </body>
 </html>
