@@ -43,7 +43,7 @@
 
     /* Visualization/Output Container */
     .visualization { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); opacity: 0; max-height: 0; overflow-y: hidden; transition: opacity 0.6s ease-out, max-height 1s ease-out; margin-top: 30px; }
-    .visualization.visible { opacity: 1; max-height: 1500px; }
+    .visualization.visible { opacity: 1; max-height: 2000px; } /* Increased max-height */
     
     .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
     
@@ -100,7 +100,7 @@
               <optgroup label="COB Models (16:9 Cabinet - 600x337.5mm)">
                   <option value="cob_09">PeopleLink COB (0.9375mm)</option>
                   <option value="cob_125">PeopleLink COB (1.25mm)</option>
-                  <option value="cob_15">PeopleLink COB (1.5mm)</option>
+                  <option value="cob_15">PeopleLink COB (1.5625mm)</option>
               </optgroup>
               <optgroup label="SMD Indoor Models (4:3 Cabinet - 640x480mm)">
                   <option value="indoor_186">PeopleLink SMD Indoor (1.86mm)</option>
@@ -145,17 +145,10 @@
               <option value="16:9">16:9 (HD/UHD)</option> 
               <option value="16:10">16:10 (WUXGA)</option> 
               <option value="4:3">4:3 (Legacy)</option> 
+              <option value="2:1">2:1 (Cinematic)</option>
+              <option value="21:9">21:9 (Cinematic/2.37:1)</option>
               <option value="1:1">1:1 (Square)</option> 
           </select>
-        </div>
-
-        <div class="input-group">
-            <label for="recCardCapacity">Receiving Card Pixel Capacity</label>
-            <input type="number" id="recCardCapacity" placeholder="Max pixels per Rec. Card" value="524288" min="100000" step="1000">
-        </div>
-        <div class="input-group">
-            <label for="recCardModel">Receiving Card Model Name</label>
-            <input type="text" id="recCardModel" placeholder="e.g., RC-524K" value="RC-524K">
         </div>
 
         <button class="submit-btn" id="submitButton" onclick="showVisualization()">Calculate & Visualize System</button>
@@ -174,11 +167,14 @@
                 <span id="cabinetSize">Cabinet Size (WxH): <strong>--</strong></span>
                 <span id="cabinetPixels">Cabinet Pixels (WxH): <strong>--</strong></span>
                 <span id="numCabinets">Total Cabinets (WxH): <strong>--</strong></span>
-                <span id="finalDimensions">Actual Final Dimensions (WxH): <strong>--</strong></span>
+                <span id="totalModules">Total Modules Required: <strong>--</strong></span>
+                <span id="finalDimensions">**Actual Final Dimensions (WxH):** <strong>--</strong></span>
                 <span id="finalDiagonal">Final Diagonal Size: <strong>--</strong></span>
                 <span id="resolution">**Actual Final Resolution (WxH):** <strong>--</strong></span>
                 <span id="finalArea">Final Area: <strong>--</strong></span>
                 <span id="totalPixels">Total Pixels: <strong>--</strong></span>
+                <span id="cabinetWeight">Est. Total Cabinet Weight: <strong>--</strong></span>
+                <span id="brightness">Brightness/Nits: <strong>--</strong></span>
             </div>
         </div>
 
@@ -186,7 +182,6 @@
             <h4>Control System Requirements <button class="edit-btn" onclick="openControllerModal()">Edit/View Components ⚙️</button></h4>
             <div class="vis-details">
                 <span id="requiredRecCards">Total Receiving Cards Required: <strong>--</strong></span>
-                <span id="recCardUsed">Rec. Card Model Used: <strong>--</strong></span>
                 <span id="suggestedControllerModel">Suggested Controller Model: <strong>--</strong></span>
                 <span id="controllerPorts">Total Ethernet Ports Needed: <strong>--</strong></span>
                 <span id="requiredSendCards">Estimated Sending Cards: <strong>--</strong></span>
@@ -222,15 +217,6 @@
         </div>
         
         <div class="modal-input-group">
-            <label for="modalRecCardCapacity">Receiving Card Capacity (Pixels):</label>
-            <input type="number" id="modalRecCardCapacity" min="100000" step="1000">
-        </div>
-        <div class="modal-input-group">
-            <label for="modalRecCardModel">Receiving Card Model:</label>
-            <input type="text" id="modalRecCardModel">
-        </div>
-        
-        <div class="modal-input-group">
             <label for="modalControllerModel">Suggested Controller Model (Editable):</label>
             <input type="text" id="modalControllerModel">
         </div>
@@ -257,24 +243,22 @@
     const MM_PER_INCH = 25.4;
     const MM_PER_FOOT = MM_PER_INCH * 12;
     const PIXELS_PER_PORT_DEFAULT_MODULAR = 920000; // Standard for high-end modular controllers
-    const REC_CARD_CAPACITY_DEFAULT = 524288; // Common max for popular cards
-    const REC_CARD_MODEL_DEFAULT = "RC-524K";
     
     // --- PeopleLink LED Models (Updated Set) ---
     const LED_PRODUCTS = {
         // COB Models (16:9 Cabinet: 600mm x 337.5mm)
-        'cob_09': { name: "PeopleLink COB (0.9375mm)", pitch_mm: 0.9375, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 640, cabPixH: 360, maxPower_W_m2: 300, avgPower_W_m2: 100 },
-        'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, maxPower_W_m2: 300, avgPower_W_m2: 100 },
-        'cob_15': { name: "PeopleLink COB (1.5mm)", pitch_mm: 1.5, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 400, cabPixH: 225, maxPower_W_m2: 300, avgPower_W_m2: 100 },
+        'cob_09': { name: "PeopleLink COB (0.9375mm)", pitch_mm: 0.9375, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 640, cabPixH: 360, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-1000", maxPower_W_m2: 300 },
+        'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 },
+        'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, // Updated PITCH and RESOLUTION
         // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm)
-        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, maxPower_W_m2: 400, avgPower_W_m2: 130 },
-        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, maxPower_W_m2: 400, avgPower_W_m2: 130 },
-        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, maxPower_W_m2: 400, avgPower_W_m2: 130 },
+        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
+        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
+        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
         // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm)
-        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, maxPower_W_m2: 800, avgPower_W_m2: 250 },
-        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, maxPower_W_m2: 800, avgPower_W_m2: 250 },
-        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, maxPower_W_m2: 800, avgPower_W_m2: 250 },
-        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, maxPower_W_m2: 800, avgPower_W_m2: 250 }
+        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
+        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
+        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
+        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 } 
     };
 
     // --- Controller Tiers (Generic Naming) ---
@@ -299,21 +283,26 @@
     function formatNumber(n,d=1){return n.toLocaleString(undefined,{minimumFractionDigits:d,maximumFractionDigits:d});}
     function formatLargeNumber(n){if(n>=1e6)return(n/1e6).toFixed(2)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"K";return n.toLocaleString();}
     function gcd(a,b){return b===0?a:gcd(b,a%b);}
-    function getTimestamp(){const n=new Date();const d=n.toLocaleDateString();const t=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:!0});return`${d} ${t}`;}
-
+    
     // --- UI/Modal Functions ---
 
     function toggleMeasurementFields(){
-        const u=document.getElementById('unit').value;
-        const s=(u==='inches');
-        document.getElementById('width').classList.toggle('hidden',s);
-        document.getElementById('height').classList.toggle('hidden',s);
-        document.getElementById('widthLabel').classList.toggle('hidden',s);
-        document.getElementById('heightLabel').classList.toggle('hidden',s);
-        document.getElementById('diagonalGroup').classList.toggle('hidden',!s);
-        document.getElementById('aspectRatioGroup').classList.toggle('hidden',!s);
+        const unit = document.getElementById('unit').value;
+        const isDiagonal = (unit === 'inches');
+        const isFeet = (unit === 'feet');
 
-        if (s) {
+        // Dynamic Label Update
+        const unitText = isFeet ? '(ft)' : '(m)';
+        document.getElementById('widthLabel').textContent = `Desired Width ${unitText}`;
+        document.getElementById('heightLabel').textContent = `Desired Height ${unitText}`;
+
+        // Toggle visibility
+        document.getElementById('width').parentNode.classList.toggle('hidden', isDiagonal);
+        document.getElementById('height').parentNode.classList.toggle('hidden', isDiagonal);
+        document.getElementById('diagonalGroup').classList.toggle('hidden', !isDiagonal);
+        document.getElementById('aspectRatioGroup').classList.toggle('hidden', !isDiagonal);
+
+        if (isDiagonal) {
             document.getElementById('width').value = '';
             document.getElementById('height').value = '';
         } else {
@@ -325,8 +314,7 @@
 
     function openControllerModal() {
         // Load current calculated/stored values into the modal fields
-        document.getElementById('modalRecCardCapacity').value = finalCalculationData.recCardCapacity || document.getElementById('recCardCapacity').value;
-        document.getElementById('modalRecCardModel').value = finalCalculationData.recCardModel || document.getElementById('recCardModel').value;
+        // NOTE: Rec Card fields removed as requested
         document.getElementById('modalControllerModel').value = finalCalculationData.controllerName || document.getElementById('suggestedControllerModel').textContent.split('(')[0].trim();
         document.getElementById('modalSendCardModel').value = finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL;
         document.getElementById('modalSendCardPorts').value = finalCalculationData.sendCardPorts || MODULAR_CARD_DEFAULTS.SENDING_CARD_PORTS;
@@ -339,10 +327,7 @@
     }
 
     function applyModalChanges() {
-        // Update input field values from modal before calculating
-        document.getElementById('recCardCapacity').value = document.getElementById('modalRecCardCapacity').value;
-        document.getElementById('recCardModel').value = document.getElementById('modalRecCardModel').value;
-
+        // NOTE: Removed Rec Card updates as requested
         // Store controller/sending card overrides for use in the next calculation
         finalCalculationData.controllerOverrideName = document.getElementById('modalControllerModel').value;
         finalCalculationData.sendCardModel = document.getElementById('modalSendCardModel').value;
@@ -398,8 +383,6 @@
         let inputW = parseFloat(widthInput);
         let inputH = parseFloat(heightInput);
         let inputD = parseFloat(diagonalInput);
-        const recCardCapacity = parseFloat(document.getElementById('recCardCapacity').value || REC_CARD_CAPACITY_DEFAULT);
-        const recCardModel = document.getElementById('recCardModel').value || REC_CARD_MODEL_DEFAULT;
 
         const errorDiv=document.getElementById('errorMessage');
         errorDiv.classList.add('hidden');
@@ -455,6 +438,10 @@
         numCabW = Math.max(1, numCabW);
         numCabH = Math.max(1, numCabH);
 
+        const totalCabinets = numCabW * numCabH;
+        const totalModules = totalCabinets * details.modulesPerCab;
+
+
         // 4. Calculate Final Actual Dimensions (in mm)
         const finalW_mm = numCabW * cabinetW_mm;
         const finalH_mm = numCabH * cabinetH_mm;
@@ -475,11 +462,8 @@
         const maxPower_W = finalArea_m2 * details.maxPower_W_m2;
         const maxCurrent_A = maxPower_W / 220; // Assuming 220V standard
 
-        // 8. Calculate Receiving Cards
-        const cabinetPixels = details.cabPixW * details.cabPixH;
-        // Receving card quantity per cabinet: Calculated based on pixel capacity
-        const recCardsPerCabinet = Math.ceil(cabinetPixels / recCardCapacity); 
-        const totalRecCards = numCabW * numCabH * recCardsPerCabinet;
+        // 8. Calculate Receiving Cards (Assumed 1 per cabinet)
+        const totalRecCards = totalCabinets;
 
         // 9. Calculate Controller Requirements (Ports & Sending Cards)
         const suggestedController = getSuggestedControllerModel(totalPixels);
@@ -514,11 +498,9 @@
             cabinetH_mm: cabinetH_mm,
             cabPixW: details.cabPixW,
             cabPixH: details.cabPixH,
-            totalCabinets: numCabW * numCabH,
-            recCardCapacity: recCardCapacity,
-            recCardModel: recCardModel,
-            recCardsPerCabinet: recCardsPerCabinet,
-            totalRecCards: totalRecCards,
+            totalCabinets: totalCabinets,
+            totalModules: totalModules,
+            totalRecCards: totalRecCards, // 1 per cabinet
             controllerName: controllerName,
             controllerType: suggestedController.type,
             requiredPorts: requiredPorts,
@@ -527,7 +509,9 @@
             sendCardPorts: sendCardPorts,
             maxPower_W: maxPower_W,
             maxCurrent_A: maxCurrent_A,
-            finalArea_m2: finalArea_m2
+            finalArea_m2: finalArea_m2,
+            weight_kg: details.weight_kg,
+            nits_range: details.nits_range
         };
 
         return finalCalculationData;
@@ -552,9 +536,10 @@
         if (data.unit === 'inches') {
             summaryText = `Model: <strong>${data.productName}</strong>, Diag: <strong>${data.finalDiagonal_in.toFixed(1)}in</strong>`;
         } else {
+             const unitSymbol = data.unit === 'meters' ? 'm' : 'ft';
              const inputW_str = formatNumber(data.finalW_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
              const inputH_str = formatNumber(data.finalH_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
-             summaryText = `Model: <strong>${data.productName}</strong>, Final WxH: <strong>${inputW_str}x${inputH_str} ${data.unit.substring(0,1)}</strong>`;
+             summaryText = `Model: <strong>${data.productName}</strong>, Final WxH: <strong>${inputW_str}x${inputH_str} ${unitSymbol}</strong>`;
         }
 
         document.getElementById('enteredSummaryText').innerHTML = summaryText;
@@ -568,20 +553,24 @@
         document.getElementById('visualization').classList.add('visible');
 
         // 3. Update Details Section (Column 1 - Wall Specs)
+        const totalWeight = data.weight_kg ? ` / ${formatNumber(data.weight_kg * data.totalCabinets, 1)} kg` : '';
+
         document.getElementById('productName').innerHTML = `Product Model: <strong>${data.productName}</strong>`;
         document.getElementById('pixelPitchDisplay').innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
         document.getElementById('cabinetSize').innerHTML = `Cabinet Size (WxH): <strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong>`;
         document.getElementById('cabinetPixels').innerHTML = `Cabinet Pixels (WxH): <strong>${data.cabPixW} x ${data.cabPixH}</strong>`;
         document.getElementById('numCabinets').innerHTML = `Total Cabinets (WxH): <strong>${data.numCabW} x ${data.numCabH} = ${data.totalCabinets}</strong>`;
+        document.getElementById('totalModules').innerHTML = `Total Modules Required: <strong>${data.totalModules}</strong><small> (${data.modulesPerCab} per cabinet)</small>`;
         document.getElementById('finalDimensions').innerHTML = `**Actual Final Dimensions (WxH):** <strong>${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</strong><small> (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)</small>`;
         document.getElementById('finalDiagonal').innerHTML = `Final Diagonal Size: <strong>${data.finalDiagonal_in.toFixed(1)} in</strong>`;
         document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${data.finalArea_m2.toFixed(2)} m²</strong>`;
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
+        document.getElementById('cabinetWeight').innerHTML = `Est. Total Cabinet Weight: <strong>${data.totalCabinets} cabinets</strong><small>${totalWeight}</small>`;
+        document.getElementById('brightness').innerHTML = `Brightness/Nits: <strong>${data.nits_range || 'N/A'} cd/m²</strong>`;
         
         // 4. Update Details Section (Column 2 - Control System)
-        document.getElementById('requiredRecCards').innerHTML = `Total Receiving Cards Required: <strong>${data.totalRecCards}</strong><small> (${data.recCardsPerCabinet} per cabinet)</small>`;
-        document.getElementById('recCardUsed').innerHTML = `Rec. Card Model Used: <strong>${data.recCardModel}</strong><small> (${formatLargeNumber(data.recCardCapacity)} pixels max)</small>`;
+        document.getElementById('requiredRecCards').innerHTML = `Total Receiving Cards Required: <strong>${data.totalRecCards}</strong><small> (Assumes 1 card per cabinet)</small>`;
         document.getElementById('suggestedControllerModel').innerHTML = `Suggested Controller Model: <strong>${data.controllerName}</strong><small> (${data.controllerType})</small>`;
         document.getElementById('controllerPorts').innerHTML = `Total Ethernet Ports Needed: <strong>${data.requiredPorts}</strong><small> (based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)</small>`;
         document.getElementById('requiredSendCards').innerHTML = `Estimated Sending Cards: <strong>${data.requiredSendCards}</strong><small> (based on ${data.sendCardPorts} ports/card)</small>`;
@@ -592,12 +581,19 @@
         // 5. Update Visualization Grid
         const aspectRatio = data.finalW_mm / data.finalH_mm;
         const visualizationHeight = 300; 
-        const visualizationWidth = visualizationHeight * aspectRatio;
+        // Max width limit to 800px for smaller screens
+        const visualizationWidth = Math.min(800, visualizationHeight * aspectRatio); 
         const visGrid = document.getElementById('visGrid');
         const cabinetOverlay = document.getElementById('cabinetOverlay');
 
-        visGrid.style.height = `${visualizationHeight}px`;
-        visGrid.style.width = `min(100%, ${visualizationWidth}px)`;
+        // Adjust height if width exceeds max for better fit
+        if (visualizationHeight * aspectRatio > 800) {
+             visGrid.style.width = `800px`;
+             visGrid.style.height = `${800 / aspectRatio}px`;
+        } else {
+             visGrid.style.height = `${visualizationHeight}px`;
+             visGrid.style.width = `${visualizationWidth}px`;
+        }
 
         document.getElementById('visWidthLabel').textContent = `${finalW_M.toFixed(2)} m (W)`;
         document.getElementById('visHeightLabel').textContent = `${finalH_M.toFixed(2)} m (H)`;
@@ -656,43 +652,60 @@
         // 2. Specifications
         doc.setFontSize(14);
         doc.setTextColor(...primaryColor); 
-        doc.text('1. Screen & Pixel Specifications', margin, y);
+        doc.text('1. Screen & Cabinet Specifications', margin, y);
         y += lineHeight;
 
         const specsData = [
             ['Product Model', data.productName],
             ['Pixel Pitch (mm)', `${data.pixelPitch_mm} mm`],
-            ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
             ['Cabinet Dimensions (mm)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
-            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
-            ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
-            ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
-            ['Total Pixels', formatLargeNumber(data.totalPixels)],
-            ['Final Area', `${data.finalArea_m2.toFixed(2)} m²`],
+            ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
+            ['Total Cabinets Required', `${data.totalCabinets}`],
+            ['Total Modules Required', `${data.totalModules} (${data.modulesPerCab} per cabinet)`],
+            ['Est. Total Weight', data.weight_kg ? `${formatNumber(data.weight_kg * data.totalCabinets, 1)} kg` : 'N/A'],
+            ['Brightness', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'],
         ];
 
         doc.autoTable({ startY: y + 3, body: specsData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'striped', styles: { fontSize: 9 } });
         y = doc.lastAutoTable.finalY + lineHeight;
 
-        // 3. Control System Details
+        // 3. Wall Performance
+        doc.setFontSize(14);
+        doc.setTextColor(...primaryColor); 
+        doc.text('2. Wall Performance & Resolution', margin, y);
+        y += lineHeight;
+
+        const performanceData = [
+            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
+            ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
+            ['Aspect Ratio', data.aspectRatioText],
+            ['Total Pixels', formatLargeNumber(data.totalPixels)],
+            ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
+            ['Final Area', `${data.finalArea_m2.toFixed(2)} m²`],
+        ];
+
+        doc.autoTable({ startY: y + 3, body: performanceData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
+        y = doc.lastAutoTable.finalY + lineHeight;
+
+        // 4. Control System Details
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
-        doc.text('2. Control System & Power Requirements', margin, y);
+        doc.text('3. Control System & Power Requirements', margin, y);
         y += lineHeight;
 
         const controllerData = [
             ['Suggested Controller Model', `${data.controllerName} (${data.controllerType})`],
-            ['Total Receiving Cards', `${data.totalRecCards} (Using ${data.recCardModel} @ ${formatLargeNumber(data.recCardCapacity)} pixels)`],
+            ['Total Receiving Cards', `${data.totalRecCards} (Assumes 1 per cabinet)`],
             ['Total Ethernet Ports Required', `${data.requiredPorts} (Based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)`],
             ['Estimated Sending Cards', `${data.requiredSendCards} (Using ${data.sendCardModel} @ ${data.sendCardPorts} ports/card)`],
             ['Max Power Consumption', `${formatNumber(data.maxPower_W, 0)} W`],
             ['Max Current Draw (@220V)', `${data.maxCurrent_A.toFixed(2)} A`],
         ];
 
-        doc.autoTable({ startY: y + 3, body: controllerData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
+        doc.autoTable({ startY: y + 3, body: controllerData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'striped', styles: { fontSize: 9 } });
         y = doc.lastAutoTable.finalY + 8; 
 
-        // 4. Connection Diagram (Conceptual)
+        // 5. Connection Diagram (Conceptual)
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
         doc.text('Conceptual System Connection Flow:', margin, y);
@@ -751,8 +764,9 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
+  © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
 </footer>
 </body>
 </html>
+
 
