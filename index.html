@@ -43,7 +43,7 @@
 
     /* Visualization/Output Container */
     .visualization { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); opacity: 0; max-height: 0; overflow-y: hidden; transition: opacity 0.6s ease-out, max-height 1s ease-out; margin-top: 30px; }
-    .visualization.visible { opacity: 1; max-height: 2000px; } /* Increased max-height */
+    .visualization.visible { opacity: 1; max-height: 2000px; } 
     
     .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
     
@@ -89,7 +89,7 @@
       <h2>PeopleLink LED Video Wall Configuration</h2>
       <div id="enteredValuesDisplay" class="hidden">
           <span id="enteredSummaryText"></span><br>
-          Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
+          Actual Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
       </div>
       <div id="errorMessage" class="error-message hidden"></div>
 
@@ -97,6 +97,7 @@
         <div class="input-group">
           <label for="productModel">LED Model / Pixel Pitch</label>
           <select id="productModel">
+              <option value="">Select LED Model</option>
               <optgroup label="COB Models (16:9 Cabinet - 600x337.5mm)">
                   <option value="cob_09">PeopleLink COB (0.9375mm)</option>
                   <option value="cob_125">PeopleLink COB (1.25mm)</option>
@@ -125,11 +126,11 @@
           </select>
         </div>
         
-        <div class="input-group">
+        <div class="input-group" id="widthGroup">
           <label for="width" id="widthLabel">Desired Width (m)</label>
           <input type="number" id="width" placeholder="Enter desired width" min="0.1" step="0.01">
         </div>
-        <div class="input-group">
+        <div class="input-group" id="heightGroup">
           <label for="height" id="heightLabel">Desired Height (m)</label>
           <input type="number" id="height" placeholder="Enter desired height" min="0.1" step="0.01">
         </div>
@@ -138,10 +139,11 @@
           <label for="diagonal" id="diagonalLabel">Desired Diagonal (inches)</label>
           <input type="number" id="diagonal" placeholder="Enter desired diagonal inches" min="10" step="1">
         </div>
-        <div class="input-group hidden" id="aspectRatioGroup">
-          <label for="aspectRatio" id="aspectRatioLabel">Aspect Ratio</label>
+
+        <div class="input-group" id="aspectRatioGroup">
+          <label for="aspectRatio" id="aspectRatioLabel">Target Aspect Ratio (Optional)</label>
           <select id="aspectRatio"> 
-              <option value="">Select ratio</option> 
+              <option value="">Select ratio (Optional)</option> 
               <option value="16:9">16:9 (HD/UHD)</option> 
               <option value="16:10">16:10 (WUXGA)</option> 
               <option value="4:3">4:3 (Legacy)</option> 
@@ -151,7 +153,7 @@
           </select>
         </div>
 
-        <button class="submit-btn" id="submitButton" onclick="showVisualization()">Calculate & Visualize System</button>
+        <button class="submit-btn" id="submitButton" onclick="showVisualization">Calculate & Visualize System</button>
         <div class="back-btn-placeholder hidden"></div>
       </div>
     </div>
@@ -251,9 +253,9 @@
         'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 },
         'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, // Updated PITCH and RESOLUTION
         // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm)
-        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
-        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
-        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, // Updated Max Power
+        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
+        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
+        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
         // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm)
         'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
         'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
@@ -292,29 +294,37 @@
         const isFeet = (unit === 'feet');
 
         // Dynamic Label Update
-        const unitText = isFeet ? '(ft)' : '(m)';
-        document.getElementById('widthLabel').textContent = `Desired Width ${unitText}`;
-        document.getElementById('heightLabel').textContent = `Desired Height ${unitText}`;
+        let unitText = ' (m)';
+        if (isFeet) unitText = ' (ft)';
+        if (isDiagonal) unitText = ' (in)';
+
+        document.getElementById('widthLabel').textContent = `Desired Width${unitText}`;
+        document.getElementById('heightLabel').textContent = `Desired Height${unitText}`;
+        
+        const aspectRatioLabel = document.getElementById('aspectRatioLabel');
+        aspectRatioLabel.textContent = isDiagonal ? 'Target Aspect Ratio (Required)' : 'Target Aspect Ratio (Optional)';
 
         // Toggle visibility
-        document.getElementById('width').parentNode.classList.toggle('hidden', isDiagonal);
-        document.getElementById('height').parentNode.classList.toggle('hidden', isDiagonal);
+        document.getElementById('widthGroup').classList.toggle('hidden', isDiagonal);
+        document.getElementById('heightGroup').classList.toggle('hidden', isDiagonal);
         document.getElementById('diagonalGroup').classList.toggle('hidden', !isDiagonal);
-        document.getElementById('aspectRatioGroup').classList.toggle('hidden', !isDiagonal);
+        
+        // Aspect Ratio Group is always visible now, but positioned differently
+        // It's already in the grid layout, so just update the label
 
+        // Clear unused fields
         if (isDiagonal) {
             document.getElementById('width').value = '';
             document.getElementById('height').value = '';
         } else {
             document.getElementById('diagonal').value = '';
-            document.getElementById('aspectRatio').value = '';
+            // Don't clear aspectRatio, as it's optional now
         }
         document.getElementById('errorMessage').classList.add('hidden');
     }
 
     function openControllerModal() {
         // Load current calculated/stored values into the modal fields
-        // NOTE: Rec Card fields removed as requested
         document.getElementById('modalControllerModel').value = finalCalculationData.controllerName || document.getElementById('suggestedControllerModel').textContent.split('(')[0].trim();
         document.getElementById('modalSendCardModel').value = finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL;
         document.getElementById('modalSendCardPorts').value = finalCalculationData.sendCardPorts || MODULAR_CARD_DEFAULTS.SENDING_CARD_PORTS;
@@ -327,7 +337,6 @@
     }
 
     function applyModalChanges() {
-        // NOTE: Removed Rec Card updates as requested
         // Store controller/sending card overrides for use in the next calculation
         finalCalculationData.controllerOverrideName = document.getElementById('modalControllerModel').value;
         finalCalculationData.sendCardModel = document.getElementById('modalSendCardModel').value;
@@ -387,15 +396,21 @@
         const errorDiv=document.getElementById('errorMessage');
         errorDiv.classList.add('hidden');
         
-        if (!productKey || !unit) {
-            errorDiv.textContent = 'Please select an LED Model/Pitch and Unit.';
+        // Mandatory field validation
+        if (!productKey) {
+            errorDiv.textContent = 'Please select an LED Model/Pitch.';
+            errorDiv.classList.remove('hidden');
+            return null;
+        }
+        if (!unit) {
+            errorDiv.textContent = 'Please select a Unit of Measurement.';
             errorDiv.classList.remove('hidden');
             return null;
         }
 
         const isDiagonal = (unit === 'inches');
 
-        // Robust Input Validation
+        // Input Validation
         if (!isDiagonal) {
             if (isNaN(inputW) || isNaN(inputH) || inputW <= 0 || inputH <= 0) {
                 errorDiv.textContent = 'Please enter valid positive numeric values for Width and Height.';
@@ -403,8 +418,14 @@
                 return null;
             }
         } else {
-            if (isNaN(inputD) || !aspectRatioKey || inputD <= 0) {
-                errorDiv.textContent = 'Please enter a valid positive Diagonal and select an Aspect Ratio.';
+            // Diagonal mode requires Aspect Ratio
+            if (isNaN(inputD) || inputD <= 0) {
+                errorDiv.textContent = 'Please enter a valid positive Diagonal.';
+                errorDiv.classList.remove('hidden');
+                return null;
+            }
+            if (!aspectRatioKey) {
+                 errorDiv.textContent = 'Selecting an Aspect Ratio is required for Diagonal input.';
                 errorDiv.classList.remove('hidden');
                 return null;
             }
@@ -423,6 +444,7 @@
             desiredW_mm = inputW * MM_PER_FOOT;
             desiredH_mm = inputH * MM_PER_FOOT;
         } else if (unit === 'inches') {
+            // Aspect ratio is used to convert diagonal to W/H for desired dimensions
             const [ratioW, ratioH] = aspectRatioKey.split(':').map(Number);
             const ratioDiagonal = Math.sqrt(ratioW * ratioW + ratioH * ratioH);
             const factor = inputD / ratioDiagonal;
@@ -431,10 +453,12 @@
             desiredH_mm = ratioH * factor * MM_PER_INCH;
         }
 
-        // 3. Calculate cabinets needed (round up)
-        let numCabW = Math.ceil(desiredW_mm / cabinetW_mm);
-        let numCabH = Math.ceil(desiredH_mm / cabinetH_mm);
+        // 3. Calculate cabinets needed (round to nearest integer - CRUCIAL CHANGE)
+        // Math.round() ensures the closest cabinet count is selected.
+        let numCabW = Math.round(desiredW_mm / cabinetW_mm);
+        let numCabH = Math.round(desiredH_mm / cabinetH_mm);
         
+        // Ensure a minimum of 1 cabinet in each dimension
         numCabW = Math.max(1, numCabW);
         numCabH = Math.max(1, numCabH);
 
@@ -594,6 +618,9 @@
              visGrid.style.height = `${visualizationHeight}px`;
              visGrid.style.width = `${visualizationWidth}px`;
         }
+        
+        // Center the visualization
+        visGrid.style.margin = '0 auto';
 
         document.getElementById('visWidthLabel').textContent = `${finalW_M.toFixed(2)} m (W)`;
         document.getElementById('visHeightLabel').textContent = `${finalH_M.toFixed(2)} m (H)`;
@@ -749,9 +776,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Set PeopleLink SMD Indoor 2.5mm as the default selection.
-        document.getElementById('productModel').value = 'indoor_25';
-        document.getElementById('unit').value = 'meters';
+        // Removed default selections to enforce mandatory input
         toggleMeasurementFields();
 
         // Close modal when clicking outside
@@ -764,9 +789,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-  © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
+    © PeopleLink
 </footer>
 </body>
 </html>
-
-
