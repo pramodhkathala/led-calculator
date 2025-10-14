@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>PeopleLink Professional LED Configuration Calculator</title>
+  <title>PeopleLink LED Video Wall Configuration Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -51,10 +51,10 @@
 
     <label for="productModel">LED Model / Pixel Pitch</label>
     <select id="productModel">
-        <option value="smd_125">PeopleLink SMD (1.25mm) - Default</option>
-        <option value="viewsonicLDC091C">ViewSonic LDC027G-091C (0.9375mm)</option>
-        <option value="smd_154">PeopleLink/Generic SMD (1.54mm)</option>
-        <option value="smd_25">PeopleLink/Generic Outdoor (2.5mm)</option>
+        <option value="cob_09375">PeopleLink COB Fine Pitch (0.9375mm)</option>
+        <option value="smd_125">PeopleLink SMD Indoor (1.25mm) - Default</option>
+        <option value="smd_154">PeopleLink SMD Indoor (1.54mm)</option>
+        <option value="smd_25">PeopleLink SMD Outdoor (2.5mm)</option>
     </select>
     
     <label for="unit">Unit of Measurement</label>
@@ -108,9 +108,9 @@
       <span id="moduleSize">Module Size: <strong>--</strong></span>
       <span id="numModules">Total Modules (WxH): <strong>--</strong></span>
       <span id="finalArea">Final Area: <strong>--</strong></span>
-      <span id="requiredPorts">Required Sending Ports: <strong>--</strong></span>
-      <span id="suggestedController" data-controller-name="">Suggested Controller (Novastar/VNNox): <strong>--</strong></span>
-      <span id="vendorController">Vendor Control Box: <strong>--</strong></span>
+      <span id="requiredPorts">Required Data Ports: <strong>--</strong></span>
+      <span id="suggestedController" data-controller-name="">Suggested Controller: <strong>--</strong></span>
+      <span id="vendorController">Control Box Model: <strong>--</strong></span>
       <span id="downloadPdfLink" onclick="downloadPdf()">Download PDF Technical Summary 📄</span>
     </div>
 
@@ -123,12 +123,11 @@
     const MM_PER_INCH = 25.4;
     const MM_PER_FOOT = MM_PER_INCH * 12;
     const PIXELS_PER_SENDING_PORT = 650000; 
-    const SENDING_CARD_PORTS = 16;
-    const ALT_SENDING_CARD_PORTS = 20;
 
+    // --- PeopleLink LED Models (COB, SMD Indoor, SMD Outdoor) ---
     const LED_PRODUCTS = {
-        'viewsonicLDC091C': {
-            name: "ViewSonic LDC027G-091C (0.9375mm)",
+        'cob_09375': {
+            name: "PeopleLink COB Fine Pitch (0.9375mm)",
             pitch_mm: 0.9375,
             cabW_mm: 600,
             cabH_mm: 337.5,
@@ -138,10 +137,10 @@
             cabModH: 2, 
             cabPixW: 640, 
             cabPixH: 360, 
-            vendorController: "LD-SCB-024" 
+            vendorController: "PeopleLink SCB/Control Box" 
         },
         'smd_125': {
-            name: "PeopleLink SMD (1.25mm)",
+            name: "PeopleLink SMD Indoor (1.25mm)",
             pitch_mm: 1.25,
             cabW_mm: 640,
             cabH_mm: 480,
@@ -151,10 +150,10 @@
             cabModH: 3,
             cabPixW: 512,
             cabPixH: 384,
-            vendorController: "VNNox/Generic"
+            vendorController: "PeopleLink Control System"
         },
         'smd_154': {
-            name: "PeopleLink SMD (1.54mm)",
+            name: "PeopleLink SMD Indoor (1.54mm)",
             pitch_mm: 1.5385,
             cabW_mm: 640,
             cabH_mm: 480,
@@ -164,10 +163,10 @@
             cabModH: 3,
             cabPixW: 416,
             cabPixH: 312,
-            vendorController: "VNNox/Generic"
+            vendorController: "PeopleLink Control System"
         },
         'smd_25': {
-            name: "PeopleLink Outdoor (2.5mm)",
+            name: "PeopleLink SMD Outdoor (2.5mm)",
             pitch_mm: 2.5,
             cabW_mm: 960,
             cabH_mm: 960,
@@ -177,19 +176,17 @@
             cabModH: 6,
             cabPixW: 384,
             cabPixH: 384,
-            vendorController: "VNNox/Generic"
+            vendorController: "PeopleLink Control System"
         }
     };
 
+    // --- Generic Controller Tiers (Abstracted from Novastar/VNNox) ---
     const controllers=[
-        {name:"TB40",maxPixels:1300000,sendingPorts:2,outputCardSlots:0, isHSeries:!1,details:"2x Main Eth Outputs (1 Backup). Android OS."},
-        {name:"TB60",maxPixels:2300000,sendingPorts:4,outputCardSlots:0, isHSeries:!1,details:"4x Main Eth Outputs. Android OS."},
-        {name:"VX400 Pro",maxPixels:2600000,sendingPorts:4,outputCardSlots:0, isHSeries:!1,details:"4x Eth Outputs. Inputs: 3G-SDI, HDMI 1.3, DVI."},
-        {name:"VX600 Pro",maxPixels:3900000,sendingPorts:6,outputCardSlots:0, isHSeries:!1,details:"6x Eth Outputs. Inputs: 3G-SDI, HDMI 1.3, DVI. Layers: 1 Main + 2 PIP."},
-        {name:"VX1000 Pro",maxPixels:6500000,sendingPorts:10,outputCardSlots:0, isHSeries:!1,details:"10x Eth Outputs. Inputs: 3G-SDI, HDMI 1.4, DVI(HDMI 1.4). Layers: 1 Main + 2 PIP."},
-        {name:"4K-Prime",maxPixels:10000000,sendingPorts:16,outputCardSlots:0, isHSeries:!1,details:"16x Eth + 4x OPT Outputs. Inputs: DP 1.2, HDMI 2.0, DVI(4). DVI Mosaic. HDR. 10-bit."},
-        {name:"H2",maxPixels:26000000,sendingPorts:40,outputCardSlots:2, isHSeries:!0,details:"Modular (2U Rack). Max 2 Output cards."},
-        {name:"H5",maxPixels:39000000,sendingPorts:60,outputCardSlots:3, isHSeries:!0,details:"Modular (5U Rack). Max 3 Output cards."},
+        {name:"Tier 1: Basic Media Player (Up to 1.3M Pixels)",maxPixels:1300000},
+        {name:"Tier 2: Standard Controller (Up to 2.6M Pixels)",maxPixels:2600000},
+        {name:"Tier 3: High Capacity Controller (Up to 6.5M Pixels)",maxPixels:6500000},
+        {name:"Tier 4: Advanced 4K Controller (Up to 10M Pixels)",maxPixels:10000000},
+        {name:"Tier 5: Modular System (Up to 26M+ Pixels)",maxPixels:26000000},
     ].sort((a,b)=>a.maxPixels-b.maxPixels);
 
     const TERMS_AND_CONDITIONS=["Warranty 1 Year","Required Fiber or CAT6 Cables (as per the drawing) to be laid by Client or SI.","Required Uninterrupted Power Cables/Points/Distribution Box (as per the drawing) is in Client's or SI's Scope.","Scaffolding or Man Lift, if required at the site, will be under SI/Client's Scope","Any cladding(Covering of sides of the screen) if required will be under SI/Client’s Scope","Any integration of third-party product will be under Client's/SI's Scope","Rack for Controller under SI's Scope.","Require Flat Surface for Installation of LED Wall along with fabrication as per the design shared by our team.","Content for the above Configuration with respect to the Aspect Ratio and Resolution shall be under Client's/SI's Scope.","Mounting Structure and Enclosure will be charged extra as per Site Conditions/Scope of Work.","Installation & Configuration under Client/SI Scope.","Plywood of appropriate (15-18mm) dimension need to be placed on iron frame before placing/fixing the Cabinets, will be under Client's/SI's Scope"];
@@ -251,7 +248,7 @@
 
         const isDiagonal = (unit === 'inches');
 
-        // *** Functional Fix: Robust Input Validation ***
+        // Robust Input Validation
         if (!isDiagonal) {
             if (isNaN(inputW) || isNaN(inputH) || inputW <= 0 || inputH <= 0) {
                 errorDiv.textContent = 'Please enter valid positive numeric values for Width and Height.';
@@ -265,7 +262,6 @@
                 return null;
             }
         }
-        // *** End Functional Fix ***
 
         const details = LED_PRODUCTS[productKey];
         const cabinetW_mm = details.cabW_mm;
@@ -288,7 +284,7 @@
             desiredH_mm = ratioH * factor * MM_PER_INCH;
         }
 
-        // 3. Calculate cabinets needed (round up to ensure desired area is covered)
+        // 3. Calculate cabinets needed (round up)
         let numCabW = Math.ceil(desiredW_mm / cabinetW_mm);
         let numCabH = Math.ceil(desiredH_mm / cabinetH_mm);
         
@@ -314,7 +310,7 @@
         const reqPorts = Math.ceil(totalPixels / PIXELS_PER_SENDING_PORT);
         let suggestedController = controllers.find(c => c.maxPixels >= totalPixels);
         if (!suggestedController) {
-            suggestedController = { name: "None sufficient", maxPixels: Infinity, details: "Exceeds all listed Novastar/VNNox controller capabilities." };
+            suggestedController = { name: "Tier 5: Modular System (Exceeds 26M Pixels)", maxPixels: Infinity };
         }
 
         // Store data
@@ -339,7 +335,7 @@
             cabPixH: details.cabPixH,
             moduleW_mm: details.modW_mm,
             moduleH_mm: details.modH_mm,
-            vendorController: details.vendorController || "Not Specified (Use Novastar/VNNox)",
+            vendorController: details.vendorController,
             reqPorts: reqPorts,
             suggestedController: suggestedController,
             totalCabinets: numCabW * numCabH,
@@ -392,9 +388,9 @@
         document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong><small> (${data.cabPixW}x${data.cabPixH} pixels/cabinet)</small>`;
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${(finalW_M * finalH_M).toFixed(2)} m²</strong>`;
-        document.getElementById('requiredPorts').innerHTML = `Required Sending Ports: <strong>${data.reqPorts}</strong>`;
-        document.getElementById('suggestedController').innerHTML = `Suggested Controller (Novastar/VNNox): <strong>${data.suggestedController.name}</strong>`;
-        document.getElementById('vendorController').innerHTML = `Vendor Control Box: <strong>${data.vendorController}</strong>`;
+        document.getElementById('requiredPorts').innerHTML = `Required Data Ports (650k/Port): <strong>${data.reqPorts}</strong>`;
+        document.getElementById('suggestedController').innerHTML = `Suggested Controller Tier: <strong>${data.suggestedController.name}</strong>`;
+        document.getElementById('vendorController').innerHTML = `Control Box Model: <strong>${data.vendorController}</strong>`;
 
         // 4. Update Visualization Grid
         const aspectRatio = finalW_mm / finalH_mm;
@@ -499,13 +495,13 @@
         const controller = data.suggestedController;
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
-        doc.text('2. Control System and Connectivity (VNNox/Novastar)', margin, y);
+        doc.text('2. Control System and Connectivity', margin, y);
         y += lineHeight;
 
         const controllerData = [
-            ['Required Sending Ports (650k/Port)', `${data.reqPorts}`],
-            ['Suggested Controller', controller.name],
-            ['Vendor Control Box (if applicable)', data.vendorController],
+            ['Required Data Ports (650k/Port)', `${data.reqPorts}`],
+            ['Suggested Controller Tier', controller.name],
+            ['Control Box Model', data.vendorController],
         ];
 
         doc.autoTable({
@@ -546,7 +542,7 @@
         // Controller Block
         doc.setFillColor(200, 220, 250);
         doc.rect(x, y, boxW, boxH, 'F');
-        doc.text(`${controller.name} / ${data.vendorController}`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        doc.text(`${controller.name.split(':')[0]} / ${data.vendorController}`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
         y += boxH;
 
         // Arrow 2 (CAT6/Fiber)
@@ -557,12 +553,12 @@
         // LED Cabinet Block
         doc.setFillColor(220, 250, 220);
         doc.rect(x, y, boxW, boxH, 'F');
-        doc.text('LED Cabinets (Video Wall)', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        doc.text('PeopleLink LED Cabinets', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
         y += boxH + 5;
         
         doc.setFontSize(8);
         doc.setTextColor(77, 77, 77);
-        let flowText = doc.splitTextToSize("The video signal flows from the source through the controller and daisy-chains via CAT6/Fiber optic cables between the LED cabinets. Power distribution is managed separately via Power Boxes.", pageW - margin * 2);
+        let flowText = doc.splitTextToSize("The video signal flows from the source through the control system and daisy-chains via CAT6/Fiber optic cables between the LED cabinets. Power distribution is managed separately via Power Boxes.", pageW - margin * 2);
         doc.text(flowText, margin, y);
         y += flowText.length * 4.5 + 5;
 
