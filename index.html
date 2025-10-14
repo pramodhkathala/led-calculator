@@ -35,9 +35,20 @@
     .back-btn { background-color: #6c757d; margin-top: 30px; }
     .back-btn:hover { background-color: #5a6268; }
     
-    /* Error/Summary Display */
+    /* Error/Summary Display - ENHANCED VISIBILITY */
     .hidden { display: none !important; }
-    .error-message { color: #B71C1C; font-weight: bold; text-align: center; margin-top: 15px; padding: 10px; min-height: 20px; background: #ffebee; border-radius: 6px; }
+    .error-message { 
+        color: #B71C1C; 
+        font-weight: bold; 
+        text-align: center; 
+        margin-top: 15px; 
+        padding: 15px; 
+        min-height: 20px; 
+        background: #ffebee; 
+        border: 2px solid #B71C1C; /* Added border for prominence */
+        border-radius: 8px; 
+        transition: all 0.3s ease;
+    }
     #enteredValuesDisplay { text-align: center; font-size: 0.95em; color: #444; margin-bottom: 15px; line-height: 1.4; display: none; }
     .input-panel.minimized #enteredValuesDisplay { display: block !important; opacity: 1; transition: opacity 0.3s ease-out 0.3s; }
 
@@ -89,7 +100,7 @@
       <h2>PeopleLink LED Video Wall Configuration</h2>
       <div id="enteredValuesDisplay" class="hidden">
           <span id="enteredSummaryText"></span><br>
-          Actual Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
+          Actual Final Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
       </div>
       <div id="errorMessage" class="error-message hidden"></div>
 
@@ -141,7 +152,7 @@
         </div>
 
         <div class="input-group" id="aspectRatioGroup">
-          <label for="aspectRatio" id="aspectRatioLabel">Target Aspect Ratio (Optional)</label>
+          <label for="aspectRatio" id="aspectRatioLabel">Target Aspect Ratio (Optional for W/H)</label>
           <select id="aspectRatio"> 
               <option value="">Select ratio (Optional)</option> 
               <option value="16:9">16:9 (HD/UHD)</option> 
@@ -153,7 +164,7 @@
           </select>
         </div>
 
-        <button class="submit-btn" id="submitButton" onclick="showVisualization">Calculate & Visualize System</button>
+        <button class="submit-btn" id="submitButton" onclick="showVisualization()">Calculate & Visualize System</button>
         <div class="back-btn-placeholder hidden"></div>
       </div>
     </div>
@@ -253,14 +264,14 @@
         'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 },
         'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, // Updated PITCH and RESOLUTION
         // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm)
-        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
-        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
-        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, nits_range: "450", modulePower_W: 20, maxPower_W_m2: 390 }, 
+        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
+        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
+        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
         // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm)
-        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
-        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
-        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 }, 
-        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, modulePower_W: 40, maxPower_W_m2: 800 } 
+        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
+        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
+        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
+        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 } 
     };
 
     // --- Controller Tiers (Generic Naming) ---
@@ -272,7 +283,7 @@
         { name: "Modular Controller System (MCS-4)", maxPixels: 36800000, maxPorts: 40, type: "Modular Controller System" }
     ].sort((a, b) => a.maxPixels - b.maxPixels);
 
-    // --- Modular Card Defaults ---
+    // --- Modular Card Defaults (Used for port calculation) ---
     const MODULAR_CARD_DEFAULTS = {
         SENDING_CARD_MODEL: "Sending Card - MC9.2M", 
         SENDING_CARD_PORTS: 10,       
@@ -302,30 +313,26 @@
         document.getElementById('heightLabel').textContent = `Desired Height${unitText}`;
         
         const aspectRatioLabel = document.getElementById('aspectRatioLabel');
-        aspectRatioLabel.textContent = isDiagonal ? 'Target Aspect Ratio (Required)' : 'Target Aspect Ratio (Optional)';
+        aspectRatioLabel.textContent = isDiagonal ? 'Target Aspect Ratio (Required)' : 'Target Aspect Ratio (Optional for W/H)';
 
         // Toggle visibility
         document.getElementById('widthGroup').classList.toggle('hidden', isDiagonal);
         document.getElementById('heightGroup').classList.toggle('hidden', isDiagonal);
         document.getElementById('diagonalGroup').classList.toggle('hidden', !isDiagonal);
         
-        // Aspect Ratio Group is always visible now, but positioned differently
-        // It's already in the grid layout, so just update the label
-
         // Clear unused fields
         if (isDiagonal) {
             document.getElementById('width').value = '';
             document.getElementById('height').value = '';
         } else {
             document.getElementById('diagonal').value = '';
-            // Don't clear aspectRatio, as it's optional now
         }
         document.getElementById('errorMessage').classList.add('hidden');
     }
 
     function openControllerModal() {
         // Load current calculated/stored values into the modal fields
-        document.getElementById('modalControllerModel').value = finalCalculationData.controllerName || document.getElementById('suggestedControllerModel').textContent.split('(')[0].trim();
+        document.getElementById('modalControllerModel').value = finalCalculationData.controllerOverrideName || document.getElementById('suggestedControllerModel').textContent.split('(')[0].trim();
         document.getElementById('modalSendCardModel').value = finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL;
         document.getElementById('modalSendCardPorts').value = finalCalculationData.sendCardPorts || MODULAR_CARD_DEFAULTS.SENDING_CARD_PORTS;
 
@@ -396,64 +403,111 @@
         const errorDiv=document.getElementById('errorMessage');
         errorDiv.classList.add('hidden');
         
-        // Mandatory field validation
+        // --- MANDATORY FIELD VALIDATION (WITH SCROLL FIX) ---
         if (!productKey) {
-            errorDiv.textContent = 'Please select an LED Model/Pitch.';
+            errorDiv.textContent = 'ERROR: Please select an LED Model/Pitch to continue.';
             errorDiv.classList.remove('hidden');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return null;
         }
         if (!unit) {
-            errorDiv.textContent = 'Please select a Unit of Measurement.';
+            errorDiv.textContent = 'ERROR: Please select a Unit of Measurement to continue.';
             errorDiv.classList.remove('hidden');
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
             return null;
         }
 
         const isDiagonal = (unit === 'inches');
 
-        // Input Validation
+        // Input Validation based on mode
         if (!isDiagonal) {
-            if (isNaN(inputW) || isNaN(inputH) || inputW <= 0 || inputH <= 0) {
-                errorDiv.textContent = 'Please enter valid positive numeric values for Width and Height.';
+            const hasW = !isNaN(inputW) && inputW > 0;
+            const hasH = !isNaN(inputH) && inputH > 0;
+            
+            if (!aspectRatioKey && (!hasW || !hasH)) {
+                errorDiv.textContent = 'ERROR: Please enter valid positive numeric values for BOTH Width and Height, or select an Aspect Ratio.';
                 errorDiv.classList.remove('hidden');
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return null;
+            }
+            if (aspectRatioKey && !hasW && !hasH) {
+                 errorDiv.textContent = 'ERROR: If an Aspect Ratio is selected, please enter either a Desired Width or a Desired Height.';
+                errorDiv.classList.remove('hidden');
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return null;
             }
         } else {
             // Diagonal mode requires Aspect Ratio
             if (isNaN(inputD) || inputD <= 0) {
-                errorDiv.textContent = 'Please enter a valid positive Diagonal.';
+                errorDiv.textContent = 'ERROR: Please enter a valid positive Diagonal.';
                 errorDiv.classList.remove('hidden');
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return null;
             }
             if (!aspectRatioKey) {
-                 errorDiv.textContent = 'Selecting an Aspect Ratio is required for Diagonal input.';
+                 errorDiv.textContent = 'ERROR: Selecting an Aspect Ratio is required for Diagonal input.';
                 errorDiv.classList.remove('hidden');
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return null;
             }
         }
+        // --- END VALIDATION ---
 
         const details = LED_PRODUCTS[productKey];
         const cabinetW_mm = details.cabW_mm;
         const cabinetH_mm = details.cabH_mm;
         
-        // 2. Convert input to millimeters (Desired dimensions)
+        // 2. Determine Desired Dimensions (W/H in mm) based on input and AR
         let desiredW_mm, desiredH_mm;
-        if (unit === 'meters') {
-            desiredW_mm = inputW * MM_PER_METER;
-            desiredH_mm = inputH * MM_PER_METER;
-        } else if (unit === 'feet') {
-            desiredW_mm = inputW * MM_PER_FOOT;
-            desiredH_mm = inputH * MM_PER_FOOT;
-        } else if (unit === 'inches') {
-            // Aspect ratio is used to convert diagonal to W/H for desired dimensions
+        let usedW_input, usedH_input;
+        
+        if (unit === 'inches') {
+            // Diagonal mode: AR is mandatory, calculates W/H
             const [ratioW, ratioH] = aspectRatioKey.split(':').map(Number);
             const ratioDiagonal = Math.sqrt(ratioW * ratioW + ratioH * ratioH);
             const factor = inputD / ratioDiagonal;
 
             desiredW_mm = ratioW * factor * MM_PER_INCH;
             desiredH_mm = ratioH * factor * MM_PER_INCH;
+
+            usedW_input = ratioW; // Store ratio parts for summary, will be updated to actual dimensions later
+            usedH_input = ratioH;
+
+        } else {
+            // Meters/Feet Mode
+            const unit_factor = (unit === 'meters') ? MM_PER_METER : MM_PER_FOOT;
+            const hasW = !isNaN(inputW) && inputW > 0;
+            const hasH = !isNaN(inputH) && inputH > 0;
+            
+            if (aspectRatioKey) {
+                // Aspect Ratio is selected (Precedence logic: W > H)
+                const [ratioW, ratioH] = aspectRatioKey.split(':').map(Number);
+
+                if (hasW) {
+                    // Priority 1: Use Desired Width (inputW) and AR to determine Desired Height
+                    usedW_input = inputW;
+                    usedH_input = (inputW / ratioW) * ratioH;
+                } else if (hasH) {
+                    // Priority 2: Use Desired Height (inputH) and AR to determine Desired Width
+                    usedH_input = inputH;
+                    usedW_input = (inputH / ratioH) * ratioW;
+                }
+                
+                // Convert AR-matched dimension to mm
+                desiredW_mm = usedW_input * unit_factor;
+                desiredH_mm = usedH_input * unit_factor;
+
+            } else {
+                // No Aspect Ratio selected: Use entered W and H
+                usedW_input = inputW;
+                usedH_input = inputH;
+
+                desiredW_mm = inputW * unit_factor;
+                desiredH_mm = inputH * unit_factor;
+            }
         }
 
-        // 3. Calculate cabinets needed (round to nearest integer - CRUCIAL CHANGE)
+        // 3. Calculate cabinets needed (round to nearest integer - Core Logic for "Best Match")
         // Math.round() ensures the closest cabinet count is selected.
         let numCabW = Math.round(desiredW_mm / cabinetW_mm);
         let numCabH = Math.round(desiredH_mm / cabinetH_mm);
@@ -535,7 +589,12 @@
             maxCurrent_A: maxCurrent_A,
             finalArea_m2: finalArea_m2,
             weight_kg: details.weight_kg,
-            nits_range: details.nits_range
+            nits_range: details.nits_range,
+            // Input data for summary
+            usedW_input: usedW_input,
+            usedH_input: usedH_input,
+            inputRatioKey: aspectRatioKey,
+            inputDiagonal: inputD
         };
 
         return finalCalculationData;
@@ -551,22 +610,25 @@
 
     function showVisualization(){
         const data = calculateLEDWall();
-        if (!data) return;
+        if (!data) return; // Stop if calculation failed/validation error occurred
 
         const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
 
         // 1. Update Input Summary Display
         let summaryText;
+        const unitSymbol = data.unit === 'meters' ? 'm' : (data.unit === 'feet' ? 'ft' : 'in');
+
         if (data.unit === 'inches') {
-            summaryText = `Model: <strong>${data.productName}</strong>, Diag: <strong>${data.finalDiagonal_in.toFixed(1)}in</strong>`;
+            summaryText = `Desired AR: <strong>${data.inputRatioKey}</strong>, Diag: <strong>${data.inputDiagonal.toFixed(1)} ${unitSymbol}</strong>`;
+        } else if (data.inputRatioKey) {
+            // Show AR-matched inputs used for cabinet calculation
+            summaryText = `Desired AR: <strong>${data.inputRatioKey}</strong>, **Used WxH:** <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         } else {
-             const unitSymbol = data.unit === 'meters' ? 'm' : 'ft';
-             const inputW_str = formatNumber(data.finalW_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
-             const inputH_str = formatNumber(data.finalH_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
-             summaryText = `Model: <strong>${data.productName}</strong>, Final WxH: <strong>${inputW_str}x${inputH_str} ${unitSymbol}</strong>`;
+            // Show original inputs
+            summaryText = `Desired WxH: <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         }
 
-        document.getElementById('enteredSummaryText').innerHTML = summaryText;
+        document.getElementById('enteredSummaryText').innerHTML = `Model: <strong>${data.productName}</strong>. ${summaryText}`;
         document.getElementById('aspectRatioValue').textContent = data.aspectRatioText;
         document.getElementById('enteredValuesDisplay').classList.remove('hidden');
 
@@ -789,9 +851,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink - Pramodh
+    © PeopleLink
 </footer>
 </body>
 </html>
-
-
