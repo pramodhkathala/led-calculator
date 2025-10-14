@@ -52,9 +52,10 @@
     <label for="productModel">LED Model / Pixel Pitch</label>
     <select id="productModel">
         <option value="cob_09375">PeopleLink COB Fine Pitch (0.9375mm)</option>
-        <option value="smd_125">PeopleLink SMD Indoor (1.25mm) - Default</option>
+        <option value="smd_125">PeopleLink SMD Indoor (1.25mm)</option>
         <option value="smd_154">PeopleLink SMD Indoor (1.54mm)</option>
-        <option value="smd_25">PeopleLink SMD Outdoor (2.5mm)</option>
+        <option value="smd_25_640x480">PeopleLink SMD Outdoor (2.5mm) - Default</option>
+        <option value="smd_30_960x960">PeopleLink SMD Outdoor (3.0mm)</option>
     </select>
     
     <label for="unit">Unit of Measurement</label>
@@ -105,8 +106,6 @@
       <span id="finalDiagonal">Final Diagonal Size: <strong>--</strong></span>
       <span id="resolution">Actual Final Resolution (WxH): <strong>--</strong></span>
       <span id="totalPixels">Total Pixels: <strong>--</strong></span>
-      <span id="moduleSize">Module Size: <strong>--</strong></span>
-      <span id="numModules">Total Modules (WxH): <strong>--</strong></span>
       <span id="finalArea">Final Area: <strong>--</strong></span>
       <span id="requiredPorts">Required Data Ports: <strong>--</strong></span>
       <span id="suggestedController" data-controller-name="">Suggested Controller: <strong>--</strong></span>
@@ -131,10 +130,6 @@
             pitch_mm: 0.9375,
             cabW_mm: 600,
             cabH_mm: 337.5,
-            modW_mm: 150,
-            modH_mm: 168.75,
-            cabModW: 4, 
-            cabModH: 2, 
             cabPixW: 640, 
             cabPixH: 360, 
             vendorController: "PeopleLink SCB/Control Box" 
@@ -144,10 +139,6 @@
             pitch_mm: 1.25,
             cabW_mm: 640,
             cabH_mm: 480,
-            modW_mm: 320,
-            modH_mm: 160,
-            cabModW: 2,
-            cabModH: 3,
             cabPixW: 512,
             cabPixH: 384,
             vendorController: "PeopleLink Control System"
@@ -157,30 +148,31 @@
             pitch_mm: 1.5385,
             cabW_mm: 640,
             cabH_mm: 480,
-            modW_mm: 320,
-            modH_mm: 160,
-            cabModW: 2,
-            cabModH: 3,
             cabPixW: 416,
             cabPixH: 312,
             vendorController: "PeopleLink Control System"
         },
-        'smd_25': {
+        'smd_25_640x480': { // Matches the uploaded PDF's characteristics
             name: "PeopleLink SMD Outdoor (2.5mm)",
             pitch_mm: 2.5,
+            cabW_mm: 640,
+            cabH_mm: 480,
+            cabPixW: 256, 
+            cabPixH: 192, 
+            vendorController: "PeopleLink Control System"
+        },
+        'smd_30_960x960': { // Generic large outdoor model
+            name: "PeopleLink SMD Outdoor (3.0mm)",
+            pitch_mm: 3.0,
             cabW_mm: 960,
             cabH_mm: 960,
-            modW_mm: 320,
-            modH_mm: 160,
-            cabModW: 3,
-            cabModH: 6,
-            cabPixW: 384,
-            cabPixH: 384,
+            cabPixW: 320,
+            cabPixH: 320,
             vendorController: "PeopleLink Control System"
         }
     };
 
-    // --- Generic Controller Tiers (Abstracted from Novastar/VNNox) ---
+    // --- Generic Controller Tiers ---
     const controllers=[
         {name:"Tier 1: Basic Media Player (Up to 1.3M Pixels)",maxPixels:1300000},
         {name:"Tier 2: Standard Controller (Up to 2.6M Pixels)",maxPixels:2600000},
@@ -189,8 +181,19 @@
         {name:"Tier 5: Modular System (Up to 26M+ Pixels)",maxPixels:26000000},
     ].sort((a,b)=>a.maxPixels-b.maxPixels);
 
-    const TERMS_AND_CONDITIONS=["Warranty 1 Year","Required Fiber or CAT6 Cables (as per the drawing) to be laid by Client or SI.","Required Uninterrupted Power Cables/Points/Distribution Box (as per the drawing) is in Client's or SI's Scope.","Scaffolding or Man Lift, if required at the site, will be under SI/Client's Scope","Any cladding(Covering of sides of the screen) if required will be under SI/Client’s Scope","Any integration of third-party product will be under Client's/SI's Scope","Rack for Controller under SI's Scope.","Require Flat Surface for Installation of LED Wall along with fabrication as per the design shared by our team.","Content for the above Configuration with respect to the Aspect Ratio and Resolution shall be under Client's/SI's Scope.","Mounting Structure and Enclosure will be charged extra as per Site Conditions/Scope of Work.","Installation & Configuration under Client/SI Scope.","Plywood of appropriate (15-18mm) dimension need to be placed on iron frame before placing/fixing the Cabinets, will be under Client's/SI's Scope"];
-
+    // --- Standard Terms & Conditions ---
+    const TERMS_AND_CONDITIONS=[
+        "Warranty is 1 year unless specified otherwise in the final quotation.",
+        "Signal and Power Cabling (Fiber/CAT6/Mains) must be supplied and installed by the client or SI, according to the final connection diagram.",
+        "Power distribution infrastructure (e.g., dedicated circuits, distribution box, UPS) is in the client's scope.",
+        "Any required lifting equipment (Scaffolding, Man-lifts, etc.) for installation is in the SI/Client's scope.",
+        "Cosmetic finishes, such as side cladding or enclosure fabrication, are considered external scope.",
+        "Any third-party device integration with the LED system is the responsibility of the SI/Client.",
+        "The final LED mounting structure requires a flat, robust surface, and fabrication is subject to specific design shared by PeopleLink team.",
+        "Content creation, resolution scaling, and aspect ratio matching for the video wall are under the Client's/SI's scope.",
+        "Mounting Structure and Enclosure costs are excluded unless explicitly itemized in the final quote.",
+        "Installation, initial configuration, and setup are considered separate line items or under Client/SI scope unless specified.",
+    ];
 
     // --- Global Store and Helpers ---
     let finalCalculationData = {}; 
@@ -333,13 +336,10 @@
             cabinetH_mm: cabinetH_mm,
             cabPixW: details.cabPixW,
             cabPixH: details.cabPixH,
-            moduleW_mm: details.modW_mm,
-            moduleH_mm: details.modH_mm,
             vendorController: details.vendorController,
             reqPorts: reqPorts,
             suggestedController: suggestedController,
             totalCabinets: numCabW * numCabH,
-            totalModules: (numCabW * details.cabModW) * (numCabH * details.cabModH)
         };
     }
 
@@ -393,7 +393,7 @@
         document.getElementById('vendorController').innerHTML = `Control Box Model: <strong>${data.vendorController}</strong>`;
 
         // 4. Update Visualization Grid
-        const aspectRatio = finalW_mm / finalH_mm;
+        const aspectRatio = data.finalW_mm / data.finalH_mm;
         const visualizationHeight = 300; 
         const visualizationWidth = visualizationHeight * aspectRatio;
         const visGrid = document.getElementById('visGrid');
@@ -438,7 +438,7 @@
         }
 
         const data = finalCalculationData;
-        const { finalW_M, finalH_M } = calculateDimensions(data);
+        const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4'); 
@@ -462,10 +462,11 @@
         doc.line(margin, y, pageW - margin, y);
         y += lineHeight * 0.75;
 
+
         // 2. Final LED Wall Specifications (Technical Output)
         doc.setFontSize(14);
         doc.setTextColor(...primaryColor); 
-        doc.text('1. Final Physical & Pixel Specifications', margin, y);
+        doc.text('1. Screen & Pixel Specifications', margin, y);
         y += lineHeight;
 
         const specsData = [
@@ -473,11 +474,12 @@
             ['Pixel Pitch (mm)', `${data.pixelPitch_mm} mm`],
             ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
             ['Total Cabinets Required', data.totalCabinets],
-            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
+            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)`],
             ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
             ['Final Aspect Ratio', data.aspectRatioText],
             ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
             ['Total Pixels', formatLargeNumber(data.totalPixels)],
+            ['Final Area', `${(finalW_M * finalH_M).toFixed(2)} m²`],
         ];
 
         doc.autoTable({
@@ -491,16 +493,16 @@
         });
         y = doc.lastAutoTable.finalY + lineHeight;
 
-        // 3. Controller Recommendation and Connection Diagram
+        // 3. Control System and Connection Diagram
         const controller = data.suggestedController;
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
-        doc.text('2. Control System and Connectivity', margin, y);
+        doc.text('2. Control System & Connection Diagram', margin, y);
         y += lineHeight;
 
         const controllerData = [
             ['Required Data Ports (650k/Port)', `${data.reqPorts}`],
-            ['Suggested Controller Tier', controller.name],
+            ['Suggested Controller Tier', controller.name.split(':')[0]],
             ['Control Box Model', data.vendorController],
         ];
 
@@ -512,14 +514,12 @@
             styles: { fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
             columnStyles: { 0: { fontStyle: 'normal', textColor: [0, 0, 0] } }
         });
-        y = doc.lastAutoTable.finalY + 3;
-        
-        // Connection Diagram (Conceptual)
-        y += lineHeight;
+        y = doc.lastAutoTable.finalY + 8; // Increased gap for diagram
 
+        // Connection Diagram (Conceptual)
         doc.setFontSize(10);
         doc.setTextColor(0, 0, 0);
-        doc.text('Conceptual System Connection Diagram:', margin, y);
+        doc.text('Conceptual System Connection Flow:', margin, y);
         y += 5;
 
         const boxW = 55;
@@ -542,12 +542,12 @@
         // Controller Block
         doc.setFillColor(200, 220, 250);
         doc.rect(x, y, boxW, boxH, 'F');
-        doc.text(`${controller.name.split(':')[0]} / ${data.vendorController}`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        doc.text(`PeopleLink Control System`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
         y += boxH;
 
         // Arrow 2 (CAT6/Fiber)
         doc.line(x + boxW/2, y, x + boxW/2, y + gap - 2);
-        doc.text('CAT6/Fiber Signal', x + boxW + 2, y + gap/2 + 2);
+        doc.text('CAT6/Fiber Data', x + boxW + 2, y + gap/2 + 2);
         y += gap;
 
         // LED Cabinet Block
@@ -558,20 +558,20 @@
         
         doc.setFontSize(8);
         doc.setTextColor(77, 77, 77);
-        let flowText = doc.splitTextToSize("The video signal flows from the source through the control system and daisy-chains via CAT6/Fiber optic cables between the LED cabinets. Power distribution is managed separately via Power Boxes.", pageW - margin * 2);
+        let flowText = doc.splitTextToSize("The video signal is processed by the PeopleLink Control System and distributed to the cabinets via CAT6/Fiber optic cables. Power distribution is handled separately.", pageW - margin * 2);
         doc.text(flowText, margin, y);
         y += flowText.length * 4.5 + 5;
 
 
         // 4. Terms and Conditions / Notes
-        if (y > 230) { 
+        if (y > 230) { // Check for space and add new page if needed
              doc.addPage();
              y = margin;
         }
 
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
-        doc.text('3. Notes / Standard Terms & Conditions', margin, y);
+        doc.text('3. Standard Terms & Conditions', margin, y);
         y += lineHeight * 0.7;
 
         doc.setFontSize(8);
@@ -586,14 +586,14 @@
         // 5. Footer Disclaimer
         doc.setFontSize(8);
         doc.setTextColor(150, 150, 150);
-        doc.text("Disclaimer: This document is a system-generated technical summary for reference only. Actual site conditions may require modifications.", pageW / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+        doc.text("Disclaimer: This document is a system-generated technical summary for reference only. Actual site conditions and final Bill of Quantity (BOQ) may require modifications.", pageW / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
 
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}.pdf`);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Set PeopleLink SMD (1.25mm) as the default selection
-        document.getElementById('productModel').value = 'smd_125';
+        // Set PeopleLink 2.5mm Outdoor as the default selection, based on the provided configuration file
+        document.getElementById('productModel').value = 'smd_25_640x480';
         // Set the default unit selection to avoid validation errors on first calculation attempt
         document.getElementById('unit').value = 'meters';
         // Run toggle to ensure correct initial fields are shown
