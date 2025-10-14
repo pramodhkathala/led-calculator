@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Professional LED Configuration Calculator</title>
+  <title>PeopleLink Professional LED Configuration Calculator</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
@@ -15,8 +15,8 @@
     .container.minimized h2 { margin-bottom: 5px; }
     #enteredValuesDisplay { text-align: center; font-size: 0.95em; color: #444; margin-bottom: 15px; line-height: 1.4; display: none; }
     .container.minimized #enteredValuesDisplay { display: block !important; opacity: 1; transition: opacity 0.3s ease-out 0.3s; }
-    h2 { text-align: center; color: #0D47A1; margin-top: 0; margin-bottom: 20px; transition: margin 0.6s ease-out; }
-    label { display: block; margin-top: 15px; font-weight: 600; color: #1B5E20; }
+    h2 { text-align: center; color: #B71C1C; margin-top: 0; margin-bottom: 20px; transition: margin 0.6s ease-out; }
+    label { display: block; margin-top: 15px; font-weight: 600; color: #0D47A1; }
     select, input[type="number"] { width: 100%; padding: 10px; margin-top: 5px; font-size: 14px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
     .submit-btn, .back-btn { margin-top: 30px; background-color: #0D47A1; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 16px; width: 100%; cursor: pointer; transition: background-color 0.3s; }
     .submit-btn:hover { background-color: #1565C0; }
@@ -34,18 +34,15 @@
     .dim-right { top: 50%; right: 10px; transform: translateY(-50%) rotate(90deg); transform-origin: center center; }
     .vis-details { margin-top: 20px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px 25px; font-size: 0.95em; color: #333; }
     .vis-details span { display: block; line-height: 1.4; }
-    .vis-details strong { color: #0D47A1; font-weight: 600; }
+    .vis-details strong { color: #B71C1C; font-weight: 600; }
     .vis-details small { font-size: 0.85em; color: #555; }
     #downloadPdfLink { grid-column: 1 / -1; margin-top: 15px; text-align: center; cursor: pointer; color: #1B5E20; text-decoration: underline; padding: 8px 0; font-weight: 600; }
     #downloadPdfLink:hover { color: #2E7D32; }
-    /* Styles for the click-to-show controller name */
-    #suggestedController strong { cursor: pointer; text-decoration: underline dotted; text-decoration-color: #aaa; }
-    #suggestedController strong:hover { color: #1565C0; }
   </style>
 </head>
 <body>
   <div class="container" id="formContainer">
-    <h2>LED Video Wall Configuration Tool</h2>
+    <h2>PeopleLink LED Video Wall Configuration</h2>
     <div id="enteredValuesDisplay" class="hidden">
         <span id="enteredSummaryText"></span><br>
         Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
@@ -54,8 +51,8 @@
 
     <label for="productModel">LED Model / Pixel Pitch</label>
     <select id="productModel">
-        <option value="viewsonicLDC091C">ViewSonic LDC027G-091C (0.9375mm) - Recommended</option>
-        <option value="smd_125">PeopleLink/Generic SMD (1.25mm)</option>
+        <option value="smd_125">PeopleLink SMD (1.25mm) - Default</option>
+        <option value="viewsonicLDC091C">ViewSonic LDC027G-091C (0.9375mm)</option>
         <option value="smd_154">PeopleLink/Generic SMD (1.54mm)</option>
         <option value="smd_25">PeopleLink/Generic Outdoor (2.5mm)</option>
     </select>
@@ -120,31 +117,15 @@
      <button class="back-btn" id="backButton" onclick="hideVisualization()">Modify Configuration</button>
   </div>
 
-  <div id="popupOverlay" class="hidden"></div>
-  <div id="controllerInfoPopup" class="hidden">
-      <button id="popupCloseBtn" onclick="hidePopup()">×</button>
-      <h3 id="popupTitle">Controller Details</h3>
-      <div id="popupContent"></div>
-  </div>
-
   <script>
     // --- Constants ---
     const MM_PER_METER = 1000;
     const MM_PER_INCH = 25.4;
     const MM_PER_FOOT = MM_PER_INCH * 12;
-    const PIXELS_PER_SENDING_PORT = 650000; // Typical max resolution per standard Novastar/VNNox port
+    const PIXELS_PER_SENDING_PORT = 650000; 
     const SENDING_CARD_PORTS = 16;
     const ALT_SENDING_CARD_PORTS = 20;
 
-    // Novastar/VNNox Card Names
-    const DEFAULT_H_SENDING_CARD = "H_16xRJ45+2xFiber";
-    const DEFAULT_H_PREVIEW_CARD = "H_2xRJ45+1xHDMI1.3";
-    const H_INPUT_CARD = "H_1xHDMI2.0";
-    const ALT_H_SENDING_CARD = "H_20xRJ45";
-    const MULTIFUNCTION_CARD_NAME = 'MFK300';
-    const MULTIFUNCTION_CARD_QTY = 1;
-    
-    // --- Data Store (Incorporating ViewSonic LDC027G-091C from PDF) ---
     const LED_PRODUCTS = {
         'viewsonicLDC091C': {
             name: "ViewSonic LDC027G-091C (0.9375mm)",
@@ -153,14 +134,14 @@
             cabH_mm: 337.5,
             modW_mm: 150,
             modH_mm: 168.75,
-            cabModW: 4, // 600/150 = 4 modules wide
-            cabModH: 2, // 337.5/168.75 = 2 modules high
-            cabPixW: 640, // (600 / 0.9375) = 640 pixels wide
-            cabPixH: 360, // (337.5 / 0.9375) = 360 pixels high
-            vendorController: "LD-SCB-024" // From uploaded PDF
+            cabModW: 4, 
+            cabModH: 2, 
+            cabPixW: 640, 
+            cabPixH: 360, 
+            vendorController: "LD-SCB-024" 
         },
         'smd_125': {
-            name: "PeopleLink/Generic SMD (1.25mm)",
+            name: "PeopleLink SMD (1.25mm)",
             pitch_mm: 1.25,
             cabW_mm: 640,
             cabH_mm: 480,
@@ -170,10 +151,10 @@
             cabModH: 3,
             cabPixW: 512,
             cabPixH: 384,
-            vendorController: null
+            vendorController: "VNNox/Generic"
         },
         'smd_154': {
-            name: "PeopleLink/Generic SMD (1.54mm)",
+            name: "PeopleLink SMD (1.54mm)",
             pitch_mm: 1.5385,
             cabW_mm: 640,
             cabH_mm: 480,
@@ -183,10 +164,10 @@
             cabModH: 3,
             cabPixW: 416,
             cabPixH: 312,
-            vendorController: null
+            vendorController: "VNNox/Generic"
         },
         'smd_25': {
-            name: "PeopleLink/Generic Outdoor (2.5mm)",
+            name: "PeopleLink Outdoor (2.5mm)",
             pitch_mm: 2.5,
             cabW_mm: 960,
             cabH_mm: 960,
@@ -196,11 +177,10 @@
             cabModH: 6,
             cabPixW: 384,
             cabPixH: 384,
-            vendorController: null
+            vendorController: "VNNox/Generic"
         }
     };
 
-    // Controller data for Novastar/VNNox systems (Sorted by max pixels)
     const controllers=[
         {name:"TB40",maxPixels:1300000,sendingPorts:2,outputCardSlots:0, isHSeries:!1,details:"2x Main Eth Outputs (1 Backup). Android OS."},
         {name:"TB60",maxPixels:2300000,sendingPorts:4,outputCardSlots:0, isHSeries:!1,details:"4x Main Eth Outputs. Android OS."},
@@ -212,7 +192,7 @@
         {name:"H5",maxPixels:39000000,sendingPorts:60,outputCardSlots:3, isHSeries:!0,details:"Modular (5U Rack). Max 3 Output cards."},
     ].sort((a,b)=>a.maxPixels-b.maxPixels);
 
-    const TERMS_AND_CONDITIONS=["Warranty 1 Year","Required Fibber or CAT6 Cables (as per the drawing) to be laid by Client or SI.","Required Uninterrupted Power Cables/Points/Distribution Box (as per the drawing) is in Client's or SI's Scope.","Scaffolding or Man Lift, if required at the site, will be under SI/Client's Scope","Any cladding(Covering of sides of the screen) if required will be under SI/Client’s Scope","Any integration of third-party product will be under Client's/SI's Scope","Rack for Controller under SI's Scope.","Require Flat Surface for Installation of LED Wall along with fabrication as per the design shared by our team.","Content for the above Configuration with respect to the Aspect Ratio and Resolution shall be under Client's/SI's Scope.","Mounting Structure and Enclosure will be charged extra as per Site Conditions/Scope of Work.","Installation & Configuration under Client/SI Scope.","Plywood of appropriate (15-18mm) dimension need to be placed on iron frame before placing/fixing the Cabinets, will be under Client's/SI's Scope"];
+    const TERMS_AND_CONDITIONS=["Warranty 1 Year","Required Fiber or CAT6 Cables (as per the drawing) to be laid by Client or SI.","Required Uninterrupted Power Cables/Points/Distribution Box (as per the drawing) is in Client's or SI's Scope.","Scaffolding or Man Lift, if required at the site, will be under SI/Client's Scope","Any cladding(Covering of sides of the screen) if required will be under SI/Client’s Scope","Any integration of third-party product will be under Client's/SI's Scope","Rack for Controller under SI's Scope.","Require Flat Surface for Installation of LED Wall along with fabrication as per the design shared by our team.","Content for the above Configuration with respect to the Aspect Ratio and Resolution shall be under Client's/SI's Scope.","Mounting Structure and Enclosure will be charged extra as per Site Conditions/Scope of Work.","Installation & Configuration under Client/SI Scope.","Plywood of appropriate (15-18mm) dimension need to be placed on iron frame before placing/fixing the Cabinets, will be under Client's/SI's Scope"];
 
 
     // --- Global Store and Helpers ---
@@ -251,13 +231,18 @@
         // 1. Get User Input
         const productKey = document.getElementById('productModel').value;
         const unit = document.getElementById('unit').value;
-        let inputW = parseFloat(document.getElementById('width').value);
-        let inputH = parseFloat(document.getElementById('height').value);
-        let inputD = parseFloat(document.getElementById('diagonal').value);
+        const widthInput = document.getElementById('width').value;
+        const heightInput = document.getElementById('height').value;
+        const diagonalInput = document.getElementById('diagonal').value;
         const aspectRatioKey = document.getElementById('aspectRatio').value;
+
+        let inputW = parseFloat(widthInput);
+        let inputH = parseFloat(heightInput);
+        let inputD = parseFloat(diagonalInput);
 
         const errorDiv=document.getElementById('errorMessage');
         errorDiv.classList.add('hidden');
+        
         if (!productKey || !unit) {
             errorDiv.textContent = 'Please select an LED Model/Pitch and Unit.';
             errorDiv.classList.remove('hidden');
@@ -265,25 +250,24 @@
         }
 
         const isDiagonal = (unit === 'inches');
-        if (!isDiagonal && (!inputW || !inputH || inputW <= 0 || inputH <= 0)) {
-            errorDiv.textContent = 'Please enter valid positive Width and Height values.';
-            errorDiv.classList.remove('hidden');
-            return null;
-        }
 
-        if (isDiagonal && (!inputD || !aspectRatioKey || inputD <= 0)) {
-            errorDiv.textContent = 'Please enter a valid positive Diagonal and select an Aspect Ratio.';
-            errorDiv.classList.remove('hidden');
-            return null;
+        // *** Functional Fix: Robust Input Validation ***
+        if (!isDiagonal) {
+            if (isNaN(inputW) || isNaN(inputH) || inputW <= 0 || inputH <= 0) {
+                errorDiv.textContent = 'Please enter valid positive numeric values for Width and Height.';
+                errorDiv.classList.remove('hidden');
+                return null;
+            }
+        } else {
+            if (isNaN(inputD) || !aspectRatioKey || inputD <= 0) {
+                errorDiv.textContent = 'Please enter a valid positive Diagonal and select an Aspect Ratio.';
+                errorDiv.classList.remove('hidden');
+                return null;
+            }
         }
+        // *** End Functional Fix ***
 
         const details = LED_PRODUCTS[productKey];
-        if (!details) {
-            errorDiv.textContent = 'Invalid LED product data.';
-            errorDiv.classList.remove('hidden');
-            return null;
-        }
-
         const cabinetW_mm = details.cabW_mm;
         const cabinetH_mm = details.cabH_mm;
         
@@ -308,10 +292,8 @@
         let numCabW = Math.ceil(desiredW_mm / cabinetW_mm);
         let numCabH = Math.ceil(desiredH_mm / cabinetH_mm);
         
-        // Ensure minimum 1x1 cabinet if inputs were too small
         numCabW = Math.max(1, numCabW);
         numCabH = Math.max(1, numCabH);
-
 
         // 4. Calculate Final Actual Dimensions (in mm)
         const finalW_mm = numCabW * cabinetW_mm;
@@ -346,3 +328,284 @@
             finalW_mm: finalW_mm,
             finalH_mm: finalH_mm,
             finalResW: finalResW,
+            finalResH: finalResH,
+            totalPixels: totalPixels,
+            aspectRatioText: aspectRatioText,
+            finalDiagonal_in: finalDiagonal_in,
+            pixelPitch_mm: details.pitch_mm,
+            cabinetW_mm: cabinetW_mm,
+            cabinetH_mm: cabinetH_mm,
+            cabPixW: details.cabPixW,
+            cabPixH: details.cabPixH,
+            moduleW_mm: details.modW_mm,
+            moduleH_mm: details.modH_mm,
+            vendorController: details.vendorController || "Not Specified (Use Novastar/VNNox)",
+            reqPorts: reqPorts,
+            suggestedController: suggestedController,
+            totalCabinets: numCabW * numCabH,
+            totalModules: (numCabW * details.cabModW) * (numCabH * details.cabModH)
+        };
+    }
+
+    function calculateDimensions(data) {
+        const finalW_M = data.finalW_mm / MM_PER_METER;
+        const finalH_M = data.finalH_mm / MM_PER_METER;
+        const finalW_FT = data.finalW_mm / MM_PER_FOOT;
+        const finalH_FT = data.finalH_mm / MM_PER_FOOT;
+        return { finalW_M, finalH_M, finalW_FT, finalH_FT };
+    }
+
+    function showVisualization(){
+        const data = calculateLEDWall();
+        if (!data) return;
+
+        finalCalculationData = data; 
+        const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
+
+        // 1. Update Input Summary Display
+        let summaryText;
+        if (data.unit === 'inches') {
+            summaryText = `Model: <strong>${data.productName}</strong>, Diag: <strong>${data.finalDiagonal_in.toFixed(1)}in</strong>`;
+        } else {
+             const inputW_str = formatNumber(data.desiredW_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
+             const inputH_str = formatNumber(data.desiredH_mm / (data.unit === 'meters' ? MM_PER_METER : MM_PER_FOOT), 2);
+             summaryText = `Model: <strong>${data.productName}</strong>, Input WxH: <strong>${inputW_str}x${inputH_str} ${data.unit.substring(0,1)}</strong>`;
+        }
+
+        document.getElementById('enteredSummaryText').innerHTML = summaryText;
+        document.getElementById('aspectRatioValue').textContent = data.aspectRatioText;
+        document.getElementById('enteredValuesDisplay').classList.remove('hidden');
+
+        // 2. Animate and switch containers
+        document.getElementById('formContainer').classList.add('minimized');
+        document.getElementById('submitButton').classList.add('hidden');
+        document.querySelector('.back-btn-placeholder').classList.remove('hidden');
+        document.getElementById('visualization').classList.add('visible');
+
+        // 3. Update Details Section
+        document.getElementById('productName').innerHTML = `Product Model: <strong>${data.productName}</strong>`;
+        document.getElementById('pixelPitchDisplay').innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
+        document.getElementById('cabinetSize').innerHTML = `Cabinet Size (WxH): <strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong>`;
+        document.getElementById('numCabinets').innerHTML = `Total Cabinets (WxH): <strong>${data.numCabW} x ${data.numCabH} = ${data.totalCabinets}</strong>`;
+        document.getElementById('finalDimensions').innerHTML = `**Actual Final Dimensions (WxH):** <strong>${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</strong><small> (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)</small>`;
+        document.getElementById('finalDiagonal').innerHTML = `Final Diagonal Size: <strong>${data.finalDiagonal_in.toFixed(1)} in</strong>`;
+        document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong><small> (${data.cabPixW}x${data.cabPixH} pixels/cabinet)</small>`;
+        document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
+        document.getElementById('finalArea').innerHTML = `Final Area: <strong>${(finalW_M * finalH_M).toFixed(2)} m²</strong>`;
+        document.getElementById('requiredPorts').innerHTML = `Required Sending Ports: <strong>${data.reqPorts}</strong>`;
+        document.getElementById('suggestedController').innerHTML = `Suggested Controller (Novastar/VNNox): <strong>${data.suggestedController.name}</strong>`;
+        document.getElementById('vendorController').innerHTML = `Vendor Control Box: <strong>${data.vendorController}</strong>`;
+
+        // 4. Update Visualization Grid
+        const aspectRatio = finalW_mm / finalH_mm;
+        const visualizationHeight = 300; 
+        const visualizationWidth = visualizationHeight * aspectRatio;
+        const visGrid = document.getElementById('visGrid');
+        const cabinetOverlay = document.getElementById('cabinetOverlay');
+
+        visGrid.style.height = `${visualizationHeight}px`;
+        visGrid.style.width = `min(100%, ${visualizationWidth}px)`;
+
+        document.getElementById('visWidthLabel').textContent = `${finalW_M.toFixed(2)} m (W)`;
+        document.getElementById('visHeightLabel').textContent = `${finalH_M.toFixed(2)} m (H)`;
+
+        cabinetOverlay.innerHTML = '';
+        cabinetOverlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
+        cabinetOverlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
+        cabinetOverlay.style.display = 'grid';
+
+        for (let r = 0; r < data.numCabH; r++) {
+            for (let c = 0; c < data.numCabW; c++) {
+                const cabDiv = document.createElement('div');
+                cabDiv.style.border = '1px dashed rgba(13, 71, 161, 0.4)';
+                cabDiv.style.boxSizing = 'border-box';
+                cabinetOverlay.appendChild(cabDiv);
+            }
+        }
+
+        document.getElementById('downloadPdfLink').classList.remove('hidden');
+    }
+    
+    function hideVisualization(){
+        document.getElementById('formContainer').classList.remove('minimized');
+        document.getElementById('visualization').classList.remove('visible');
+        document.getElementById('submitButton').classList.remove('hidden');
+        document.querySelector('.back-btn-placeholder').classList.add('hidden');
+        document.getElementById('downloadPdfLink').classList.add('hidden');
+    }
+
+    // --- PDF Generation (With Connection Diagram) ---
+    function downloadPdf() {
+        if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
+            alert("Please calculate the LED wall configuration first.");
+            return;
+        }
+
+        const data = finalCalculationData;
+        const { finalW_M, finalH_M } = calculateDimensions(data);
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('p', 'mm', 'a4'); 
+
+        let y = 10;
+        const margin = 15;
+        const lineHeight = 7;
+        const pageW = doc.internal.pageSize.getWidth();
+        const primaryColor = [13, 71, 161]; // Blue
+        const secondaryColor = [183, 28, 28]; // Red
+
+        // 1. Header (Title)
+        doc.setFontSize(20);
+        doc.setTextColor(...secondaryColor);
+        doc.text('PeopleLink LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
+        y += lineHeight;
+
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text(`Generated on: ${getTimestamp()}`, pageW - margin, y, { align: 'right' });
+        doc.line(margin, y, pageW - margin, y);
+        y += lineHeight * 0.75;
+
+        // 2. Final LED Wall Specifications (Technical Output)
+        doc.setFontSize(14);
+        doc.setTextColor(...primaryColor); 
+        doc.text('1. Final Physical & Pixel Specifications', margin, y);
+        y += lineHeight;
+
+        const specsData = [
+            ['Product Model', data.productName],
+            ['Pixel Pitch (mm)', `${data.pixelPitch_mm} mm`],
+            ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
+            ['Total Cabinets Required', data.totalCabinets],
+            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
+            ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
+            ['Final Aspect Ratio', data.aspectRatioText],
+            ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
+            ['Total Pixels', formatLargeNumber(data.totalPixels)],
+        ];
+
+        doc.autoTable({
+            startY: y + 3,
+            body: specsData,
+            margin: { left: margin, right: margin, bottom: 0 },
+            theme: 'striped',
+            headStyles: { fillColor: [200, 220, 250], textColor: [0, 0, 0] },
+            styles: { fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+            columnStyles: { 0: { fontStyle: 'normal', textColor: [0, 0, 0] } }
+        });
+        y = doc.lastAutoTable.finalY + lineHeight;
+
+        // 3. Controller Recommendation and Connection Diagram
+        const controller = data.suggestedController;
+        doc.setFontSize(14);
+        doc.setTextColor(...secondaryColor); 
+        doc.text('2. Control System and Connectivity (VNNox/Novastar)', margin, y);
+        y += lineHeight;
+
+        const controllerData = [
+            ['Required Sending Ports (650k/Port)', `${data.reqPorts}`],
+            ['Suggested Controller', controller.name],
+            ['Vendor Control Box (if applicable)', data.vendorController],
+        ];
+
+        doc.autoTable({
+            startY: y + 3,
+            body: controllerData,
+            margin: { left: margin, right: margin, bottom: 0 },
+            theme: 'plain',
+            styles: { fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
+            columnStyles: { 0: { fontStyle: 'normal', textColor: [0, 0, 0] } }
+        });
+        y = doc.lastAutoTable.finalY + 3;
+        
+        // Connection Diagram (Conceptual)
+        y += lineHeight;
+
+        doc.setFontSize(10);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Conceptual System Connection Diagram:', margin, y);
+        y += 5;
+
+        const boxW = 55;
+        const boxH = 8;
+        const gap = 15;
+        let x = margin + 5;
+        
+        // Draw Diagram Blocks
+        doc.setFillColor(240, 240, 240);
+        doc.rect(x, y, boxW, boxH, 'F');
+        doc.text('Video Source (PC/Player)', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        y += boxH;
+
+        // Arrow 1 (HDMI/DP Signal)
+        doc.setLineWidth(0.3);
+        doc.line(x + boxW/2, y, x + boxW/2, y + gap - 2);
+        doc.text('HDMI/DP Signal', x + boxW + 2, y + gap/2 + 2);
+        y += gap;
+
+        // Controller Block
+        doc.setFillColor(200, 220, 250);
+        doc.rect(x, y, boxW, boxH, 'F');
+        doc.text(`${controller.name} / ${data.vendorController}`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        y += boxH;
+
+        // Arrow 2 (CAT6/Fiber)
+        doc.line(x + boxW/2, y, x + boxW/2, y + gap - 2);
+        doc.text('CAT6/Fiber Signal', x + boxW + 2, y + gap/2 + 2);
+        y += gap;
+
+        // LED Cabinet Block
+        doc.setFillColor(220, 250, 220);
+        doc.rect(x, y, boxW, boxH, 'F');
+        doc.text('LED Cabinets (Video Wall)', x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        y += boxH + 5;
+        
+        doc.setFontSize(8);
+        doc.setTextColor(77, 77, 77);
+        let flowText = doc.splitTextToSize("The video signal flows from the source through the controller and daisy-chains via CAT6/Fiber optic cables between the LED cabinets. Power distribution is managed separately via Power Boxes.", pageW - margin * 2);
+        doc.text(flowText, margin, y);
+        y += flowText.length * 4.5 + 5;
+
+
+        // 4. Terms and Conditions / Notes
+        if (y > 230) { 
+             doc.addPage();
+             y = margin;
+        }
+
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text('3. Notes / Standard Terms & Conditions', margin, y);
+        y += lineHeight * 0.7;
+
+        doc.setFontSize(8);
+        doc.setTextColor(77, 77, 77);
+
+        TERMS_AND_CONDITIONS.forEach((term, index) => {
+            let lines = doc.splitTextToSize(`${index + 1}. ${term}`, pageW - margin * 2);
+            doc.text(lines, margin, y);
+            y += lines.length * 4.5;
+        });
+
+        // 5. Footer Disclaimer
+        doc.setFontSize(8);
+        doc.setTextColor(150, 150, 150);
+        doc.text("Disclaimer: This document is a system-generated technical summary for reference only. Actual site conditions may require modifications.", pageW / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+
+        doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}.pdf`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set PeopleLink SMD (1.25mm) as the default selection
+        document.getElementById('productModel').value = 'smd_125';
+        // Set the default unit selection to avoid validation errors on first calculation attempt
+        document.getElementById('unit').value = 'meters';
+        // Run toggle to ensure correct initial fields are shown
+        toggleMeasurementFields();
+    });
+  </script>
+<footer class="text-center text-gray-500 text-sm mt-10">
+    © PeopleLink
+</footer>
+</body>
+</html>
