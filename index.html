@@ -152,7 +152,7 @@
         </div>
 
         <div class="input-group" id="aspectRatioGroup">
-          <label for="aspectRatio" id="aspectRatioLabel">Target Aspect Ratio (Optional for W/H)</label>
+          <label for="aspectRatio" id="aspectRatioLabel">Target Aspect Ratio (Optional)</label>
           <select id="aspectRatio"> 
               <option value="">Select ratio (Optional)</option> 
               <option value="16:9">16:9 (HD/UHD)</option> 
@@ -186,7 +186,7 @@
                 <span id="resolution">**Actual Final Resolution (WxH):** <strong>--</strong></span>
                 <span id="finalArea">Final Area: <strong>--</strong></span>
                 <span id="totalPixels">Total Pixels: <strong>--</strong></span>
-                <span id="cabinetWeight">Est. Total Cabinet Weight: <strong>--</strong></span>
+                <span id="cabinetWeight">Est. Total Wall Weight (incl. buffer): <strong>--</strong></span>
                 <span id="brightness">Brightness/Nits: <strong>--</strong></span>
             </div>
         </div>
@@ -257,21 +257,33 @@
     const MM_PER_FOOT = MM_PER_INCH * 12;
     const PIXELS_PER_PORT_DEFAULT_MODULAR = 920000; // Standard for high-end modular controllers
     
-    // --- PeopleLink LED Models (Updated Set) ---
+    // Safety Buffers (Requested by user)
+    const POWER_BUFFER = 1.20; // 20%
+    const WEIGHT_BUFFER = 1.20; // 20%
+
+    // --- PeopleLink LED Models (V12 - Updated Specs) ---
     const LED_PRODUCTS = {
-        // COB Models (16:9 Cabinet: 600mm x 337.5mm)
+        // COB Models (16:9 Cabinet: 600mm x 337.5mm) - NO CHANGE
         'cob_09': { name: "PeopleLink COB (0.9375mm)", pitch_mm: 0.9375, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 640, cabPixH: 360, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-1000", maxPower_W_m2: 300 },
         'cob_125': { name: "PeopleLink COB (1.25mm)", pitch_mm: 1.25, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 480, cabPixH: 270, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 },
-        'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, // Updated PITCH and RESOLUTION
-        // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm)
-        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
-        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
-        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, weight_kg: 5.5, nits_range: "450", maxPower_W_m2: 390 }, 
-        // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm)
-        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
-        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
-        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 }, 
-        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, weight_kg: 10, maxPower_W_m2: 800 } 
+        'cob_15': { name: "PeopleLink COB (1.5625mm)", pitch_mm: 1.5625, cabW_mm: 600, cabH_mm: 337.5, cabPixW: 384, cabPixH: 216, modulesPerCab: 8, weight_kg: 4.6, nits_range: "600-800", maxPower_W_m2: 300 }, 
+        
+        // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm) - UPDATED
+        // Weight: 3.66kg + (0.43kg * 6 modules) = 6.24 kg (unbuffered)
+        // Power Density: 560 W/m² (from user's figures)
+        // Brightness: 450-600 nits
+        'indoor_186': { name: "PeopleLink SMD Indoor (1.86mm)", pitch_mm: 1.86, cabW_mm: 640, cabH_mm: 480, cabPixW: 344, cabPixH: 258, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
+        'indoor_20': { name: "PeopleLink SMD Indoor (2.0mm)", pitch_mm: 2.0, cabW_mm: 640, cabH_mm: 480, cabPixW: 320, cabPixH: 240, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
+        'indoor_25': { name: "PeopleLink SMD Indoor (2.5mm)", pitch_mm: 2.5, cabW_mm: 640, cabH_mm: 480, cabPixW: 256, cabPixH: 192, modulesPerCab: 6, weight_kg: 6.24, nits_range: "450-600", maxPower_W_m2: 560 }, 
+        
+        // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm) - UPDATED
+        // Weight: (0.46kg * 18 modules) * 1.20 buffer = 9.936 kg -> 9.94 kg (unbuffered weight in object, buffer applied later)
+        // Power Density: (40W * 18 modules * 1.20 buffer) / (0.96*0.96 m²) = 937.5 W/m²
+        // Brightness: 4500-5000 nits
+        'outdoor_40': { name: "PeopleLink SMD Outdoor (4.0mm)", pitch_mm: 4.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 240, cabPixH: 240, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, // Using 8.28kg unbuffered module weight, buffer applied in calculation
+        'outdoor_667': { name: "PeopleLink SMD Outdoor (6.67mm)", pitch_mm: 6.67, cabW_mm: 960, cabH_mm: 960, cabPixW: 144, cabPixH: 144, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, 
+        'outdoor_80': { name: "PeopleLink SMD Outdoor (8.0mm)", pitch_mm: 8.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 120, cabPixH: 120, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 }, 
+        'outdoor_100': { name: "PeopleLink SMD Outdoor (10.0mm)", pitch_mm: 10.0, cabW_mm: 960, cabH_mm: 960, cabPixW: 96, cabPixH: 96, modulesPerCab: 18, weight_kg: 8.28, nits_range: "4500-5000", maxPower_W_m2: 937.5 } 
     };
 
     // --- Controller Tiers (Generic Naming) ---
@@ -312,8 +324,8 @@
         document.getElementById('widthLabel').textContent = `Desired Width${unitText}`;
         document.getElementById('heightLabel').textContent = `Desired Height${unitText}`;
         
-        const aspectRatioLabel = document.getElementById('aspectRatioLabel');
-        aspectRatioLabel.textContent = isDiagonal ? 'Target Aspect Ratio (Required)' : 'Target Aspect Ratio (Optional for W/H)';
+        // Aspect Ratio label remains simple as it's optional for all
+        document.getElementById('aspectRatioLabel').textContent = 'Target Aspect Ratio (Optional)';
 
         // Toggle visibility
         document.getElementById('widthGroup').classList.toggle('hidden', isDiagonal);
@@ -421,11 +433,12 @@
 
         // Input Validation based on mode
         if (!isDiagonal) {
+            // Meters/Feet mode: requires W, H, or (W or H with AR)
             const hasW = !isNaN(inputW) && inputW > 0;
             const hasH = !isNaN(inputH) && inputH > 0;
             
-            if (!aspectRatioKey && (!hasW || !hasH)) {
-                errorDiv.textContent = 'ERROR: Please enter valid positive numeric values for BOTH Width and Height, or select an Aspect Ratio.';
+            if (!hasW && !hasH) {
+                errorDiv.textContent = 'ERROR: Please enter valid positive numeric values for Width, Height, or Diagonal.';
                 errorDiv.classList.remove('hidden');
                 errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return null;
@@ -437,15 +450,9 @@
                 return null;
             }
         } else {
-            // Diagonal mode requires Aspect Ratio
+            // Diagonal mode: requires Diagonal value
             if (isNaN(inputD) || inputD <= 0) {
-                errorDiv.textContent = 'ERROR: Please enter a valid positive Diagonal.';
-                errorDiv.classList.remove('hidden');
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return null;
-            }
-            if (!aspectRatioKey) {
-                 errorDiv.textContent = 'ERROR: Selecting an Aspect Ratio is required for Diagonal input.';
+                errorDiv.textContent = 'ERROR: Please enter a valid positive Diagonal value.';
                 errorDiv.classList.remove('hidden');
                 errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return null;
@@ -459,19 +466,21 @@
         
         // 2. Determine Desired Dimensions (W/H in mm) based on input and AR
         let desiredW_mm, desiredH_mm;
-        let usedW_input, usedH_input;
+        let usedW_input, usedH_input, usedRatio = aspectRatioKey || 'None Specified';
         
         if (unit === 'inches') {
-            // Diagonal mode: AR is mandatory, calculates W/H
-            const [ratioW, ratioH] = aspectRatioKey.split(':').map(Number);
+            // Diagonal mode: AR is optional. Fallback to 16:9 if not provided.
+            const ratioToUse = aspectRatioKey || '16:9'; 
+            const [ratioW, ratioH] = ratioToUse.split(':').map(Number);
             const ratioDiagonal = Math.sqrt(ratioW * ratioW + ratioH * ratioH);
             const factor = inputD / ratioDiagonal;
 
             desiredW_mm = ratioW * factor * MM_PER_INCH;
             desiredH_mm = ratioH * factor * MM_PER_INCH;
 
-            usedW_input = ratioW; // Store ratio parts for summary, will be updated to actual dimensions later
+            usedW_input = ratioW; 
             usedH_input = ratioH;
+            usedRatio = aspectRatioKey || '16:9 (Assumed)'; // Update summary text for fallback
 
         } else {
             // Meters/Feet Mode
@@ -491,6 +500,10 @@
                     // Priority 2: Use Desired Height (inputH) and AR to determine Desired Width
                     usedH_input = inputH;
                     usedW_input = (inputH / ratioH) * ratioW;
+                } else {
+                    // This scenario should be caught by validation, but just in case, fall back to W/H if both are missing
+                    usedW_input = inputW;
+                    usedH_input = inputH;
                 }
                 
                 // Convert AR-matched dimension to mm
@@ -499,11 +512,15 @@
 
             } else {
                 // No Aspect Ratio selected: Use entered W and H
-                usedW_input = inputW;
-                usedH_input = inputH;
+                usedW_input = hasW ? inputW : (inputH * (cabinetW_mm / cabinetH_mm)); // Infer missing dimension from Cabinet AR if only one is given
+                usedH_input = hasH ? inputH : (inputW * (cabinetH_mm / cabinetW_mm));
 
-                desiredW_mm = inputW * unit_factor;
-                desiredH_mm = inputH * unit_factor;
+                desiredW_mm = usedW_input * unit_factor;
+                desiredH_mm = usedH_input * unit_factor;
+                
+                // If only one dimension was given, note that the other was inferred from cabinet ratio
+                if(hasW && !hasH) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
+                if(hasH && !hasW) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
             }
         }
 
@@ -536,9 +553,9 @@
         const finalDiagonal_in = finalDiagonal_mm / MM_PER_INCH;
         const finalArea_m2 = (finalW_mm / MM_PER_METER) * (finalH_mm / MM_PER_METER);
 
-        // 7. Calculate Power
-        const maxPower_W = finalArea_m2 * details.maxPower_W_m2;
-        const maxCurrent_A = maxPower_W / 220; // Assuming 220V standard
+        // 7. Calculate Power (WITH 20% BUFFER)
+        const maxPower_W_buffered = (finalArea_m2 * details.maxPower_W_m2) * POWER_BUFFER; 
+        const maxCurrent_A = maxPower_W_buffered / 220; // Assuming 220V standard
 
         // 8. Calculate Receiving Cards (Assumed 1 per cabinet)
         const totalRecCards = totalCabinets;
@@ -556,6 +573,9 @@
         // Apply controller name override if set in modal
         const controllerName = finalCalculationData.controllerOverrideName || suggestedController.name;
 
+        // 10. Calculate Total Weight (WITH 20% BUFFER)
+        const totalCabinetWeight_unbuffered = details.weight_kg * totalCabinets;
+        const totalWallWeight_buffered = totalCabinetWeight_unbuffered * WEIGHT_BUFFER;
 
         // Store data
         finalCalculationData = {
@@ -585,15 +605,15 @@
             requiredSendCards: requiredSendCards,
             sendCardModel: finalCalculationData.sendCardModel || MODULAR_CARD_DEFAULTS.SENDING_CARD_MODEL,
             sendCardPorts: sendCardPorts,
-            maxPower_W: maxPower_W,
+            maxPower_W: maxPower_W_buffered,
             maxCurrent_A: maxCurrent_A,
             finalArea_m2: finalArea_m2,
-            weight_kg: details.weight_kg,
             nits_range: details.nits_range,
+            totalWallWeight_buffered: totalWallWeight_buffered, // NEW buffered weight
             // Input data for summary
             usedW_input: usedW_input,
             usedH_input: usedH_input,
-            inputRatioKey: aspectRatioKey,
+            inputRatioKey: usedRatio, // Use the determined ratio text
             inputDiagonal: inputD
         };
 
@@ -620,11 +640,11 @@
 
         if (data.unit === 'inches') {
             summaryText = `Desired AR: <strong>${data.inputRatioKey}</strong>, Diag: <strong>${data.inputDiagonal.toFixed(1)} ${unitSymbol}</strong>`;
-        } else if (data.inputRatioKey) {
+        } else if (data.inputRatioKey && data.inputRatioKey !== 'None Specified') {
             // Show AR-matched inputs used for cabinet calculation
-            summaryText = `Desired AR: <strong>${data.inputRatioKey}</strong>, **Used WxH:** <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
+            summaryText = `Input AR: <strong>${data.inputRatioKey}</strong>, **Used WxH:** <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         } else {
-            // Show original inputs
+            // Show original inputs or inferred dimensions
             summaryText = `Desired WxH: <strong>${formatNumber(data.usedW_input, 2)}x${formatNumber(data.usedH_input, 2)} ${unitSymbol}</strong>`;
         }
 
@@ -639,7 +659,7 @@
         document.getElementById('visualization').classList.add('visible');
 
         // 3. Update Details Section (Column 1 - Wall Specs)
-        const totalWeight = data.weight_kg ? ` / ${formatNumber(data.weight_kg * data.totalCabinets, 1)} kg` : '';
+        const totalWeightText = `${formatNumber(data.totalWallWeight_buffered, 1)} kg`;
 
         document.getElementById('productName').innerHTML = `Product Model: <strong>${data.productName}</strong>`;
         document.getElementById('pixelPitchDisplay').innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
@@ -652,7 +672,7 @@
         document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${data.finalArea_m2.toFixed(2)} m²</strong>`;
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
-        document.getElementById('cabinetWeight').innerHTML = `Est. Total Cabinet Weight: <strong>${data.totalCabinets} cabinets</strong><small>${totalWeight}</small>`;
+        document.getElementById('cabinetWeight').innerHTML = `Est. Total Wall Weight (incl. buffer): <strong>${totalWeightText}</strong><small> (Calculated with ${WEIGHT_BUFFER*100}% structural buffer)</small>`;
         document.getElementById('brightness').innerHTML = `Brightness/Nits: <strong>${data.nits_range || 'N/A'} cd/m²</strong>`;
         
         // 4. Update Details Section (Column 2 - Control System)
@@ -661,7 +681,7 @@
         document.getElementById('controllerPorts').innerHTML = `Total Ethernet Ports Needed: <strong>${data.requiredPorts}</strong><small> (based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)</small>`;
         document.getElementById('requiredSendCards').innerHTML = `Estimated Sending Cards: <strong>${data.requiredSendCards}</strong><small> (based on ${data.sendCardPorts} ports/card)</small>`;
         document.getElementById('sendingCardModel').innerHTML = `Sending Card Model: <strong>${data.sendCardModel}</strong><small> (${data.sendCardPorts} ports)</small>`;
-        document.getElementById('wallPower').innerHTML = `Estimated Max Power: <strong>${formatNumber(data.maxPower_W, 0)} W</strong>`;
+        document.getElementById('wallPower').innerHTML = `Estimated Max Power: <strong>${formatNumber(data.maxPower_W, 0)} W</strong><small> (Incl. ${POWER_BUFFER*100}% buffer)</small>`;
         document.getElementById('wallCurrent').innerHTML = `Estimated Max Current: <strong>${data.maxCurrent_A.toFixed(2)} A</strong><small> (@220V)</small>`;
 
         // 5. Update Visualization Grid
@@ -751,7 +771,7 @@
             ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
             ['Total Cabinets Required', `${data.totalCabinets}`],
             ['Total Modules Required', `${data.totalModules} (${data.modulesPerCab} per cabinet)`],
-            ['Est. Total Weight', data.weight_kg ? `${formatNumber(data.weight_kg * data.totalCabinets, 1)} kg` : 'N/A'],
+            ['Est. Total Wall Weight', `${formatNumber(data.totalWallWeight_buffered, 1)} kg (Incl. ${WEIGHT_BUFFER*100}% structural buffer)`],
             ['Brightness', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'],
         ];
 
@@ -787,7 +807,7 @@
             ['Total Receiving Cards', `${data.totalRecCards} (Assumes 1 per cabinet)`],
             ['Total Ethernet Ports Required', `${data.requiredPorts} (Based on ${formatLargeNumber(MODULAR_CARD_DEFAULTS.PIXELS_PER_PORT)}/port)`],
             ['Estimated Sending Cards', `${data.requiredSendCards} (Using ${data.sendCardModel} @ ${data.sendCardPorts} ports/card)`],
-            ['Max Power Consumption', `${formatNumber(data.maxPower_W, 0)} W`],
+            ['Max Power Consumption', `${formatNumber(data.maxPower_W, 0)} W (Incl. ${POWER_BUFFER*100}% buffer)`],
             ['Max Current Draw (@220V)', `${data.maxCurrent_A.toFixed(2)} A`],
         ];
 
@@ -838,7 +858,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Removed default selections to enforce mandatory input
         toggleMeasurementFields();
 
         // Close modal when clicking outside
@@ -851,7 +870,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink
+    © PeopleLink _ Pramodh
 </footer>
 </body>
 </html>
