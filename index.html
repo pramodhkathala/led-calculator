@@ -51,11 +51,22 @@
 
     <label for="productModel">LED Model / Pixel Pitch</label>
     <select id="productModel">
-        <option value="cob_09375">PeopleLink COB Fine Pitch (0.9375mm)</option>
-        <option value="smd_125">PeopleLink SMD Indoor (1.25mm)</option>
-        <option value="smd_154">PeopleLink SMD Indoor (1.54mm)</option>
-        <option value="smd_25_640x480">PeopleLink SMD Outdoor (2.5mm) - Default</option>
-        <option value="smd_30_960x960">PeopleLink SMD Outdoor (3.0mm)</option>
+        <optgroup label="COB Models (16:9 Cabinet - 600x337.5mm)">
+            <option value="cob_09">PeopleLink COB (0.9375mm)</option>
+            <option value="cob_125">PeopleLink COB (1.25mm)</option>
+            <option value="cob_15">PeopleLink COB (1.5mm)</option>
+        </optgroup>
+        <optgroup label="SMD Indoor Models (4:3 Cabinet - 640x480mm)">
+            <option value="indoor_186">PeopleLink SMD Indoor (1.86mm)</option>
+            <option value="indoor_20">PeopleLink SMD Indoor (2.0mm)</option>
+            <option value="indoor_25">PeopleLink SMD Indoor (2.5mm)</option>
+        </optgroup>
+        <optgroup label="SMD Outdoor Models (1:1 Cabinet - 960x960mm)">
+            <option value="outdoor_40">PeopleLink SMD Outdoor (4.0mm)</option>
+            <option value="outdoor_667">PeopleLink SMD Outdoor (6.67mm)</option>
+            <option value="outdoor_80">PeopleLink SMD Outdoor (8.0mm)</option>
+            <option value="outdoor_100">PeopleLink SMD Outdoor (10.0mm)</option>
+        </optgroup>
     </select>
     
     <label for="unit">Unit of Measurement</label>
@@ -107,8 +118,8 @@
       <span id="resolution">Actual Final Resolution (WxH): <strong>--</strong></span>
       <span id="totalPixels">Total Pixels: <strong>--</strong></span>
       <span id="finalArea">Final Area: <strong>--</strong></span>
-      <span id="requiredPorts">Required Data Ports: <strong>--</strong></span>
-      <span id="suggestedController" data-controller-name="">Suggested Controller: <strong>--</strong></span>
+      <span id="requiredPorts">Required Data Ports (650k/Port): <strong>--</strong></span>
+      <span id="suggestedController">Suggested Controller Model: <strong>--</strong></span>
       <span id="vendorController">Control Box Model: <strong>--</strong></span>
       <span id="downloadPdfLink" onclick="downloadPdf()">Download PDF Technical Summary 📄</span>
     </div>
@@ -123,63 +134,82 @@
     const MM_PER_FOOT = MM_PER_INCH * 12;
     const PIXELS_PER_SENDING_PORT = 650000; 
 
-    // --- PeopleLink LED Models (COB, SMD Indoor, SMD Outdoor) ---
+    // --- PeopleLink LED Models (Updated Set) ---
     const LED_PRODUCTS = {
-        'cob_09375': {
-            name: "PeopleLink COB Fine Pitch (0.9375mm)",
+        // COB Models (16:9 Cabinet: 600mm x 337.5mm)
+        'cob_09': {
+            name: "PeopleLink COB (0.9375mm)",
             pitch_mm: 0.9375,
-            cabW_mm: 600,
-            cabH_mm: 337.5,
-            cabPixW: 640, 
-            cabPixH: 360, 
-            vendorController: "PeopleLink SCB/Control Box" 
+            cabW_mm: 600, cabH_mm: 337.5,
+            cabPixW: 640, cabPixH: 360, // 1920x1080 resolution is 3x3 cabinets.
         },
-        'smd_125': {
-            name: "PeopleLink SMD Indoor (1.25mm)",
+        'cob_125': {
+            name: "PeopleLink COB (1.25mm)",
             pitch_mm: 1.25,
-            cabW_mm: 640,
-            cabH_mm: 480,
-            cabPixW: 512,
-            cabPixH: 384,
-            vendorController: "PeopleLink Control System"
+            cabW_mm: 600, cabH_mm: 337.5,
+            cabPixW: 480, cabPixH: 270,
         },
-        'smd_154': {
-            name: "PeopleLink SMD Indoor (1.54mm)",
-            pitch_mm: 1.5385,
-            cabW_mm: 640,
-            cabH_mm: 480,
-            cabPixW: 416,
-            cabPixH: 312,
-            vendorController: "PeopleLink Control System"
+        'cob_15': {
+            name: "PeopleLink COB (1.5mm)",
+            pitch_mm: 1.5,
+            cabW_mm: 600, cabH_mm: 337.5,
+            cabPixW: 400, cabPixH: 225,
         },
-        'smd_25_640x480': { // Matches the uploaded PDF's characteristics
-            name: "PeopleLink SMD Outdoor (2.5mm)",
+        // SMD Indoor Models (4:3 Cabinet: 640mm x 480mm)
+        'indoor_186': {
+            name: "PeopleLink SMD Indoor (1.86mm)",
+            pitch_mm: 1.86,
+            cabW_mm: 640, cabH_mm: 480,
+            cabPixW: 344, cabPixH: 258,
+        },
+        'indoor_20': {
+            name: "PeopleLink SMD Indoor (2.0mm)",
+            pitch_mm: 2.0,
+            cabW_mm: 640, cabH_mm: 480,
+            cabPixW: 320, cabPixH: 240,
+        },
+        'indoor_25': {
+            name: "PeopleLink SMD Indoor (2.5mm)",
             pitch_mm: 2.5,
-            cabW_mm: 640,
-            cabH_mm: 480,
-            cabPixW: 256, 
-            cabPixH: 192, 
-            vendorController: "PeopleLink Control System"
+            cabW_mm: 640, cabH_mm: 480,
+            cabPixW: 256, cabPixH: 192, 
         },
-        'smd_30_960x960': { // Generic large outdoor model
-            name: "PeopleLink SMD Outdoor (3.0mm)",
-            pitch_mm: 3.0,
-            cabW_mm: 960,
-            cabH_mm: 960,
-            cabPixW: 320,
-            cabPixH: 320,
-            vendorController: "PeopleLink Control System"
+        // SMD Outdoor Models (1:1 Cabinet: 960mm x 960mm)
+        'outdoor_40': {
+            name: "PeopleLink SMD Outdoor (4.0mm)",
+            pitch_mm: 4.0,
+            cabW_mm: 960, cabH_mm: 960,
+            cabPixW: 240, cabPixH: 240,
+        },
+        'outdoor_667': {
+            name: "PeopleLink SMD Outdoor (6.67mm)",
+            pitch_mm: 6.67,
+            cabW_mm: 960, cabH_mm: 960,
+            cabPixW: 144, cabPixH: 144,
+        },
+        'outdoor_80': {
+            name: "PeopleLink SMD Outdoor (8.0mm)",
+            pitch_mm: 8.0,
+            cabW_mm: 960, cabH_mm: 960,
+            cabPixW: 120, cabPixH: 120,
+        },
+        'outdoor_100': {
+            name: "PeopleLink SMD Outdoor (10.0mm)",
+            pitch_mm: 10.0,
+            cabW_mm: 960, cabH_mm: 960,
+            cabPixW: 96, cabPixH: 96,
         }
     };
 
-    // --- Generic Controller Tiers ---
-    const controllers=[
-        {name:"Tier 1: Basic Media Player (Up to 1.3M Pixels)",maxPixels:1300000},
-        {name:"Tier 2: Standard Controller (Up to 2.6M Pixels)",maxPixels:2600000},
-        {name:"Tier 3: High Capacity Controller (Up to 6.5M Pixels)",maxPixels:6500000},
-        {name:"Tier 4: Advanced 4K Controller (Up to 10M Pixels)",maxPixels:10000000},
-        {name:"Tier 5: Modular System (Up to 26M+ Pixels)",maxPixels:26000000},
-    ].sort((a,b)=>a.maxPixels-b.maxPixels);
+    // --- Controller Tiers (Using Model Numbers) ---
+    const controllers = [
+        { name: "TB50 (Standalone Player)", maxPixels: 2300000, description: "Standalone player/server for FHD (1920x1080) walls." },
+        { name: "VX4S-N (All-in-One Processor)", maxPixels: 2300000, description: "Standard AIO processor for FHD walls, includes scaling." },
+        { name: "VX6S (All-in-One Processor)", maxPixels: 3900000, description: "Higher capacity AIO processor for 2K/larger walls." },
+        { name: "N9 (Standard Processor)", maxPixels: 4000000, description: "Professional processor for up to 4M pixels." },
+        { name: "H5/H9 (Modular Controller)", maxPixels: 9200000, description: "Modular controller for large 4K walls (over 6M pixels)." },
+        { name: "H10 (Modular Controller)", maxPixels: 10000000, description: "Modular controller for very large 4K walls (over 9M pixels)." }
+    ].sort((a, b) => a.maxPixels - b.maxPixels);
 
     // --- Standard Terms & Conditions ---
     const TERMS_AND_CONDITIONS=[
@@ -202,6 +232,18 @@
     function formatLargeNumber(n){if(n>=1e6)return(n/1e6).toFixed(2)+"M";if(n>=1e3)return(n/1e3).toFixed(1)+"K";return n.toLocaleString();}
     function gcd(a,b){return b===0?a:gcd(b,a%b);}
     function getTimestamp(){const n=new Date();const d=n.toLocaleDateString();const t=n.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:!0});return`${d} ${t}`;}
+
+    function getSuggestedControllerModel(totalPixels) {
+        if (totalPixels <= 2300000) {
+            return { model: "TB50 / VX4S-N", capacity: "Up to 2.3M Pixels (FHD)", type: "Standalone Player / AIO Processor" };
+        } else if (totalPixels <= 4000000) {
+            return { model: "VX6S / N9", capacity: "Up to 4M Pixels (2K/UHD)", type: "High-Capacity Processor" };
+        } else if (totalPixels <= 9200000) {
+             return { model: "H5 / H9", capacity: "Up to 9.2M Pixels (Modular/4K)", type: "Modular Controller" };
+        } else {
+             return { model: "H10 + Scaling System", capacity: `Exceeds 9.2M Pixels (${(totalPixels / 1000000).toFixed(1)}M Total)`, type: "Modular Controller System" };
+        }
+    }
 
 
     // --- Core Functions ---
@@ -311,10 +353,8 @@
 
         // 7. Calculate Controller Requirements
         const reqPorts = Math.ceil(totalPixels / PIXELS_PER_SENDING_PORT);
-        let suggestedController = controllers.find(c => c.maxPixels >= totalPixels);
-        if (!suggestedController) {
-            suggestedController = { name: "Tier 5: Modular System (Exceeds 26M Pixels)", maxPixels: Infinity };
-        }
+        const suggestedController = getSuggestedControllerModel(totalPixels);
+
 
         // Store data
         return {
@@ -336,7 +376,7 @@
             cabinetH_mm: cabinetH_mm,
             cabPixW: details.cabPixW,
             cabPixH: details.cabPixH,
-            vendorController: details.vendorController,
+            vendorController: suggestedController.model,
             reqPorts: reqPorts,
             suggestedController: suggestedController,
             totalCabinets: numCabW * numCabH,
@@ -389,8 +429,8 @@
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${(finalW_M * finalH_M).toFixed(2)} m²</strong>`;
         document.getElementById('requiredPorts').innerHTML = `Required Data Ports (650k/Port): <strong>${data.reqPorts}</strong>`;
-        document.getElementById('suggestedController').innerHTML = `Suggested Controller Tier: <strong>${data.suggestedController.name}</strong>`;
-        document.getElementById('vendorController').innerHTML = `Control Box Model: <strong>${data.vendorController}</strong>`;
+        document.getElementById('suggestedController').innerHTML = `Suggested Controller Model: <strong>${data.suggestedController.model}</strong><small> (${data.suggestedController.capacity})</small>`;
+        document.getElementById('vendorController').innerHTML = `Control Box Type: <strong>${data.suggestedController.type}</strong>`;
 
         // 4. Update Visualization Grid
         const aspectRatio = data.finalW_mm / data.finalH_mm;
@@ -439,6 +479,7 @@
 
         const data = finalCalculationData;
         const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
+        const controller = data.suggestedController;
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4'); 
@@ -473,6 +514,8 @@
             ['Product Model', data.productName],
             ['Pixel Pitch (mm)', `${data.pixelPitch_mm} mm`],
             ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
+            ['Cabinet Dimensions (mm)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
+            ['Cabinet Pixels (W x H)', `${data.cabPixW} x ${data.cabPixH} pixels`],
             ['Total Cabinets Required', data.totalCabinets],
             ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)`],
             ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
@@ -494,16 +537,15 @@
         y = doc.lastAutoTable.finalY + lineHeight;
 
         // 3. Control System and Connection Diagram
-        const controller = data.suggestedController;
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
         doc.text('2. Control System & Connection Diagram', margin, y);
         y += lineHeight;
 
         const controllerData = [
+            ['Suggested Controller Model', `${controller.model} (${controller.type})`],
+            ['Controller Capacity', controller.capacity],
             ['Required Data Ports (650k/Port)', `${data.reqPorts}`],
-            ['Suggested Controller Tier', controller.name.split(':')[0]],
-            ['Control Box Model', data.vendorController],
         ];
 
         doc.autoTable({
@@ -542,7 +584,7 @@
         // Controller Block
         doc.setFillColor(200, 220, 250);
         doc.rect(x, y, boxW, boxH, 'F');
-        doc.text(`PeopleLink Control System`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
+        doc.text(`${controller.model} (${controller.type})`, x + boxW/2, y + boxH/2 + 1.5, { align: 'center' });
         y += boxH;
 
         // Arrow 2 (CAT6/Fiber)
@@ -558,7 +600,7 @@
         
         doc.setFontSize(8);
         doc.setTextColor(77, 77, 77);
-        let flowText = doc.splitTextToSize("The video signal is processed by the PeopleLink Control System and distributed to the cabinets via CAT6/Fiber optic cables. Power distribution is handled separately.", pageW - margin * 2);
+        let flowText = doc.splitTextToSize("The video signal is processed by the specified controller and distributed to the cabinets via CAT6/Fiber optic cables. Power distribution is handled separately.", pageW - margin * 2);
         doc.text(flowText, margin, y);
         y += flowText.length * 4.5 + 5;
 
@@ -592,11 +634,9 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-        // Set PeopleLink 2.5mm Outdoor as the default selection, based on the provided configuration file
-        document.getElementById('productModel').value = 'smd_25_640x480';
-        // Set the default unit selection to avoid validation errors on first calculation attempt
+        // Set PeopleLink SMD Indoor 2.5mm as the default selection.
+        document.getElementById('productModel').value = 'indoor_25';
         document.getElementById('unit').value = 'meters';
-        // Run toggle to ensure correct initial fields are shown
         toggleMeasurementFields();
     });
   </script>
