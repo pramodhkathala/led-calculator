@@ -138,7 +138,7 @@
     const PEOPLELINK_LOGO_BASE64 = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
     const PEOPLELINK_LOGO_ASPECT_RATIO = 1;
 
-    // --- Get Element References ---
+    // --- Get Element References (Same as before) ---
     const formContainer=document.getElementById('formContainer'),visualizationContainer=document.getElementById('visualization'),ledTypeSelect=document.getElementById('ledType'),viewingDistanceSelect=document.getElementById('viewingDistance'),unitSelect=document.getElementById('unit'),widthInput=document.getElementById('width'),heightInput=document.getElementById('height'),diagonalInput=document.getElementById('diagonal'),aspectRatioSelect=document.getElementById('aspectRatio'),errorDiv=document.getElementById('errorMessage'),submitButton=document.getElementById('submitButton'),backButtonPlaceholder=document.querySelector('.back-btn-placeholder'),enteredValuesDisplay=document.getElementById('enteredValuesDisplay'),enteredSummaryTextSpan=document.getElementById('enteredSummaryText'),aspectRatioValueSpan=document.getElementById('aspectRatioValue'),aspectRatioDisplayPDFSpan=document.getElementById('aspectRatioDisplayPDF'),spareModulesPDFSpan=document.getElementById('spareModulesPDF'),visGrid=document.getElementById('visGrid'),cabinetOverlay=document.getElementById('cabinetOverlay'),visWidthLabel=document.getElementById('visWidthLabel'),visHeightLabel=document.getElementById('visHeightLabel'),finalDimensionsSpan=document.getElementById('finalDimensions'),finalAreaSpan=document.getElementById('finalArea'),finalDiagonalSpan=document.getElementById('finalDiagonal'),resolutionSpan=document.getElementById('resolution'),totalPixelsSpan=document.getElementById('totalPixels'),pixelPitchDisplaySpan=document.getElementById('pixelPitchDisplay'),cabinetSizeSpan=document.getElementById('cabinetSize'),moduleSizeSpan=document.getElementById('moduleSize'),numModulesSpan=document.getElementById('numModules'),numCabinetsSpan=document.getElementById('numCabinets'),requiredPortsSpan=document.getElementById('requiredPorts'),suggestedControllerSpan=document.getElementById('suggestedController'),cabinetsPerPortSpan=document.getElementById('cabinetsPerPort'),popupOverlay=document.getElementById('popupOverlay'),controllerInfoPopup=document.getElementById('controllerInfoPopup'),popupTitle=document.getElementById('popupTitle'),popupContent=document.getElementById('popupContent'),
     downloadPdfLink=document.getElementById('downloadPdfLink');
 
@@ -269,7 +269,7 @@
 
         const cabinetW_mm = details.cabinetW_mm;
         const cabinetH_mm = details.cabinetH_mm;
-
+        
         // 2. Convert input to millimeters
         let desiredW_mm, desiredH_mm;
         if (unit === 'meters') {
@@ -289,17 +289,20 @@
         }
 
         // 3. Calculate cabinets needed (round up)
+        // THIS STEP ENSURES THE FINAL SIZE IS BASED ON WHOLE CABINETS (THE "ACTUAL SIZE" REQUIREMENT)
         let numCabW = Math.ceil(desiredW_mm / cabinetW_mm);
         let numCabH = Math.ceil(desiredH_mm / cabinetH_mm);
 
-        // 4. Calculate Final Dimensions (in mm)
+        // 4. Calculate Final Actual Dimensions (in mm)
         const finalW_mm = numCabW * cabinetW_mm;
         const finalH_mm = numCabH * cabinetH_mm;
 
         // 5. Calculate Pixel Resolution
+        // Cab Pixel W/H is derived from the fixed cabinet size and pixel pitch
         const cabPixW = Math.round(cabinetW_mm / pixelPitch_mm);
         const cabPixH = Math.round(cabinetH_mm / pixelPitch_mm);
-
+        
+        // Final Resolution is derived from the whole number of cabinets and the cabinet's native resolution
         const finalResW = numCabW * cabPixW;
         const finalResH = numCabH * cabPixH;
         const totalPixels = finalResW * finalResH;
@@ -387,11 +390,11 @@
         visualizationContainer.classList.add('visible');
 
         // 3. Update Details Section
-        finalDimensionsSpan.innerHTML = `Final Dimensions (WxH): <strong>${data.finalW_M.toFixed(2)}m x ${data.finalH_M.toFixed(2)}m</strong><small> (${data.finalW_FT.toFixed(2)}ft x ${data.finalH_FT.toFixed(2)}ft)</small>`;
+        finalDimensionsSpan.innerHTML = `**Actual Final Dimensions (WxH):** <strong>${data.finalW_M.toFixed(2)}m x ${data.finalH_M.toFixed(2)}m</strong><small> (Based on ${data.numCabW}x${data.numCabH} cabinets)</small>`;
         finalAreaSpan.innerHTML = `Final Area: <strong>${(data.finalW_M * data.finalH_M).toFixed(2)} m²</strong><small> (${(data.finalW_FT * data.finalH_FT).toFixed(2)} ft²)</small>`;
         finalDiagonalSpan.innerHTML = `Final Diagonal Size: <strong>${data.finalDiagonal_in.toFixed(1)} in</strong><small> (${(data.finalDiagonal_in * MM_PER_INCH / MM_PER_METER).toFixed(2)} m)</small>`;
         pixelPitchDisplaySpan.innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
-        resolutionSpan.innerHTML = `Resolution (WxH): <strong>${data.finalResW} x ${data.finalResH}</strong>`;
+        resolutionSpan.innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong><small> (${data.cabPixW}x${data.cabPixH} pixels/cabinet)</small>`;
         totalPixelsSpan.innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
         cabinetSizeSpan.innerHTML = `Cabinet Size (WxH): <strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong>`;
         moduleSizeSpan.innerHTML = `Module Size (WxH): <strong>${data.moduleW_mm}mm x ${data.moduleH_mm}mm</strong>`;
@@ -402,7 +405,7 @@
         const suggestedControllerText = data.suggestedController.name;
         suggestedControllerSpan.setAttribute('data-controller-name', suggestedControllerText);
         suggestedControllerSpan.innerHTML = `Suggested Controller: <strong onclick="showControllerInfo('${suggestedControllerText}')">${suggestedControllerText}</strong>`;
-        cabinetsPerPortSpan.innerHTML = data.suggestedController.isHSeries ? `Output Card Slots (Max): <strong>${data.suggestedController.outputCardSlots}</strong>` : `Max Pixels: <strong>${formatLargeNumber(data.suggestedController.maxPixels)}</strong>`;
+        cabinetsPerPortSpan.innerHTML = data.suggestedController.isHSeries ? `Max Output Card Slots: <strong>${data.suggestedController.outputCardSlots}</strong>` : `Max Pixels: <strong>${formatLargeNumber(data.suggestedController.maxPixels)}</strong>`;
 
         // PDF Data placeholders (Hidden spans)
         aspectRatioDisplayPDFSpan.querySelector('strong').textContent = data.aspectRatioText;
@@ -462,8 +465,7 @@
             let sendingCardName;
             let sendingCardQty;
             if (reqPorts > SENDING_CARD_PORTS * c.outputCardSlots) {
-                // If required ports exceed max card slots * 16 (H-series limit), this is a complex scenario
-                // For simplicity, we use the max capacity of the frame
+                // If required ports exceed max card slots * 16 (H-series limit)
                 sendingCardName = ALT_H_SENDING_CARD; // Use the 20-port card for higher density
                 sendingCardQty = c.outputCardSlots;
                 pH += `<p style="color:#B71C1C;"><strong>Warning:</strong> The required ${reqPorts} ports might exceed the practical limit for a single ${c.name} chassis. Calculation defaults to max output slots (${c.outputCardSlots}).</p>`;
@@ -543,7 +545,7 @@
         doc.line(margin, y, pageW - margin, y);
         y += lineHeight * 0.75;
 
-        // 2. Configuration Overview
+        // 2. Configuration Parameters
         doc.setFontSize(14);
         doc.setTextColor(27, 94, 32); // #1B5E20
         doc.text('1. Configuration Parameters', margin, y);
@@ -584,15 +586,16 @@
         // 3. Final LED Wall Specifications (Technical Output)
         doc.setFontSize(14);
         doc.setTextColor(13, 71, 161); // #0D47A1
-        doc.text('2. Final LED Wall Specifications', margin, y);
+        doc.text('2. Final LED Wall Specifications (Based on Cabinet Count)', margin, y);
         y += lineHeight;
 
         const specsData = [
-            ['Final Dimensions (W x H)', `${data.finalW_M.toFixed(2)}m x ${data.finalH_M.toFixed(2)}m`],
+            ['Cabinet Configuration (W x H)', `${data.numCabW} x ${data.numCabH} cabinets`],
+            ['Total Cabinets Required', data.totalCabinets],
+            ['Actual Final Dimensions (W x H)', `${data.finalW_M.toFixed(2)}m x ${data.finalH_M.toFixed(2)}m`],
+            ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
             ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
-            ['Final Aspect Ratio', data.aspectRatioText],
             ['Screen Area', `${(data.finalW_M * data.finalH_M).toFixed(2)} m²`],
-            ['Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
             ['Total Pixels', formatLargeNumber(data.totalPixels)],
         ];
 
@@ -600,23 +603,24 @@
             startY: y + 3,
             body: specsData,
             margin: { left: margin, right: margin, bottom: 0 },
-            theme: 'plain',
+            theme: 'striped',
+            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
             styles: { fontSize: 9, cellPadding: 2.5, fontStyle: 'bold' },
             columnStyles: { 0: { fontStyle: 'normal', textColor: [0, 0, 0] } }
         });
 
         y = doc.lastAutoTable.finalY + lineHeight;
 
-        // 4. Component Breakdown
+        // 4. Component Details
         doc.setFontSize(14);
         doc.setTextColor(27, 94, 32); // #1B5E20
-        doc.text('3. Component Breakdown', margin, y);
+        doc.text('3. Component Details', margin, y);
         y += lineHeight;
 
         const componentsData = [
-            ['Cabinet Unit Size (W x H)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
-            ['Cabinets Required (W x H)', `${data.numCabW} x ${data.numCabH}`],
-            ['Total Cabinets', data.totalCabinets],
+            ['LED Panel Pixel Pitch', `${data.pixelPitch_mm} mm`],
+            ['Cabinet Unit Physical Size (W x H)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
+            ['Cabinet Unit Pixel Resolution (W x H)', `${data.cabPixW} x ${data.cabPixH} pixels`],
             ['Module Size (W x H)', `${data.moduleW_mm}mm x ${data.moduleH_mm}mm`],
             ['Modules per Cabinet', `${data.modulesPerCabW} x ${data.modulesPerCabH}`],
             ['Total Modules', data.totalModules],
@@ -656,15 +660,12 @@
              let reqSendCards = Math.ceil(reqPorts / SENDING_CARD_PORTS);
 
              if (reqPorts > SENDING_CARD_PORTS * controller.outputCardSlots) {
-                // Maximum capacity case
                 sendingCardName = ALT_H_SENDING_CARD;
                 sendingCardQty = controller.outputCardSlots;
              } else if (reqPorts > SENDING_CARD_PORTS) {
-                // High-density 20-port card case
                 sendingCardName = ALT_H_SENDING_CARD;
                 sendingCardQty = Math.ceil(reqPorts / ALT_SENDING_CARD_PORTS);
              } else {
-                // Standard 16-port card case
                 sendingCardName = DEFAULT_H_SENDING_CARD;
                 sendingCardQty = Math.max(1, reqSendCards);
              }
