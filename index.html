@@ -787,16 +787,35 @@
 
         // 3. Update Details Section (Column 1 - Wall Specs) - ADDING COLON (:)
         
-        document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
-        document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
-        document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
-        document.getElementById('totalModules').innerHTML = `<strong>Total Modules Required :</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
-        document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
-        document.getElementById('finalArea').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
-        document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
+        // --- START MODIFICATION FOR PIXEL PITCH ORDER ---
+        // 1. Set Pixel Pitch to the first spot (finalDimensions span)
+        document.getElementById('finalDimensions').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
+
+        // 2. Set Final Dimensions to the second spot (resolution span)
+        document.getElementById('resolution').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
+
+        // 3. Set Resolution to the third spot (numCabinets span)
+        document.getElementById('numCabinets').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
+        
+        // 4. Total Cabinets to the fourth spot (totalModules span)
+        document.getElementById('totalModules').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
+        
+        // 5. Total Modules to the fifth spot (finalDiagonal span)
+        document.getElementById('finalDiagonal').innerHTML = `<strong>Total Modules Required :</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
+        
+        // 6. Final Diagonal to the sixth spot (finalArea span)
+        document.getElementById('finalArea').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
+        
+        // 7. Final Area to the seventh spot (totalPixels span)
+        document.getElementById('totalPixels').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
+        
+        // 8. Total Pixels to the eighth spot (pixelPitchDisplay span)
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
+        
+        // 9 & 10. The last two items (cabinet size/pixels) remain in their current spots
         document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH) :</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
         document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH) :</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
+        // --- END MODIFICATION FOR PIXEL PITCH ORDER ---
 
         // 4. Update Details Section (Column 2 - Control System & Power) - ADDING COLON (:) & NEW ETHERNET LABELS
         const isHSeries = data.controllerType.includes("Modular");
@@ -1033,21 +1052,21 @@
             ['Receiving Cards (R-Card)', `Embedded in Cabinet`, data.totalRecCards, 'PCS'],
             ['Long Ethernet Cables', `Controller to Wall runs (CAT6/7)`, data.requiredPorts, 'PCS'],
             ['Short Ethernet Cables', `Cabinet interconnect (CAT6/7)`, data.requiredShortEthernet, 'PCS'],
-            // --- NEW ITEMS ADDED HERE ---
             ['Installation / Configuration', `Includes wall mounting/stacking structure, site setup, and system commissioning.`, 1, 'LS (Lump Sum)'],
             ['Transport / Logistics', `Shipping/freight charges to site location.`, 1, 'LS (Lump Sum)'],
-            // -----------------------------
         ];
 
         if (data.controllerType.includes("Modular")) {
             boqData.push(['Modular Splicer Frame', data.splicerSolution || 'Not Specified', 1, 'PCS']);
             boqData.push(['Output Card (Sending)', data.outputCardModel, data.requiredSendCards, 'PCS']);
-            boqData.push(['Input Card (User Config)', data.inputCardModel, data.inputCardQty, 'PCS']);
+            boqData.push(['Input Card (User Config) :', data.inputCardModel, data.inputCardQty, 'PCS']); // Corrected description
         }
 
+        const boqHeaders = [['Item', 'Description / Model', 'Quantity', 'Unit']]; // Moved definition here
+        
         doc.autoTable({ 
             startY: y + 2, 
-            head: [['Item', 'Description / Model', 'Quantity', 'Unit']],
+            head: boqHeaders,
             body: boqData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'grid', 
@@ -1055,7 +1074,24 @@
             styles: { fontSize: 8, cellPadding: 1.5 },
             columnStyles: { 0: { fontStyle: 'bold' }, 2: { halign: 'right' }, 3: { halign: 'center' } }
         });
-        y = doc.lastAutoTable.finalY + lineHeight * 2;
+        y = doc.lastAutoTable.finalY; // Adjust y to the end of the first table
+
+        // --- ADDED: GST Entry Table ---
+        const gstData = [
+            ['Goods and Services Tax (GST) @ 18%', 'Applicable on the total value of taxable goods and services.', 'Total Sum', 'PERCENT'],
+        ];
+
+        doc.autoTable({
+            startY: y, // Start immediately after the main table
+            head: [], // No header for the final line
+            body: gstData,
+            margin: { left: margin, right: margin, bottom: 0 },
+            theme: 'grid',
+            styles: { fontSize: 8, cellPadding: 1.5, lineColor: [0, 0, 0] }, // Ensure borders are visible
+            columnStyles: { 0: { fontStyle: 'bold', fillColor: [240, 248, 255] }, 1: { fillColor: [240, 248, 255] }, 2: { halign: 'right' , fillColor: [240, 248, 255] }, 3: { halign: 'center', fillColor: [240, 248, 255] } }
+        });
+        y = doc.lastAutoTable.finalY + lineHeight * 2; // Move y down after the new table
+        // --- END ADDED GST Table ---
         
         // --- 7. Terms and Conditions ---
         doc.setFontSize(12);
@@ -1066,14 +1102,17 @@
         doc.setFontSize(8); 
         doc.setTextColor(50, 50, 50); // Dark gray for text
 
+        // --- MODIFIED TERMS ARRAY WITH GST & RENUMBERING ---
         const terms = [
             "1. Price Validity: This quotation is valid for 30 days from the date of issue.",
-            "2. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
-            "3. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
-            "4. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
-            "5. Warranty: Standard warranty is 3 years on LED panels and 1 year on accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.",
-            "6. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours."
+            "2. Goods and Services Tax (GST): **GST is applicable at 18% on the total taxable value of goods and services**, as detailed in the Bill of Quantities (BOQ).",
+            "3. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
+            "4. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
+            "5. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
+            "6. Warranty: Standard warranty is 1 years on LED panels and accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.",
+            "7. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours."
         ];
+        // --- END MODIFIED TERMS ARRAY ---
         
         terms.forEach((term, index) => {
             // Check if a new page is needed
@@ -1121,7 +1160,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink
+    © PeopleLink Unified Communications. All rights reserved.
 </footer>
 </body>
 </html>
