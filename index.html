@@ -250,7 +250,7 @@
 
             <div class="modal-input-group">
                 <label for="modalSplicerSolution">Splicer Frame/Solution (Optional):</label>
-                <input type="text" id="modalSplicerSolution" placeholder="e.g., H-Series Modular Splicer (H5)">
+                <input type="text" id="modalSplicerSolution" placeholder="e.g., H5 Modular Splicer (5U)">
             </div>
 
             <div class="modal-input-group">
@@ -327,13 +327,18 @@
         { name: "4K Prime", type: "All-in-One Processor", ports: 16, maxPixels: 10400000, maxW: 16384, maxH: 8192, priority: 6 },
         { name: "4K Prime Pro", type: "All-in-One Processor", ports: 20, maxPixels: 13000000, maxW: 16384, maxH: 8192, priority: 7 },
         
-        // Modular Splicers
-        { name: "H-Series Modular Splicer", type: "Modular Splicer", ports: 20, maxPixels: 26000000, maxW: 16384, maxH: 8192, priority: 8 }, 
+        // Modular Splicers (UPDATED: Individual H-Series Models)
+        // Ports is 20 for calculation based on the 20-port output card being the max capacity
+        { name: "H2 (2U)", type: "Modular Splicer", ports: 20, maxPixels: 26000000, maxW: 16384, maxH: 8192, priority: 8 }, 
+        { name: "H5 (5U)", type: "Modular Splicer", ports: 20, maxPixels: 39000000, maxW: 16384, maxH: 8192, priority: 9 }, 
+        { name: "H9 (9U)", type: "Modular Splicer", ports: 20, maxPixels: 65000000, maxW: 16384, maxH: 8192, priority: 10 }, 
+        { name: "H15 (15U)", type: "Modular Splicer", ports: 20, maxPixels: 130000000, maxW: 16384, maxH: 8192, priority: 11 }, 
+        { name: "H20 (20U)", type: "Modular Splicer", ports: 20, maxPixels: 260000000, maxW: 16384, maxH: 8192, priority: 12 }, 
     ].sort((a, b) => a.priority - b.priority);
 
     // New H-Series Card Defaults and Splicer Info
     const H_SERIES_DEFAULTS = {
-        SPLICER_NAME: "H-Series Modular Splicer (H2/H5/H9/H15/H20)", 
+        SPLICER_NAME: "H-Series Modular Splicer Frame", // Simplified description, actual model chosen based on pixels
         
         // Input Card Options (Simplified display name for user selection)
         INPUT_CARD_OPTIONS: [
@@ -504,7 +509,7 @@
         showVisualization(); 
     }
     
-    // --- Core Calculation Logic (Unchanged) ---
+    // --- Core Calculation Logic (Updated H-Series selection) ---
 
     function getSuggestedControllerModel(totalPixels, finalResW, finalResH, productKey) {
         
@@ -538,9 +543,19 @@
             }
         }
 
-        // 4. Default to Modular Splicer (H-Series) for massive walls or if no AIO/TB fits
+        // 4. Check Modular Splicers (H-Series) - Find the smallest one that fits
         if (!suggestedController) {
-            suggestedController = CONTROLLER_MODELS.find(c => c.type.includes("Modular")) || CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1]; 
+            // Filter H-Series models that fit the pixel count and screen resolution
+            const suitableHSeries = CONTROLLER_MODELS
+                .filter(c => c.type === "Modular Splicer" && c.maxPixels >= totalPixels && c.maxW >= finalResW && c.maxH >= finalResH)
+                .sort((a, b) => a.maxPixels - b.maxPixels); // Sort to find the smallest suitable one
+
+            if (suitableHSeries.length > 0) {
+                suggestedController = suitableHSeries[0];
+            } else {
+                 // Fallback to the largest available controller if even the smallest H-series is too big
+                 suggestedController = CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1]; 
+            }
         }
 
         return suggestedController;
@@ -677,7 +692,7 @@
         const inputCardModel = finalCalculationData.inputCardModel || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_MODEL;
         const inputCardQty = finalCalculationData.inputCardQty || H_SERIES_DEFAULTS.DEFAULT_INPUT_CARD_QTY;
         
-        // Splicer solution is editable and optional
+        // Splicer solution is editable and optional, defaults to the generic name if H-series suggested and no override exists
         const splicerSolution = finalCalculationData.splicerSolution || (isHSeries ? H_SERIES_DEFAULTS.SPLICER_NAME : 'N/A');
 
         // Total required ports based on standard pixel bandwidth (Long Ethernet Ports)
@@ -810,8 +825,8 @@
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Connection Summary</span>
             <span id="requiredRecCards"><strong>Total Receiving Cards Required :</strong><small>${data.totalRecCards}</small></span>
             
-            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs : (Controller to Wall)</strong><small>${data.requiredPorts}</small></span>
-            <span id="controllerShortPorts"><strong>Short Ethernet Cables : (Between Cabinets)</strong><small>${data.requiredShortEthernet}</small></span>
+            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs : (Controller to Wall) -</strong><small>** ${data.requiredPorts}</small></span>
+            <span id="controllerShortPorts"><strong>Short Ethernet Cables : (Between Cabinets) -</strong><small>** ${data.requiredShortEthernet}</small></span>
         `;
         
         // --- 4. Power and Weight Section ---
@@ -1063,7 +1078,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_KPR
+    © PeopleLink
 </footer>
 </body>
 </html>
