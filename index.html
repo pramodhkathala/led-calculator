@@ -54,7 +54,7 @@
 
     /* Visualization/Output Container */
     .visualization { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); opacity: 0; max-height: 0; overflow-y: hidden; transition: opacity 0.6s ease-out, max-height 1s ease-out; margin-top: 30px; }
-    .visualization.visible { opacity: 1; max-height: 2000px; } 
+    .visualization.visible { opacity: 1; max-height: 4000px; /* Increased height for new sections */ } 
     
     .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
     
@@ -115,9 +115,80 @@
     .modal-grid-span-2 { grid-column: 1 / -1; }
     .modal-disclaimer { margin-top: 15px; padding: 10px; background: #fffde7; border: 1px solid #ffeb3b; border-radius: 5px; font-size: 0.85em; color: #616161; }
 
+    /* --- ADDED VISUALIZATION STYLES --- */
+    .video-section {
+        margin-top: 30px;
+        padding: 30px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+    .video-section h2 {
+        text-align: left;
+        margin-bottom: 15px;
+        color: #0D47A1;
+        font-size: 1.4em;
+    }
+    .video-section input[type="text"] {
+        width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #dcdcdc; border-radius: 6px; box-sizing: border-box; 
+    }
+    .video-section button {
+        background-color: #0D47A1;
+        color: white;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 6px;
+        font-size: 15px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .video-section button:hover {
+        background-color: #1565C0;
+    }
+
+    #video-container {
+        height: 300px;
+        width: 100%;
+        background-color: black;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    #display-video {
+        width: 100%;
+        height: 100%;
+        object-fit: contain; /* Ensures the video fits within the black box */
+    }
+
+    #connection-map { 
+        position: relative; 
+        padding: 30px 10px; /* Add padding for arrows */
+        border: 1px solid #e0e0e0;
+        background: #f7f9fc;
+        border-radius: 8px;
+        overflow: auto;
+    }
+    .cabinet-box {
+        box-sizing: border-box;
+    }
+    .arrow-h, .arrow-v {
+        position: absolute;
+        font-size: 1.2em;
+        color: #ef4444; /* Red color for signal flow */
+        font-weight: 700;
+        z-index: 10;
+        /* Positioning adjusted for cabinet size/gap */
+    }
+    .arrow-h.right { top: 50%; right: -25px; transform: translateY(-50%); }
+    .arrow-h.left { top: 50%; left: -25px; transform: translateY(-50%); }
+    .arrow-v.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
+    /* --- END ADDED VISUALIZATION STYLES --- */
+
   </style>
 </head>
 <body>
+  <div style="text-align: center; margin-bottom: 20px;">
+    <img src="logo.png" alt="Company Logo" style="height:60px; width:auto;">
+  </div>
   <div class="main-wrapper">
     <div class="input-panel" id="formContainer">
       <h2>LED Video Wall Configuration Calculator</h2>
@@ -233,7 +304,30 @@
       <span id="downloadPdfLink" onclick="downloadPdf()">Download PDF Technical Summary 📄</span>
 
        <button class="back-btn" id="backButton" onclick="hideVisualization()">Modify Configuration</button>
-    </div>
+      
+      <div id="video-display-section" class="video-section">
+          <h2>Video Playback Test</h2>
+          <div class="input-group">
+              <label for="video-url">Video URL (or Local File Path):</label>
+              <input type="text" id="video-url" value="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
+                placeholder="Enter video URL (e.g., MP4 or HLS link)">
+          </div>
+          <div id="video-container">
+              <video id="display-video" controls muted>
+                  Your browser does not support the video tag.
+              </video>
+          </div>
+          <button id="play-video-btn" class="mt-4">Load & Play Video on Wall</button>
+      </div>
+
+      <div id="connection-diagram-section" class="video-section">
+          <h2>Cabinet Connection Diagram (Signal Flow)</h2>
+          <p style="font-size: 0.9em; color: #666; margin-bottom: 15px;">Based on the calculated W x H cabinet array, this illustrates the Serpentine (or N-Shape) signal flow.</p>
+          <div id="connection-map" style="min-height: 200px;">
+              <p style="text-align: center; color: #666; padding: 20px;">Click 'Calculate & Visualize System' to generate the diagram.</p>
+          </div>
+      </div>
+      </div>
 
     <div id="controllerModal" class="modal">
       <div class="modal-content">
@@ -893,6 +987,9 @@
             }
         }
 
+        // 6. Draw Connection Map (New)
+        drawConnectionMap(data.numCabW, data.numCabH);
+
         document.getElementById('downloadPdfLink').classList.remove('hidden');
     }
     
@@ -1144,6 +1241,113 @@
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_BOQ.pdf`);
     }
 
+    // --- START ADDED JAVASCRIPT FOR DIAGRAM AND VIDEO ---
+
+    // Function to draw the cabinet connection diagram (Serpentine/N-Shape flow)
+    function drawConnectionMap(cols, rows) {
+        const mapContainer = document.getElementById('connection-map');
+        mapContainer.innerHTML = '';
+        
+        // Set up grid layout
+        mapContainer.style.display = 'grid';
+        mapContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+        mapContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+        mapContainer.style.gap = '5px';
+        mapContainer.style.width = '100%';
+
+        for (let r = 0; r < rows; r++) {
+            // Determine the order for the row (Left-to-Right or Right-to-Left)
+            // LTR for even rows (r=0, 2, 4...), RTL for odd rows (r=1, 3, 5...)
+            const isLTR = (r % 2 === 0);
+            const rowIndices = [...Array(cols).keys()];
+            
+            for (let c_index of rowIndices) {
+                // Calculate the actual cabinet number (Rx card number)
+                let rxNum;
+                if (isLTR) {
+                    rxNum = r * cols + (c_index + 1); // 0-based row * cols + 1-based column
+                } else {
+                    rxNum = r * cols + (cols - c_index); // 0-based row * cols + (cols - 0-based column)
+                }
+                
+                const cabinet = document.createElement('div');
+                cabinet.className = 'cabinet-box';
+                cabinet.style.backgroundColor = '#fff';
+                cabinet.style.border = '1px solid #ccc';
+                cabinet.style.padding = '8px 5px';
+                cabinet.style.textAlign = 'center';
+                cabinet.style.fontSize = '0.75em';
+                cabinet.style.fontWeight = '600';
+                cabinet.style.position = 'relative';
+                cabinet.style.gridColumn = c_index + 1;
+                cabinet.style.gridRow = r + 1;
+                
+                // Display Cabinet ID and Receiving Card (Rx)
+                cabinet.innerHTML = `Rx ${rxNum}<br><span style="color: #0D47A1;">1 Port, 1 Cab</span>`;
+                
+                // --- DRAW CONNECTIONS (Arrows) ---
+                
+                // 1. Horizontal Arrows
+                if (isLTR) { 
+                    if (c_index < cols - 1) { // Not the last column
+                        cabinet.innerHTML += '<span class="arrow-h right">→</span>';
+                    }
+                } else { // RTL 
+                    if (c_index > 0) { // Not the first column
+                        cabinet.innerHTML += '<span class="arrow-h left">←</span>';
+                    }
+                }
+
+                // 2. Vertical Arrows (Down) - Only at the end of each row, except the last row
+                if (r < rows - 1) {
+                    if (isLTR && c_index === cols - 1) { // End of LTR row
+                        cabinet.innerHTML += '<span class="arrow-v bottom">↓</span>';
+                    } else if (!isLTR && c_index === 0) { // End of RTL row
+                        cabinet.innerHTML += '<span class="arrow-v bottom">↓</span>';
+                    }
+                }
+
+                mapContainer.appendChild(cabinet);
+            }
+        }
+    }
+    
+    document.getElementById('play-video-btn').addEventListener('click', function() {
+        // Ensure we have calculation data
+        if (!finalCalculationData || !finalCalculationData.finalResW) {
+            alert("Please calculate the LED wall configuration first.");
+            return;
+        }
+        
+        const videoUrl = document.getElementById('video-url').value;
+        const videoElement = document.getElementById('display-video');
+        
+        // 1. Simulate video source input (Synchronous Mode)
+        videoElement.src = videoUrl;
+        videoElement.load();
+        
+        // 2. Simulate playback on the LED wall
+        videoElement.play().catch(error => {
+            console.error("Video playback failed:", error);
+            alert("Video could not play. Check URL or browser permissions (might need to interact first).");
+        });
+        
+        // Optional: Update text to show resolution being used
+        const resolutionW = finalCalculationData.finalResW;
+        const resolutionH = finalCalculationData.finalResH;
+
+        const btn = document.getElementById('play-video-btn');
+        btn.textContent = `Playing Video at ${resolutionW}x${resolutionH} Resolution`;
+        btn.style.backgroundColor = '#1B5E20';
+        btn.style.color = 'white';
+
+        setTimeout(() => {
+            btn.textContent = 'Load & Play Video on Wall';
+            btn.style.backgroundColor = '#0D47A1';
+        }, 5000);
+    });
+    // --- END ADDED JAVASCRIPT FOR DIAGRAM AND VIDEO ---
+
     document.addEventListener('DOMContentLoaded', () => {
         toggleMeasurementFields();
         populateModalControllers();
@@ -1160,7 +1364,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink Unified Communications. All rights reserved.
+    © PeopleLink
 </footer>
 </body>
 </html>
