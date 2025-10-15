@@ -11,31 +11,8 @@
     body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px; background: #eef1f8; color: #1c2738; font-size: 14px; }
     .main-wrapper { max-width: 1200px; margin: auto; }
     
-    /* Watermark Style (Pramodh Kathala) - UPDATED */
-    #watermark {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        font-size: 2em; 
-        font-weight: 500;
-        color: #FFB6C1; /* Light Hex */
-        opacity: 0.1; /* Updated base opacity */
-        transform: translate(-50%, -50%) rotate(-45deg); /* Cross angle */
-        pointer-events: none; 
-        z-index: 111;
-        text-align: center;
-        width: 100%;
-        white-space: nowrap;
-    }
-
-    /* Media Query for "visible on small size of the center" */
-    @media (max-width: 768px) {
-        #watermark {
-            font-size: 2em;
-            opacity: 0.1; /* Slightly more visible on small screens */
-            width: auto;
-        }
-    }
+    /* Watermark Style (REMOVED) 
+    #watermark { ... } */
 
     /* Header & Titles */
     h2 { 
@@ -152,11 +129,9 @@
   </style>
 </head>
 <body>
-  <div id="watermark">Pramodh Kathala</div>
   <div class="main-wrapper">
     <div class="input-panel" id="formContainer">
       <h2>
-        <span id="logo-placeholder">PL</span>
         LED Video Wall Configuration Calculator
       </h2>
       <div id="enteredValuesDisplay" class="hidden">
@@ -236,6 +211,7 @@
         <div class="details-box">
             <h4>LED Wall Specifications</h4>
             <div class="vis-details">
+                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span>
                 <span id="finalDimensions"><strong>--</strong><small>--</small></span>
                 <span id="resolution"><strong>--</strong><small>--</small></span>
                 <span id="numCabinets"><strong>--</strong><small>--</small></span>
@@ -243,7 +219,6 @@
                 <span id="finalDiagonal"><strong>--</strong><small>--</small></span>
                 <span id="finalArea"><strong>--</strong><small>--</small></span>
                 <span id="totalPixels"><strong>--</strong><small>--</small></span>
-                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span>
                 <span id="cabinetSize"><strong>--</strong><small>--</small></span>
                 <span id="cabinetPixels"><strong>--</strong><small>--</small></span>
             </div>
@@ -467,23 +442,21 @@
         proceedToDownloadPdf();
     }
 
-    // --- PDF Watermark Function (NEW) ---
+    // --- PDF Watermark Function (REMOVED) ---
 
     function addWatermarkToPdf(doc, text) {
+        // Function content removed as per user request
+        /*
         const pageCount = doc.internal.getNumberOfPages();
         const pageW = doc.internal.pageSize.getWidth();
         const pageH = doc.internal.pageSize.getHeight();
         
-        // Light Hex: #FFB6C1 (RGB:255, 182, 193)
-        // Set very low opacity and light hex color for watermark
         doc.setFontSize(30);
         doc.setTextColor(255, 182, 193); 
         doc.setGState(new doc.GState({opacity: 0.1})); 
 
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
-            // Draw the text in the center with a positive 45-degree angle (cross angle)
-            // (105 is the center of the A4 page in mm)
             doc.text(text, pageW / 2, pageH / 2, { 
                 angle: 45, 
                 align: 'center',
@@ -491,13 +464,12 @@
             });
         }
 
-        // Reset state
         doc.setGState(new doc.GState({opacity: 1})); 
-        doc.setTextColor(0, 0, 0); 
+        doc.setTextColor(0, 0, 0);
+        */ 
     }
 
-    // --- Core Calculation & UI Functions (Same as previous, omitted for brevity but present in actual file) ---
-    // (Existing functions like toggleMeasurementFields, populateModalControllers, openControllerModal, calculateLEDWall, etc.)
+    // --- Core Calculation & UI Functions (Same as previous, abbreviated) ---
     
     function toggleMeasurementFields(){
         const unit = document.getElementById('unit').value;
@@ -860,7 +832,7 @@
 
         const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
 
-        document.getElementById('enteredSummaryText').textContent = `Cabinet Array: ${data.numCabW}x${data.numCabH} (${data.totalCabinets} Cabinets)`;
+        document.getElementById('enteredSummaryText').textContent = `Cabinet Matrix: ${data.numCabW}x${data.numCabH} (${data.totalCabinets} Cabinets)`;
         document.getElementById('aspectRatioValue').textContent = data.aspectRatioText; 
 
         document.getElementById('formContainer').classList.add('minimized');
@@ -868,6 +840,7 @@
         document.querySelector('.back-btn-placeholder').classList.remove('hidden');
         document.getElementById('visualization').classList.add('visible');
 
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
         document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
         document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
         document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
@@ -875,7 +848,6 @@
         document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
         document.getElementById('finalArea').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
         document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
         document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH) :</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
         document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH) :</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
 
@@ -902,8 +874,8 @@
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Connection Summary</span>
             <span id="requiredRecCards"><strong>Total Receiving Cards Required :</strong><small>${data.totalRecCards}</small></span>
             
-            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs : (Controller to Wall) -</strong><small>** ${data.requiredPorts}</small></span>
-            <span id="controllerShortPorts"><strong>Short Ethernet Cables : (Between Cabinets) -</strong><small>** ${data.requiredShortEthernet}</small></span>
+            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs :</strong><small>${data.requiredPorts} (Controller to Wall) </small></span>
+            <span id="controllerShortPorts"><strong>Short Ethernet Cables :</strong><small>${data.requiredShortEthernet} (Between Cabinets) </small></span>
         `;
         
         htmlContent += `
@@ -959,7 +931,7 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation Function (Renamed and Watermark Added) ---
+    // --- PDF Generation Function (Watermark Removed) ---
     function proceedToDownloadPdf() {
         const data = finalCalculationData;
         const { finalW_M, finalH_M, finalW_FT, finalH_FT } = calculateDimensions(data);
@@ -1021,7 +993,7 @@
             ['Pixel Pitch :', `${data.pixelPitch_mm} mm`],
             ['Cabinet Dimensions (W x H) :', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
             ['Cabinet Pixels (W x H) :', `${data.cabPixW} x ${data.cabPixH}`],
-            ['Cabinet Array (W x H) :', `${data.numCabW} x ${data.numCabH}`],
+            ['Cabinet Matrix (W x H) :', `${data.numCabW} x ${data.numCabH}`],
             ['Total Cabinets Required :', `${data.totalCabinets}`],
             ['Total Modules Required :', `${data.totalModules}`],
             ['Brightness Range :', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'], 
@@ -1144,7 +1116,7 @@
         ];
         
         terms.forEach((term, index) => {
-            if (y > doc.internal.pageSize.getHeight() - margin - 20) {
+            if (y > doc.internal.pageSize.getHeight() - margin - 30) {
                 doc.addPage();
                 y = margin;
                 doc.setFontSize(8);
@@ -1157,7 +1129,7 @@
         
         // Final Disclaimer
         y += lineHeight * 0.5;
-        if (y > doc.internal.pageSize.getHeight() - margin - 10) {
+        if (y > doc.internal.pageSize.getHeight() - margin - 20) {
                 doc.addPage();
                 y = margin;
         }
@@ -1166,9 +1138,18 @@
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
         y += lineHeight;
+        
+        // PDF Footer (Light Color)
+        doc.setFontSize(8);
+        doc.setTextColor(176, 196, 222); // Light Steel Blue
+        const footerText = '© 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala';
 
-        // --- ADD WATERMARK TO ALL PAGES ---
-        addWatermarkToPdf(doc, "Pramodh Kathala");
+        // Add footer to the current page (last page)
+        doc.text(footerText, pageW / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
+
+
+        // --- ADD WATERMARK TO ALL PAGES (REMOVED) ---
+        // addWatermarkToPdf(doc, "Pramodh Kathala");
 
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_BOQ.pdf`);
     }
@@ -1191,13 +1172,8 @@
         }
     });
   </script>
-<footer class="text-center text-gray-500 text-sm mt-10">
+<footer class="text-center text-gray-500 text-sm mt-10" style="color: #b0c4de;">
     © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
 </footer>
 </body>
 </html>
-
-
-
-
-
