@@ -1033,6 +1033,10 @@
             ['Receiving Cards (R-Card)', `Embedded in Cabinet`, data.totalRecCards, 'PCS'],
             ['Long Ethernet Cables', `Controller to Wall runs (CAT6/7)`, data.requiredPorts, 'PCS'],
             ['Short Ethernet Cables', `Cabinet interconnect (CAT6/7)`, data.requiredShortEthernet, 'PCS'],
+            // --- NEW ITEMS ADDED HERE ---
+            ['Installation / Configuration', `Includes wall mounting/stacking structure, site setup, and system commissioning.`, 1, 'LS (Lump Sum)'],
+            ['Transport / Logistics', `Shipping/freight charges to site location.`, 1, 'LS (Lump Sum)'],
+            // -----------------------------
         ];
 
         if (data.controllerType.includes("Modular")) {
@@ -1051,9 +1055,48 @@
             styles: { fontSize: 8, cellPadding: 1.5 },
             columnStyles: { 0: { fontStyle: 'bold' }, 2: { halign: 'right' }, 3: { halign: 'center' } }
         });
-        y = doc.lastAutoTable.finalY + 8;
+        y = doc.lastAutoTable.finalY + lineHeight * 2;
+        
+        // --- 7. Terms and Conditions ---
+        doc.setFontSize(12);
+        doc.setTextColor(...secondaryColor);
+        doc.text('6. Standard Terms & Conditions for Active LED', margin, y);
+        y += lineHeight;
+        
+        doc.setFontSize(8); 
+        doc.setTextColor(50, 50, 50); // Dark gray for text
+
+        const terms = [
+            "1. Price Validity: This quotation is valid for 30 days from the date of issue.",
+            "2. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
+            "3. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
+            "4. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
+            "5. Warranty: Standard warranty is 3 years on LED panels and 1 year on accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.",
+            "6. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours."
+        ];
+        
+        terms.forEach((term, index) => {
+            // Check if a new page is needed
+            if (y > doc.internal.pageSize.getHeight() - margin - 20) {
+                doc.addPage();
+                y = margin;
+                doc.setFontSize(8);
+                doc.setTextColor(50, 50, 50);
+            }
+            // Use doc.text for wrapping capability if lines are long
+            const splitText = doc.splitTextToSize(term, pageW - 2 * margin);
+            doc.text(splitText, margin, y);
+            y += (splitText.length * 3.5) + 1; // 3.5 is the approximate height of font size 8 with some line spacing
+        });
         
         // Final Disclaimer
+        y += lineHeight * 0.5;
+        // Check if a new page is needed for the footer
+        if (y > doc.internal.pageSize.getHeight() - margin - 10) {
+                doc.addPage();
+                y = margin;
+        }
+
         doc.setFontSize(7); 
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
