@@ -9,8 +9,24 @@
   <style>
     /* Base styles */
     body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px; background: #eef1f8; color: #1c2738; font-size: 14px; }
-    .main-wrapper { max-width: 1200px; margin: auto; }
+    .main-wrapper { 
+        max-width: 1200px; 
+        margin: auto; 
+        position: relative; /* ADDED: For absolute logo positioning */
+    }
     
+    /* NEW: Logo Placeholder Style for Configurator */
+    .logo-placeholder {
+        position: absolute;
+        top: -25px; /* Positioned slightly above the input panel */
+        left: 0;
+        font-size: 1.2em;
+        font-weight: 700;
+        color: #0D47A1;
+        z-index: 10;
+        letter-spacing: 1px;
+    }
+
     /* Header & Titles */
     h2 { text-align: center; color: #0D47A1; margin-top: 0; margin-bottom: 30px; font-weight: 700; font-size: 1.8em; }
 
@@ -24,10 +40,10 @@
     .input-group { margin-top: 0; }
     
     label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
-    select, input[type="number"], input[type="text"], input[type="email"] { 
+    select, input[type="number"], input[type="text"] { 
         width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #dcdcdc; border-radius: 6px; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; 
     }
-    select:focus, input[type="number"]:focus, input[type="text"]:focus, input[type="email"]:focus { border-color: #0D47A1; box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2); outline: none; }
+    select:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: #0D47A1; box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2); outline: none; }
     
     /* Buttons */
     .submit-btn { margin-top: 25px; grid-column: 1 / -1; background-color: #0D47A1; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; width: 100%; cursor: pointer; transition: background-color 0.3s, transform 0.2s; font-weight: 600; }
@@ -115,28 +131,20 @@
     .modal-grid-span-2 { grid-column: 1 / -1; }
     .modal-disclaimer { margin-top: 15px; padding: 10px; background: #fffde7; border: 1px solid #ffeb3b; border-radius: 5px; font-size: 0.85em; color: #616161; }
     
-    /* NEW STYLES: Watermark and Logo positioning */
-    .watermark {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%) rotate(-30deg);
-        font-size: 5em;
-        color: rgba(0, 0, 0, 0.05); /* Very faint grey */
-        pointer-events: none;
-        z-index: 999;
-        font-weight: 700;
-        white-space: nowrap;
+    /* NEW: Footer Watermark Style (lite visible) */
+    footer { 
+        text-align: center;
+        color: #b0b5c4; /* Light gray color */
+        opacity: 0.7; /* Add some transparency */
+        font-size: 0.9em;
+        margin-top: 20px;
     }
+
   </style>
 </head>
 <body>
-  <div class="watermark">Pramodh Kathala</div>
-  
-  <img src="logo_1.png" alt="Company Logo" style="height:60px; width:auto; position: absolute; top: 40px; right: 40px; z-index: 10;">
-  
   <div class="main-wrapper">
-    <div class="input-panel" id="formContainer">
+    <div class="logo-placeholder">PEOPLELINK</div> <div class="input-panel" id="formContainer">
       <h2>LED Video Wall Configuration Calculator</h2>
       <div id="enteredValuesDisplay" class="hidden">
           <span id="enteredSummaryText"></span><br>
@@ -215,7 +223,6 @@
         <div class="details-box">
             <h4>LED Wall Specifications</h4>
             <div class="vis-details">
-                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span> 
                 <span id="finalDimensions"><strong>--</strong><small>--</small></span>
                 <span id="resolution"><strong>--</strong><small>--</small></span>
                 <span id="numCabinets"><strong>--</strong><small>--</small></span>
@@ -223,6 +230,7 @@
                 <span id="finalDiagonal"><strong>--</strong><small>--</small></span>
                 <span id="finalArea"><strong>--</strong><small>--</small></span>
                 <span id="totalPixels"><strong>--</strong><small>--</small></span>
+                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span>
                 <span id="cabinetSize"><strong>--</strong><small>--</small></span>
                 <span id="cabinetPixels"><strong>--</strong><small>--</small></span>
             </div>
@@ -247,7 +255,7 @@
       </div>
 
 
-      <span id="downloadPdfLink" onclick="openPdfGateModal()">Download PDF Technical Summary 📄</span>
+      <span id="downloadPdfLink" onclick="downloadPdf()">Download PDF Technical Summary 📄</span>
 
        <button class="back-btn" id="backButton" onclick="hideVisualization()">Modify Configuration</button>
     </div>
@@ -296,27 +304,6 @@
         </div>
 
         <button class="submit-btn modal-submit" onclick="applyModalChanges()">Apply Changes & Recalculate</button>
-      </div>
-    </div>
-    
-    <div id="pdfGateModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 style="margin:0; color:#1B5E20;">Download PDF Summary</h3>
-          <span class="close-btn" onclick="closePdfGateModal()">&times;</span>
-        </div>
-        
-        <div class="modal-input-group">
-            <label for="gateEmail">Email Address (Required)</label>
-            <input type="email" id="gateEmail" placeholder="Enter your email" required>
-        </div>
-        
-        <div class="modal-input-group">
-            <label for="gateMobile">Mobile Number (Required)</label>
-            <input type="text" id="gateMobile" placeholder="Enter your mobile number" required>
-        </div>
-
-        <button class="submit-btn modal-submit" onclick="validateAndDownloadPdf()">Download Summary</button>
       </div>
     </div>
 
@@ -545,33 +532,6 @@
         // Force re-run visualization with new parameters
         closeControllerModal();
         showVisualization(); 
-    }
-    
-    // --- PDF Gate Modal Functions (NEW) ---
-    function openPdfGateModal() {
-        if (!finalCalculationData || finalCalculationData.totalPixels === undefined) {
-            document.getElementById('errorMessage').textContent = 'ERROR: Please calculate the LED wall configuration first.';
-            document.getElementById('errorMessage').classList.remove('hidden');
-            return;
-        }
-        document.getElementById('pdfGateModal').style.display = 'block';
-    }
-
-    function closePdfGateModal() {
-        document.getElementById('pdfGateModal').style.display = 'none';
-    }
-    
-    function validateAndDownloadPdf() {
-        const email = document.getElementById('gateEmail').value;
-        const mobile = document.getElementById('gateMobile').value;
-        
-        if (!email || !mobile) {
-            alert("Please enter both Email Address and Mobile Number to download the PDF.");
-            return;
-        }
-        
-        closePdfGateModal();
-        downloadPdf(email, mobile);
     }
     
     // --- Core Calculation Logic (Updated H-Series selection) ---
@@ -850,9 +810,8 @@
         document.querySelector('.back-btn-placeholder').classList.remove('hidden');
         document.getElementById('visualization').classList.add('visible');
 
-        // 3. Update Details Section (Column 1 - Wall Specs) - PIXEL PITCH MOVED TO TOP
+        // 3. Update Details Section (Column 1 - Wall Specs) - ADDING COLON (:)
         
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
         document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
         document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
         document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
@@ -860,6 +819,7 @@
         document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
         document.getElementById('finalArea').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
         document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
         document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH) :</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
         document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH) :</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
 
@@ -950,10 +910,10 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation (Redesigned with Watermark, Logo Placeholder, GST/Warranty/Contact) ---
-    function downloadPdf(email, mobile) {
-        if (!finalCalculationData || finalCalculationData.totalPixels === undefined) {
-            alert("Internal Error: Calculation data is missing.");
+    // --- PDF Generation (Redesigned with Smaller Font & BOQ) ---
+    function downloadPdf() {
+        if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
+            alert("Please calculate the LED wall configuration first.");
             return;
         }
 
@@ -967,48 +927,16 @@
         const margin = 15;
         const lineHeight = 7; 
         const pageW = doc.internal.pageSize.getWidth();
-        const pageH = doc.internal.pageSize.getHeight(); // Get page height for watermark
         const primaryColor = [13, 71, 161]; 
         const secondaryColor = [183, 28, 28]; 
 
-        // PDF Watermark function (NEW)
-        const addWatermark = (doc, name) => {
-            const totalPages = doc.internal.getNumberOfPages();
-            doc.setFontSize(50);
-            doc.setTextColor(0, 0, 0, 0.05); // Very faint black
-            doc.setFont('helvetica', 'bold'); 
-            
-            for (let i = 1; i <= totalPages; i++) {
-                doc.setPage(i);
-                doc.text(name, pageW / 2, pageH / 2, { 
-                    align: 'center', 
-                    angle: -30 
-                });
-            }
-            // Reset to the last page after adding watermark to all
-            doc.setPage(totalPages); 
-            doc.setTextColor(0, 0, 0); // Reset color
-            doc.setFont('helvetica', 'normal'); // Reset font
-        };
-        
-        // 1. Header (Title) - Reduced to 18pt
+        // 1. Header (Logo & Title) - MODIFIED FOR LOGO
+        doc.setFontSize(10);
+        doc.setTextColor(...primaryColor);
+        doc.text('PEOPLELINK LOGO HERE', margin, y, { align: 'left' }); /* NEW: Logo Placeholder */
         doc.setFontSize(18);
         doc.setTextColor(...primaryColor);
-        doc.text('PeopleLink LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
-        
-        // Logo Placeholder (Top Right Corner)
-        // Since we don't have the image data, we draw a box and text as a visual representation
-        const logo_h = 10; 
-        const logo_w = 40; // 40mm width for placeholder
-        const logo_x = pageW - margin - logo_w;
-        const logo_y = y - lineHeight + 1;
-        
-        doc.setFillColor(...primaryColor);
-        doc.rect(logo_x, logo_y, logo_w, logo_h, 'F');
-        doc.setFontSize(6);
-        doc.setTextColor(255, 255, 255);
-        doc.text("Company Logo", logo_x + logo_w/2, logo_y + logo_h/2 + 0.5, { align: 'center' }); // +0.5 to center vertically
-
+        doc.text('LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
         y += lineHeight;
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
@@ -1022,7 +950,6 @@
         y += lineHeight;
 
         const performanceData = [
-            ['Pixel Pitch :', `${data.pixelPitch_mm} mm`], // MOVED TO TOP
             ['Actual Final Dimensions (WxH) :', `(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
             ['Actual Final Resolution (WxH) :', `${data.finalResW} x ${data.finalResH}`],
             ['Aspect Ratio :', data.aspectRatioText],
@@ -1168,13 +1095,12 @@
         doc.setTextColor(50, 50, 50); // Dark gray for text
 
         const terms = [
-            `1. Price Validity: This quotation is valid for 30 days from the date of issue. All quoted prices are exclusive of 18% GST (Goods and Services Tax).`, // GST ADDED
+            "1. Price Validity: This quotation is valid for 30 days from the date of issue.",
             "2. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
             "3. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
             "4. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
-            "5. Warranty: Standard warranty is 1 year on LED panels and accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.", // WARRANTY 1 YEAR
-            "6. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours.",
-            `7. Contact Information: Email: ${email} | Mobile: ${mobile}` // CONTACT INFO ADDED
+            "5. Warranty: Standard warranty is 1 years on LED panels and accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.",
+            "6. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours."
         ];
         
         terms.forEach((term, index) => {
@@ -1203,9 +1129,6 @@
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
         y += lineHeight;
-        
-        // Apply Watermark to ALL pages (LAST STEP)
-        addWatermark(doc, "Pramodh Kathala");
 
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_BOQ.pdf`);
     }
@@ -1218,19 +1141,15 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-          const controllerModal = document.getElementById('controllerModal');
-          const gateModal = document.getElementById('pdfGateModal');
-          if (event.target == controllerModal) {
-            controllerModal.style.display = "none";
-          }
-          if (event.target == gateModal) {
-            gateModal.style.display = "none";
+          const modal = document.getElementById('controllerModal');
+          if (event.target == modal) {
+            modal.style.display = "none";
           }
         }
     });
   </script>
-<footer class="text-center text-gray-500 text-sm mt-10">
-    © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
+<footer>
+    © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by PK
 </footer>
 </body>
 </html>
