@@ -341,7 +341,6 @@
     // --- UI/Modal Functions ---
 
     function toggleMeasurementFields(){
-        // ... (function logic unchanged)
         const unit = document.getElementById('unit').value;
         const isDiagonal = (unit === 'inches');
         const isFeet = (unit === 'feet');
@@ -486,7 +485,6 @@
     // --- Core Calculation Logic ---
 
     function getSuggestedControllerModel(totalPixels, finalResW, finalResH, productKey) {
-        // ... (function logic unchanged, prioritizes nearest suitable)
         
         const details = LED_PRODUCTS[productKey];
         const isOutdoor = productKey.startsWith('outdoor');
@@ -558,6 +556,7 @@
         // 2. Determine Desired Dimensions (W/H in mm) 
         let desiredW_mm, desiredH_mm;
         let usedW_input, usedH_input, usedRatio = aspectRatioKey || 'None Specified';
+        let inputDiagonal;
         
         if (unit === 'inches') {
             const ratioToUse = aspectRatioKey || '16:9'; 
@@ -568,8 +567,8 @@
             desiredW_mm = ratioW * factor * MM_PER_INCH;
             desiredH_mm = ratioH * factor * MM_PER_INCH;
 
-            usedW_input = inputW; 
-            usedH_input = inputH;
+            usedW_input = 0; // Not directly used in diagonal calculation, setting to 0 for summary
+            usedH_input = 0; // Not directly used in diagonal calculation, setting to 0 for summary
             usedRatio = aspectRatioKey || '16:9 (Assumed)'; 
             inputDiagonal = inputD;
 
@@ -666,11 +665,19 @@
         // Apply controller name override if set in modal
         const controllerName = finalCalculationData.controllerOverrideName || suggestedController.name;
         
-        // 9. Store data
+        // 9. Store data (FIX: Added cabinet dimensions and pixels to data object)
         finalCalculationData = {
             ...finalCalculationData, // Preserve overrides
             productName: details.name,
             pixelPitch_mm: details.pitch_mm,
+            
+            // --- ADDED MISSING CABINET/PIXEL PROPERTIES (FIX) ---
+            cabinetW_mm: cabinetW_mm,
+            cabinetH_mm: cabinetH_mm,
+            cabPixW: details.cabPixW,
+            cabPixH: details.cabPixH,
+            // ----------------------------------------------------
+
             finalW_mm: finalW_mm,
             finalH_mm: finalH_mm,
             finalArea_m2: finalArea_m2,
@@ -682,6 +689,9 @@
             totalCabinets: totalCabinets,
             totalModules: totalModules,
             totalRecCards: totalCabinets,
+            numCabW: numCabW,
+            numCabH: numCabH,
+            modulesPerCab: details.modulesPerCab,
             nits_range: details.nits_range,
             
             // Power and Weight (UPDATED BUFFER)
@@ -730,12 +740,13 @@
         document.getElementById('visualization').classList.add('visible');
 
         // 3. Update Details Section (Column 1 - Wall Specs)
-        // ... (Wall Specs logic unchanged)
         
         document.getElementById('productName').innerHTML = `Product Model: <strong>${data.productName}</strong>`;
         document.getElementById('pixelPitchDisplay').innerHTML = `Pixel Pitch: <strong>${data.pixelPitch_mm} mm</strong>`;
+        // THESE LINES NOW WORK CORRECTLY
         document.getElementById('cabinetSize').innerHTML = `Cabinet Size (WxH): <strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong>`;
         document.getElementById('cabinetPixels').innerHTML = `Cabinet Pixels (WxH): <strong>${data.cabPixW} x ${data.cabPixH}</strong>`;
+        // END FIX
         document.getElementById('numCabinets').innerHTML = `Total Cabinets (WxH): <strong>${data.numCabW} x ${data.numCabH} = ${data.totalCabinets}</strong>`;
         document.getElementById('totalModules').innerHTML = `Total Modules Required: <strong>${data.totalModules}</strong><small> (${data.modulesPerCab} per cabinet)</small>`;
         document.getElementById('finalDimensions').innerHTML = `**Actual Final Dimensions (WxH):** <strong>${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</strong><small> (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)</small>`;
@@ -952,7 +963,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_P
+    © PeopleLink_S
 </footer>
 </body>
 </html>
