@@ -272,7 +272,7 @@
         </div>
 
         <div class="modal-disclaimer">
-            <p><strong>Crucial Disclaimer:</strong> You can edit the types and quantities of input cards/sending cards and accessories as required. The system will regenerate a solution based on your pixel count and the *Max Ports per Output Card* value you enter.</p>
+            <p><strong>Crucial Disclaimer:</strong> You can edit the types and quantities of input cards/sending cards and accessories as required. The system will regenerate a solution based on your pixel count and the *Max Ports per Output Card* value you enter. **The default input card quantity is 1 and should be changed 'as per site requirement/number of inputs actual requirement'.**</p>
         </div>
 
         <button class="submit-btn modal-submit" onclick="applyModalChanges()">Apply Changes & Recalculate</button>
@@ -516,9 +516,10 @@
             desiredW_mm = ratioW * factor * MM_PER_INCH;
             desiredH_mm = ratioH * factor * MM_PER_INCH;
 
-            usedW_input = ratioW; 
-            usedH_input = ratioH;
+            usedW_input = inputW; 
+            usedH_input = inputH;
             usedRatio = aspectRatioKey || '16:9 (Assumed)'; 
+            inputDiagonal = inputD;
 
         } else {
             const unit_factor = (unit === 'meters') ? MM_PER_METER : MM_PER_FOOT;
@@ -534,7 +535,7 @@
                     usedH_input = inputH;
                     usedW_input = (inputH / ratioH) * ratioW;
                 } else {
-                    usedW_input = inputW;
+                    usedW_input = inputW; // Fallback to user input
                     usedH_input = inputH;
                 }
                 
@@ -542,8 +543,8 @@
                 desiredH_mm = usedH_input * unit_factor;
 
             } else {
-                usedW_input = hasW ? inputW : (inputH * (cabinetW_mm / cabinetH_mm)); 
-                usedH_input = hasH ? inputH : (inputW * (cabinetH_mm / cabinetW_mm));
+                usedW_input = hasW ? inputW : (inputH * (cabinetW_mm / cabinetH_mm) * (unit === 'meters' ? 1 : 1)); 
+                usedH_input = hasH ? inputH : (inputW * (cabinetH_mm / cabinetW_mm) * (unit === 'meters' ? 1 : 1));
 
                 desiredW_mm = usedW_input * unit_factor;
                 desiredH_mm = usedH_input * unit_factor;
@@ -551,6 +552,7 @@
                 if(hasW && !hasH) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
                 if(hasH && !hasW) usedRatio = `Inferred from Cabinet AR (${cabinetW_mm}:${cabinetH_mm})`;
             }
+            inputDiagonal = 0; // Not applicable for W/H input
         }
 
         // 3. Calculate cabinets needed (round to nearest integer)
@@ -564,6 +566,7 @@
         // 4. Calculate Final Actual Dimensions (in mm)
         const finalW_mm = numCabW * cabinetW_mm;
         const finalH_mm = numCabH * cabinetH_mm;
+        const finalArea_m2 = (finalW_mm / MM_PER_METER) * (finalH_mm / MM_PER_METER);
 
         // 5. Calculate Pixel Resolution
         const finalResW = numCabW * details.cabPixW;
@@ -575,10 +578,11 @@
         const aspectRatioText = `${finalResW / ratioGCD}:${finalResH / ratioGCD}`;
         const finalDiagonal_mm = Math.sqrt(finalW_mm * finalW_mm + finalH_mm * finalH_mm);
         const finalDiagonal_in = finalDiagonal_mm / MM_PER_INCH;
-        const finalArea_m2 = (finalW_mm / MM_PER_METER) * (finalH_mm / MM_PER_METER);
+        
 
         // 7. Calculate Power & Weight (WITH 20% BUFFER)
-        const maxPower_W_buffered = (finalArea_m2 * details.maxPower_W_m2) * POWER_BUFFER; 
+        const maxPower_W_unbuffered = finalArea_m2 * details.maxPower_W_m2; 
+        const maxPower_W_buffered = maxPower_W_unbuffered * POWER_BUFFER; 
         const maxCurrent_A = maxPower_W_buffered / 220;
         const totalCabinetWeight_unbuffered = details.weight_kg * totalCabinets;
         const totalWallWeight_buffered = totalCabinetWeight_unbuffered * WEIGHT_BUFFER;
@@ -607,23 +611,38 @@
         finalCalculationData = {
             ...finalCalculationData, // Preserve overrides
             productName: details.name,
+            pixelPitch_mm: details.pitch_mm,
+            cabinetW_mm: cabinetW_mm,
+            cabinetH_mm: cabinetH_mm,
+            cabPixW: details.cabPixW,
+            cabPixH: details.cabPixH,
+            modulesPerCab: details.modulesPerCab,
             numCabW: numCabW,
             numCabH: numCabH,
             finalW_mm: finalW_mm,
             finalH_mm: finalH_mm,
+            finalArea_m2: finalArea_m2,
             finalResW: finalResW,
             finalResH: finalResH,
             totalPixels: totalPixels,
             aspectRatioText: aspectRatioText,
             finalDiagonal_in: finalDiagonal_in,
-            pixelPitch_mm: details.pitch_mm,
             totalCabinets: totalCabinets,
             totalModules: totalModules,
             totalRecCards: totalCabinets,
+            nits_range: details.nits_range,
+            
+            // Power and Weight
             maxPower_W: maxPower_W_buffered,
             maxCurrent_A: maxCurrent_A,
             totalWallWeight_buffered: totalWallWeight_buffered,
-            nits_range: details.nits_range,
+
+            // Input Data for Summary
+            unit: unit,
+            inputDiagonal: inputDiagonal,
+            inputRatioKey: usedRatio,
+            usedW_input: usedW_input,
+            usedH_input: usedH_input,
             
             // Controller/Card Details
             controllerName: controllerName,
@@ -882,7 +901,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_pram
+    © PeopleLink_K
 </footer>
 </body>
 </html>
