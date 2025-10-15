@@ -9,26 +9,57 @@
   <style>
     /* Base styles */
     body { font-family: 'Inter', sans-serif; margin: 0; padding: 40px; background: #eef1f8; color: #1c2738; font-size: 14px; }
-    .main-wrapper { 
-        max-width: 1200px; 
-        margin: auto; 
-        position: relative; /* ADDED: For absolute logo positioning */
-    }
+    .main-wrapper { max-width: 1200px; margin: auto; }
     
-    /* NEW: Logo Placeholder Style for Configurator */
-    .logo-placeholder {
-        position: absolute;
-        top: -25px; /* Positioned slightly above the input panel */
-        left: 0;
-        font-size: 1.2em;
+    /* Watermark Style (Pramodh Kathala) */
+    #watermark {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 3em; 
         font-weight: 700;
-        color: #0D47A1;
-        z-index: 10;
-        letter-spacing: 1px;
+        color: #B71C1C; 
+        opacity: 0.05; /* Very low opacity for "not visible" */
+        pointer-events: none; 
+        z-index: 999;
+        text-align: center;
+        width: 100%;
+        white-space: nowrap;
+    }
+
+    /* Transparent Logo Style (Placeholder) */
+    #logo-placeholder {
+        color: #0D47A1; 
+        font-size: 1.2em; 
+        font-weight: 800;
+        opacity: 0.3; /* Transparent/Subtle */
+        display: inline-block;
+        margin-right: 10px;
+    }
+
+    /* Media Query for "visible on small size of the center" */
+    @media (max-width: 768px) {
+        #watermark {
+            font-size: 2em;
+            opacity: 0.2; /* Slightly more visible on small screens */
+            width: auto;
+        }
     }
 
     /* Header & Titles */
-    h2 { text-align: center; color: #0D47A1; margin-top: 0; margin-bottom: 30px; font-weight: 700; font-size: 1.8em; }
+    h2 { 
+        text-align: center; 
+        color: #0D47A1; 
+        margin-top: 0; 
+        margin-bottom: 30px; 
+        font-weight: 700; 
+        font-size: 1.8em; 
+        /* Added flex to center logo and title together */
+        display: flex; 
+        align-items: center; 
+        justify-content: center;
+    }
 
     /* Input/Form Container */
     .input-panel { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.6s ease-out; }
@@ -130,22 +161,17 @@
     .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .modal-grid-span-2 { grid-column: 1 / -1; }
     .modal-disclaimer { margin-top: 15px; padding: 10px; background: #fffde7; border: 1px solid #ffeb3b; border-radius: 5px; font-size: 0.85em; color: #616161; }
-    
-    /* NEW: Footer Watermark Style (lite visible) */
-    footer { 
-        text-align: center;
-        color: #b0b5c4; /* Light gray color */
-        opacity: 0.7; /* Add some transparency */
-        font-size: 0.9em;
-        margin-top: 20px;
-    }
 
   </style>
 </head>
 <body>
+  <div id="watermark">Pramodh Kathala</div>
   <div class="main-wrapper">
-    <div class="logo-placeholder">PEOPLELINK</div> <div class="input-panel" id="formContainer">
-      <h2>LED Video Wall Configuration Calculator</h2>
+    <div class="input-panel" id="formContainer">
+      <h2>
+        <span id="logo-placeholder">PL</span>
+        LED Video Wall Configuration Calculator
+      </h2>
       <div id="enteredValuesDisplay" class="hidden">
           <span id="enteredSummaryText"></span><br>
           Actual Final Aspect Ratio: <strong><span id="aspectRatioValue">--</span></strong>
@@ -930,13 +956,10 @@
         const primaryColor = [13, 71, 161]; 
         const secondaryColor = [183, 28, 28]; 
 
-        // 1. Header (Logo & Title) - MODIFIED FOR LOGO
-        doc.setFontSize(10);
-        doc.setTextColor(...primaryColor);
-        doc.text('PEOPLELINK LOGO HERE', margin, y, { align: 'left' }); /* NEW: Logo Placeholder */
+        // 1. Header (Title) - Reduced to 18pt
         doc.setFontSize(18);
         doc.setTextColor(...primaryColor);
-        doc.text('LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
+        doc.text('PeopleLink LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
         y += lineHeight;
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
@@ -1148,8 +1171,8 @@
         }
     });
   </script>
-<footer>
-    © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by PK
+<footer class="text-center text-gray-500 text-sm mt-10">
+    © PeopleLink
 </footer>
 </body>
 </html>
