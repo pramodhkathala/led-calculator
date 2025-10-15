@@ -71,7 +71,7 @@
     .details-box { border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; background: #f7f9fc; }
     .details-box h4 { margin-top: 0; color: #0D47A1; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.1em; }
     
-    /* Custom style for the inverted table layout */
+    /* Custom style for the table layout (REVERTED: Remarks/Labels on left, Actual Figures on right) */
     .vis-details { display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 0.95em; color: #333; }
     .vis-details span { 
         display: flex; 
@@ -82,13 +82,19 @@
         border-bottom: 1px dotted #e0e0e0;
     }
     .vis-details strong { 
-        color: #B71C1C; /* Red color for actual figures */
-        font-weight: 700; 
-        min-width: 150px; /* Ensures the value column is aligned */
+        /* This is now the REMARK/LABEL (left side) */
+        color: #333; 
+        font-weight: 400; 
+        min-width: 250px; /* Ensures the remark column is aligned, adjusted for new format */
         text-align: left;
         margin-right: 15px; /* Spacing between value and remark */
     }
-    .vis-details small { font-size: 0.95em; color: #333; font-weight: 400; } /* Remarks moved to the right */
+    .vis-details small { 
+        /* This is now the ACTUAL FIGURE (right side, red) */
+        font-size: 1.0em; 
+        color: #B71C1C; 
+        font-weight: 700; 
+    } 
 
     .edit-btn { background: none; border: none; color: #0D47A1; font-size: 0.9em; cursor: pointer; text-decoration: underline; padding: 0; margin-left: 10px; }
 
@@ -192,16 +198,16 @@
         <div class="details-box">
             <h4>LED Wall Specifications</h4>
             <div class="vis-details">
-                <span id="finalDimensions"><strong>--</strong><small>Actual Final Dimensions (WxH)</small></span>
-                <span id="resolution"><strong>--</strong><small>Actual Final Resolution (WxH)</small></span>
-                <span id="numCabinets"><strong>--</strong><small>Total Cabinets (W x H)</small></span>
-                <span id="totalModules"><strong>--</strong><small>Total Modules Required</small></span>
-                <span id="finalDiagonal"><strong>--</strong><small>Final Diagonal Size</small></span>
-                <span id="finalArea"><strong>--</strong><small>Final Area</small></span>
-                <span id="totalPixels"><strong>--</strong><small>Total Pixels</small></span>
-                <span id="pixelPitchDisplay"><strong>--</strong><small>Pixel Pitch</small></span>
-                <span id="cabinetSize"><strong>--</strong><small>Cabinet Size (WxH)</small></span>
-                <span id="cabinetPixels"><strong>--</strong><small>Cabinet Pixels (WxH)</small></span>
+                <span id="finalDimensions"><strong>--</strong><small>--</small></span>
+                <span id="resolution"><strong>--</strong><small>--</small></span>
+                <span id="numCabinets"><strong>--</strong><small>--</small></span>
+                <span id="totalModules"><strong>--</strong><small>--</small></span>
+                <span id="finalDiagonal"><strong>--</strong><small>--</small></span>
+                <span id="finalArea"><strong>--</strong><small>--</small></span>
+                <span id="totalPixels"><strong>--</strong><small>--</small></span>
+                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span>
+                <span id="cabinetSize"><strong>--</strong><small>--</small></span>
+                <span id="cabinetPixels"><strong>--</strong><small>--</small></span>
             </div>
         </div>
 
@@ -764,28 +770,33 @@
         document.querySelector('.back-btn-placeholder').classList.remove('hidden');
         document.getElementById('visualization').classList.add('visible');
 
-        // 3. Update Details Section (Column 1 - Wall Specs) - **Updated for Inverted/Left-Aligned Values**
+        // 3. Update Details Section (Column 1 - Wall Specs) - **Updated for REVERSED Order (Remark Left, Value Right)**
         
-        // Actual Figures (Red and Left) followed by Remarks (Right)
-        document.getElementById('finalDimensions').innerHTML = `<strong>${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</strong><small>Actual Final Dimensions (WxH) (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)</small>`;
-        document.getElementById('resolution').innerHTML = `<strong>${data.finalResW} x ${data.finalResH}</strong><small>Actual Final Resolution (WxH)</small>`;
-        document.getElementById('numCabinets').innerHTML = `<strong>${data.totalCabinets}</strong><small>Total Cabinets (W x H: ${data.numCabW} x ${data.numCabH})</small>`;
-        document.getElementById('totalModules').innerHTML = `<strong>${data.totalModules}</strong><small>Total Modules Required (${data.modulesPerCab} per cabinet)</small>`;
-        document.getElementById('finalDiagonal').innerHTML = `<strong>${data.finalDiagonal_in.toFixed(1)} in</strong><small>Final Diagonal Size</small>`;
-        document.getElementById('finalArea').innerHTML = `<strong>${data.finalArea_m2.toFixed(2)} m²</strong><small>Final Area</small>`;
-        document.getElementById('totalPixels').innerHTML = `<strong>${formatLargeNumber(data.totalPixels)}</strong><small>Total Pixels</small>`;
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>${data.pixelPitch_mm} mm</strong><small>Pixel Pitch</small>`;
-        document.getElementById('cabinetSize').innerHTML = `<strong>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</strong><small>Cabinet Size (WxH)</small>`;
-        document.getElementById('cabinetPixels').innerHTML = `<strong>${data.cabPixW} x ${data.cabPixH}</strong><small>Cabinet Pixels (WxH)</small>`;
+        // Remarks (Left) in <strong>, Actual Figures (Red, Right) in <small>
+        
+        // Specific format: Actual Final Dimensions (WxH) (15.75ft x 8.86ft) - 4.80m x 2.70m
+        document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH)</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
+        
+        // Specific format: Actual Final Resolution (WxH) - 5120 x 2880
+        document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH)</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
+        
+        document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H)</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
+        document.getElementById('totalModules').innerHTML = `<strong>Total Modules Required</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
+        document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
+        document.getElementById('finalArea').innerHTML = `<strong>Final Area</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
+        document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch</strong><small>${data.pixelPitch_mm} mm</small>`;
+        document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH)</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
+        document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH)</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
 
-        // 4. Update Details Section (Column 2 - Control System & Power) - **Updated for Inverted/Left-Aligned Values**
+        // 4. Update Details Section (Column 2 - Control System & Power) - **REVERSED Order**
         const isHSeries = data.controllerType.includes("Modular");
         const controlSystemDetailsDiv = document.getElementById('controlSystemDetails');
         
         // --- 1. Primary Controller ---
         let htmlContent = `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Control System Summary</span>
-            <span id="suggestedControllerModel"><strong>${data.controllerName}</strong><small>Controller/Processor Model (${data.controllerType})</small></span>
+            <span id="suggestedControllerModel"><strong>Controller/Processor Model (${data.controllerType})</strong><small>${data.controllerName}</small></span>
         `;
 
         // --- 2. Modular/Splicer Specific Details (Only for H-Series) ---
@@ -793,9 +804,9 @@
             htmlContent += `
                 <div id="modularDetails" class="vis-details" style="grid-column: 1 / -1; gap: 5px; border-top: 1px solid #e0e0e0; padding-top: 10px; margin-top: 5px;">
                     <span style="grid-column: 1 / -1; font-weight: 700; color: #B71C1C; margin-bottom: 5px;">Modular Components (H-Series)</span>
-                    <span id="splicerSolution"><strong>${data.splicerSolution || 'N/A'}</strong><small>Splicer Frame/Solution</small></span>
-                    <span id="sendingCardModel"><strong>${data.requiredSendCards} x ${data.outputCardModel}</strong><small>Output Card (${data.outputCardPorts} ports/card)</small></span>
-                    <span id="inputCardModel"><strong>${data.inputCardQty} x ${data.inputCardModel}</strong><small>Input Card (User Specified)</small></span>
+                    <span id="splicerSolution"><strong>Splicer Frame/Solution</strong><small>${data.splicerSolution || 'N/A'}</small></span>
+                    <span id="sendingCardModel"><strong>Output Card (${data.outputCardPorts} ports/card)</strong><small>${data.requiredSendCards} x ${data.outputCardModel}</small></span>
+                    <span id="inputCardModel"><strong>Input Card (User Specified)</strong><small>${data.inputCardQty} x ${data.inputCardModel}</small></span>
                 </div>
             `;
         }
@@ -803,23 +814,23 @@
         // --- 3. Wall Connection Summary ---
         htmlContent += `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Connection Summary</span>
-            <span id="requiredRecCards"><strong>${data.totalRecCards}</strong><small>Total Receiving Cards Required</small></span>
-            <span id="controllerLongPorts"><strong>${data.requiredPorts}</strong><small>Long Ethernet Ports/Runs (Controller to Wall)</small></span>
-            <span id="controllerShortPorts"><strong>${data.requiredShortEthernet}</strong><small>Short Ethernet Cables (Between Cabinets)</small></span>
+            <span id="requiredRecCards"><strong>Total Receiving Cards Required</strong><small>${data.totalRecCards}</small></span>
+            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs</strong><small>${data.requiredPorts}</small></span>
+            <span id="controllerShortPorts"><strong>Short Ethernet Cables</strong><small>${data.requiredShortEthernet}</small></span>
         `;
         
         // --- 4. Power and Weight Section (CLEANED - Only Actual Figures, Left-Aligned with Remarks) ---
         htmlContent += `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Power and Weight (Actual Figures Only)</span>
-            <span id="wallPowerActual"><strong>${formatNumber(data.actualPower_W_unbuffered, 0)} W</strong><small>Max Power Consumption (Actual)</small></span>
-            <span id="wallCurrent"><strong>${data.actualCurrent_A.toFixed(2)} A</strong><small>Max Current Draw (Actual @220V)</small></span>
-            <span id="cabinetWeightActual"><strong>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</strong><small>Total Wall Weight (Actual Cabinets)</small></span>
+            <span id="wallPowerActual"><strong>Max Power Consumption (Actual)</strong><small>${formatNumber(data.actualPower_W_unbuffered, 0)} W</small></span>
+            <span id="wallCurrent"><strong>Max Current Draw (Actual @220V)</strong><small>${data.actualCurrent_A.toFixed(2)} A</small></span>
+            <span id="cabinetWeightActual"><strong>Total Wall Weight (Actual Cabinets)</strong><small>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</small></span>
         `;
         
         controlSystemDetailsDiv.innerHTML = htmlContent;
 
 
-        // 5. Update Visualization Grid
+        // 5. Update Visualization Grid (Unchanged)
         const aspectRatio = data.finalW_mm / data.finalH_mm;
         const visualizationHeight = 300; 
         const visGrid = document.getElementById('visGrid');
@@ -864,7 +875,7 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation (Redesigned) ---
+    // --- PDF Generation (Redesigned with Smaller Font) ---
     function downloadPdf() {
         if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
             alert("Please calculate the LED wall configuration first.");
@@ -879,30 +890,30 @@
 
         let y = 10;
         const margin = 15;
-        const lineHeight = 8;
+        const lineHeight = 7; // Reduced line height
         const pageW = doc.internal.pageSize.getWidth();
         const primaryColor = [13, 71, 161]; 
         const secondaryColor = [183, 28, 28]; 
 
-        // 1. Header (Title)
-        doc.setFontSize(22);
+        // 1. Header (Title) - Reduced to 18pt
+        doc.setFontSize(18);
         doc.setTextColor(...primaryColor);
         doc.text('PeopleLink LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
         y += lineHeight;
-        doc.setFontSize(10);
+        doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
         doc.text(`Generated: ${new Date().toLocaleDateString()} | Model: ${data.productName}`, pageW / 2, y, { align: 'center' });
         y += lineHeight * 1.5;
 
         // --- 2. Wall Performance & Resolution ---
-        doc.setFontSize(14);
+        doc.setFontSize(12); // Reduced to 12pt
         doc.setTextColor(...secondaryColor); 
         doc.text('1. Wall Performance & Dimensions', margin, y);
         y += lineHeight;
 
         const performanceData = [
-            ['Actual Final Dimensions (W x H)', `${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m (${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft)`],
-            ['Actual Final Resolution (W x H)', `${data.finalResW} x ${data.finalResH}`],
+            ['Actual Final Dimensions (WxH)', `(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
+            ['Actual Final Resolution (WxH)', `${data.finalResW} x ${data.finalResH}`],
             ['Aspect Ratio', data.aspectRatioText],
             ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
             ['Total Pixels / Area', `${formatLargeNumber(data.totalPixels)} / ${data.finalArea_m2.toFixed(2)} m²`],
@@ -915,13 +926,13 @@
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'striped', 
             headStyles: { fillColor: primaryColor, halign: 'center' },
-            styles: { fontSize: 10, cellPadding: 2.5 },
+            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
 
         // --- 3. Physical & Cabinet Specifications ---
-        doc.setFontSize(14);
+        doc.setFontSize(12); // Reduced to 12pt
         doc.setTextColor(...secondaryColor); 
         doc.text('2. Physical & Cabinet Specifications', margin, y);
         y += lineHeight;
@@ -941,13 +952,13 @@
             body: specsData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'plain', 
-            styles: { fontSize: 10, cellPadding: 2.5 },
+            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
         
         // --- 4. Control System & Connections ---
-        doc.setFontSize(14);
+        doc.setFontSize(12); // Reduced to 12pt
         doc.setTextColor(...secondaryColor); 
         doc.text('3. Control System & Connections', margin, y);
         y += lineHeight;
@@ -971,13 +982,13 @@
             body: controllerData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'striped', 
-            styles: { fontSize: 10, cellPadding: 2.5 },
+            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
         
         // --- 5. Power and Weight (Standardized 15% Margin) ---
-        doc.setFontSize(14);
+        doc.setFontSize(12); // Reduced to 12pt
         doc.setTextColor(...secondaryColor); 
         doc.text('4. Power and Weight', margin, y);
         y += lineHeight;
@@ -996,13 +1007,13 @@
             body: powerWeightData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'plain', 
-            styles: { fontSize: 10, cellPadding: 2.5 },
+            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + 8;
         
         // Final Disclaimer
-        doc.setFontSize(8);
+        doc.setFontSize(7); // Reduced to 7pt
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
         y += lineHeight;
@@ -1026,7 +1037,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_SK
+    © PeopleLink_K
 </footer>
 </body>
 </html>
