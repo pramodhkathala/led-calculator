@@ -24,10 +24,10 @@
     .input-group { margin-top: 0; }
     
     label { display: block; margin-bottom: 5px; font-weight: 600; color: #444; }
-    select, input[type="number"], input[type="text"] { 
+    select, input[type="number"], input[type="text"], input[type="email"] { 
         width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #dcdcdc; border-radius: 6px; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; 
     }
-    select:focus, input[type="number"]:focus, input[type="text"]:focus { border-color: #0D47A1; box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2); outline: none; }
+    select:focus, input[type="number"]:focus, input[type="text"]:focus, input[type="email"]:focus { border-color: #0D47A1; box-shadow: 0 0 0 2px rgba(13, 71, 161, 0.2); outline: none; }
     
     /* Buttons */
     .submit-btn { margin-top: 25px; grid-column: 1 / -1; background-color: #0D47A1; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 16px; width: 100%; cursor: pointer; transition: background-color 0.3s, transform 0.2s; font-weight: 600; }
@@ -54,7 +54,7 @@
 
     /* Visualization/Output Container */
     .visualization { background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); opacity: 0; max-height: 0; overflow-y: hidden; transition: opacity 0.6s ease-out, max-height 1s ease-out; margin-top: 30px; }
-    .visualization.visible { opacity: 1; max-height: 4000px; /* Increased height for new sections */ } 
+    .visualization.visible { opacity: 1; max-height: 2000px; } 
     
     .output-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px; }
     
@@ -114,81 +114,27 @@
     .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     .modal-grid-span-2 { grid-column: 1 / -1; }
     .modal-disclaimer { margin-top: 15px; padding: 10px; background: #fffde7; border: 1px solid #ffeb3b; border-radius: 5px; font-size: 0.85em; color: #616161; }
-
-    /* --- ADDED VISUALIZATION STYLES --- */
-    .video-section {
-        margin-top: 30px;
-        padding: 30px;
-        background: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-    .video-section h2 {
-        text-align: left;
-        margin-bottom: 15px;
-        color: #0D47A1;
-        font-size: 1.4em;
-    }
-    .video-section input[type="text"] {
-        width: 100%; padding: 10px 12px; font-size: 15px; border: 1px solid #dcdcdc; border-radius: 6px; box-sizing: border-box; 
-    }
-    .video-section button {
-        background-color: #0D47A1;
-        color: white;
-        padding: 10px 15px;
-        border: none;
-        border-radius: 6px;
-        font-size: 15px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .video-section button:hover {
-        background-color: #1565C0;
-    }
-
-    #video-container {
-        height: 300px;
-        width: 100%;
-        background-color: black;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-    #display-video {
-        width: 100%;
-        height: 100%;
-        object-fit: contain; /* Ensures the video fits within the black box */
-    }
-
-    #connection-map { 
-        position: relative; 
-        padding: 30px 10px; /* Add padding for arrows */
-        border: 1px solid #e0e0e0;
-        background: #f7f9fc;
-        border-radius: 8px;
-        overflow: auto;
-    }
-    .cabinet-box {
-        box-sizing: border-box;
-    }
-    .arrow-h, .arrow-v {
-        position: absolute;
-        font-size: 1.2em;
-        color: #ef4444; /* Red color for signal flow */
+    
+    /* NEW STYLES: Watermark and Logo positioning */
+    .watermark {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) rotate(-30deg);
+        font-size: 5em;
+        color: rgba(0, 0, 0, 0.05); /* Very faint grey */
+        pointer-events: none;
+        z-index: 999;
         font-weight: 700;
-        z-index: 10;
-        /* Positioning adjusted for cabinet size/gap */
+        white-space: nowrap;
     }
-    .arrow-h.right { top: 50%; right: -25px; transform: translateY(-50%); }
-    .arrow-h.left { top: 50%; left: -25px; transform: translateY(-50%); }
-    .arrow-v.bottom { bottom: -25px; left: 50%; transform: translateX(-50%); }
-    /* --- END ADDED VISUALIZATION STYLES --- */
-
   </style>
 </head>
 <body>
-  <div style="text-align: center; margin-bottom: 20px;">
-    <img src="logo.png" alt="Company Logo" style="height:60px; width:auto;">
-  </div>
+  <div class="watermark">Pramodh Kathala</div>
+  
+  <img src="logo_1.png" alt="Company Logo" style="height:60px; width:auto; position: absolute; top: 40px; right: 40px; z-index: 10;">
+  
   <div class="main-wrapper">
     <div class="input-panel" id="formContainer">
       <h2>LED Video Wall Configuration Calculator</h2>
@@ -269,6 +215,7 @@
         <div class="details-box">
             <h4>LED Wall Specifications</h4>
             <div class="vis-details">
+                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span> 
                 <span id="finalDimensions"><strong>--</strong><small>--</small></span>
                 <span id="resolution"><strong>--</strong><small>--</small></span>
                 <span id="numCabinets"><strong>--</strong><small>--</small></span>
@@ -276,7 +223,6 @@
                 <span id="finalDiagonal"><strong>--</strong><small>--</small></span>
                 <span id="finalArea"><strong>--</strong><small>--</small></span>
                 <span id="totalPixels"><strong>--</strong><small>--</small></span>
-                <span id="pixelPitchDisplay"><strong>--</strong><small>--</small></span>
                 <span id="cabinetSize"><strong>--</strong><small>--</small></span>
                 <span id="cabinetPixels"><strong>--</strong><small>--</small></span>
             </div>
@@ -301,33 +247,10 @@
       </div>
 
 
-      <span id="downloadPdfLink" onclick="downloadPdf()">Download PDF Technical Summary 📄</span>
+      <span id="downloadPdfLink" onclick="openPdfGateModal()">Download PDF Technical Summary 📄</span>
 
        <button class="back-btn" id="backButton" onclick="hideVisualization()">Modify Configuration</button>
-      
-      <div id="video-display-section" class="video-section">
-          <h2>Video Playback Test</h2>
-          <div class="input-group">
-              <label for="video-url">Video URL (or Local File Path):</label>
-              <input type="text" id="video-url" value="https://sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"
-                placeholder="Enter video URL (e.g., MP4 or HLS link)">
-          </div>
-          <div id="video-container">
-              <video id="display-video" controls muted>
-                  Your browser does not support the video tag.
-              </video>
-          </div>
-          <button id="play-video-btn" class="mt-4">Load & Play Video on Wall</button>
-      </div>
-
-      <div id="connection-diagram-section" class="video-section">
-          <h2>Cabinet Connection Diagram (Signal Flow)</h2>
-          <p style="font-size: 0.9em; color: #666; margin-bottom: 15px;">Based on the calculated W x H cabinet array, this illustrates the Serpentine (or N-Shape) signal flow.</p>
-          <div id="connection-map" style="min-height: 200px;">
-              <p style="text-align: center; color: #666; padding: 20px;">Click 'Calculate & Visualize System' to generate the diagram.</p>
-          </div>
-      </div>
-      </div>
+    </div>
 
     <div id="controllerModal" class="modal">
       <div class="modal-content">
@@ -373,6 +296,27 @@
         </div>
 
         <button class="submit-btn modal-submit" onclick="applyModalChanges()">Apply Changes & Recalculate</button>
+      </div>
+    </div>
+    
+    <div id="pdfGateModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 style="margin:0; color:#1B5E20;">Download PDF Summary</h3>
+          <span class="close-btn" onclick="closePdfGateModal()">&times;</span>
+        </div>
+        
+        <div class="modal-input-group">
+            <label for="gateEmail">Email Address (Required)</label>
+            <input type="email" id="gateEmail" placeholder="Enter your email" required>
+        </div>
+        
+        <div class="modal-input-group">
+            <label for="gateMobile">Mobile Number (Required)</label>
+            <input type="text" id="gateMobile" placeholder="Enter your mobile number" required>
+        </div>
+
+        <button class="submit-btn modal-submit" onclick="validateAndDownloadPdf()">Download Summary</button>
       </div>
     </div>
 
@@ -601,6 +545,33 @@
         // Force re-run visualization with new parameters
         closeControllerModal();
         showVisualization(); 
+    }
+    
+    // --- PDF Gate Modal Functions (NEW) ---
+    function openPdfGateModal() {
+        if (!finalCalculationData || finalCalculationData.totalPixels === undefined) {
+            document.getElementById('errorMessage').textContent = 'ERROR: Please calculate the LED wall configuration first.';
+            document.getElementById('errorMessage').classList.remove('hidden');
+            return;
+        }
+        document.getElementById('pdfGateModal').style.display = 'block';
+    }
+
+    function closePdfGateModal() {
+        document.getElementById('pdfGateModal').style.display = 'none';
+    }
+    
+    function validateAndDownloadPdf() {
+        const email = document.getElementById('gateEmail').value;
+        const mobile = document.getElementById('gateMobile').value;
+        
+        if (!email || !mobile) {
+            alert("Please enter both Email Address and Mobile Number to download the PDF.");
+            return;
+        }
+        
+        closePdfGateModal();
+        downloadPdf(email, mobile);
     }
     
     // --- Core Calculation Logic (Updated H-Series selection) ---
@@ -879,37 +850,18 @@
         document.querySelector('.back-btn-placeholder').classList.remove('hidden');
         document.getElementById('visualization').classList.add('visible');
 
-        // 3. Update Details Section (Column 1 - Wall Specs) - ADDING COLON (:)
+        // 3. Update Details Section (Column 1 - Wall Specs) - PIXEL PITCH MOVED TO TOP
         
-        // --- START MODIFICATION FOR PIXEL PITCH ORDER ---
-        // 1. Set Pixel Pitch to the first spot (finalDimensions span)
-        document.getElementById('finalDimensions').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
-
-        // 2. Set Final Dimensions to the second spot (resolution span)
-        document.getElementById('resolution').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
-
-        // 3. Set Resolution to the third spot (numCabinets span)
-        document.getElementById('numCabinets').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
-        
-        // 4. Total Cabinets to the fourth spot (totalModules span)
-        document.getElementById('totalModules').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
-        
-        // 5. Total Modules to the fifth spot (finalDiagonal span)
-        document.getElementById('finalDiagonal').innerHTML = `<strong>Total Modules Required :</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
-        
-        // 6. Final Diagonal to the sixth spot (finalArea span)
-        document.getElementById('finalArea').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
-        
-        // 7. Final Area to the seventh spot (totalPixels span)
-        document.getElementById('totalPixels').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
-        
-        // 8. Total Pixels to the eighth spot (pixelPitchDisplay span)
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
-        
-        // 9 & 10. The last two items (cabinet size/pixels) remain in their current spots
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
+        document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
+        document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
+        document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
+        document.getElementById('totalModules').innerHTML = `<strong>Total Modules Required :</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
+        document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
+        document.getElementById('finalArea').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
+        document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
         document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH) :</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
         document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH) :</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
-        // --- END MODIFICATION FOR PIXEL PITCH ORDER ---
 
         // 4. Update Details Section (Column 2 - Control System & Power) - ADDING COLON (:) & NEW ETHERNET LABELS
         const isHSeries = data.controllerType.includes("Modular");
@@ -987,9 +939,6 @@
             }
         }
 
-        // 6. Draw Connection Map (New)
-        drawConnectionMap(data.numCabW, data.numCabH);
-
         document.getElementById('downloadPdfLink').classList.remove('hidden');
     }
     
@@ -1001,10 +950,10 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation (Redesigned with Smaller Font & BOQ) ---
-    function downloadPdf() {
-        if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
-            alert("Please calculate the LED wall configuration first.");
+    // --- PDF Generation (Redesigned with Watermark, Logo Placeholder, GST/Warranty/Contact) ---
+    function downloadPdf(email, mobile) {
+        if (!finalCalculationData || finalCalculationData.totalPixels === undefined) {
+            alert("Internal Error: Calculation data is missing.");
             return;
         }
 
@@ -1018,13 +967,48 @@
         const margin = 15;
         const lineHeight = 7; 
         const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight(); // Get page height for watermark
         const primaryColor = [13, 71, 161]; 
         const secondaryColor = [183, 28, 28]; 
 
+        // PDF Watermark function (NEW)
+        const addWatermark = (doc, name) => {
+            const totalPages = doc.internal.getNumberOfPages();
+            doc.setFontSize(50);
+            doc.setTextColor(0, 0, 0, 0.05); // Very faint black
+            doc.setFont('helvetica', 'bold'); 
+            
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.text(name, pageW / 2, pageH / 2, { 
+                    align: 'center', 
+                    angle: -30 
+                });
+            }
+            // Reset to the last page after adding watermark to all
+            doc.setPage(totalPages); 
+            doc.setTextColor(0, 0, 0); // Reset color
+            doc.setFont('helvetica', 'normal'); // Reset font
+        };
+        
         // 1. Header (Title) - Reduced to 18pt
         doc.setFontSize(18);
         doc.setTextColor(...primaryColor);
         doc.text('PeopleLink LED Video Wall Technical Summary', pageW / 2, y, { align: 'center' });
+        
+        // Logo Placeholder (Top Right Corner)
+        // Since we don't have the image data, we draw a box and text as a visual representation
+        const logo_h = 10; 
+        const logo_w = 40; // 40mm width for placeholder
+        const logo_x = pageW - margin - logo_w;
+        const logo_y = y - lineHeight + 1;
+        
+        doc.setFillColor(...primaryColor);
+        doc.rect(logo_x, logo_y, logo_w, logo_h, 'F');
+        doc.setFontSize(6);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Company Logo", logo_x + logo_w/2, logo_y + logo_h/2 + 0.5, { align: 'center' }); // +0.5 to center vertically
+
         y += lineHeight;
         doc.setFontSize(8);
         doc.setTextColor(100, 100, 100);
@@ -1038,6 +1022,7 @@
         y += lineHeight;
 
         const performanceData = [
+            ['Pixel Pitch :', `${data.pixelPitch_mm} mm`], // MOVED TO TOP
             ['Actual Final Dimensions (WxH) :', `(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
             ['Actual Final Resolution (WxH) :', `${data.finalResW} x ${data.finalResH}`],
             ['Aspect Ratio :', data.aspectRatioText],
@@ -1149,21 +1134,21 @@
             ['Receiving Cards (R-Card)', `Embedded in Cabinet`, data.totalRecCards, 'PCS'],
             ['Long Ethernet Cables', `Controller to Wall runs (CAT6/7)`, data.requiredPorts, 'PCS'],
             ['Short Ethernet Cables', `Cabinet interconnect (CAT6/7)`, data.requiredShortEthernet, 'PCS'],
+            // --- NEW ITEMS ADDED HERE ---
             ['Installation / Configuration', `Includes wall mounting/stacking structure, site setup, and system commissioning.`, 1, 'LS (Lump Sum)'],
             ['Transport / Logistics', `Shipping/freight charges to site location.`, 1, 'LS (Lump Sum)'],
+            // -----------------------------
         ];
 
         if (data.controllerType.includes("Modular")) {
             boqData.push(['Modular Splicer Frame', data.splicerSolution || 'Not Specified', 1, 'PCS']);
             boqData.push(['Output Card (Sending)', data.outputCardModel, data.requiredSendCards, 'PCS']);
-            boqData.push(['Input Card (User Config) :', data.inputCardModel, data.inputCardQty, 'PCS']); // Corrected description
+            boqData.push(['Input Card (User Config)', data.inputCardModel, data.inputCardQty, 'PCS']);
         }
 
-        const boqHeaders = [['Item', 'Description / Model', 'Quantity', 'Unit']]; // Moved definition here
-        
         doc.autoTable({ 
             startY: y + 2, 
-            head: boqHeaders,
+            head: [['Item', 'Description / Model', 'Quantity', 'Unit']],
             body: boqData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'grid', 
@@ -1171,24 +1156,7 @@
             styles: { fontSize: 8, cellPadding: 1.5 },
             columnStyles: { 0: { fontStyle: 'bold' }, 2: { halign: 'right' }, 3: { halign: 'center' } }
         });
-        y = doc.lastAutoTable.finalY; // Adjust y to the end of the first table
-
-        // --- ADDED: GST Entry Table ---
-        const gstData = [
-            ['Goods and Services Tax (GST) @ 18%', 'Applicable on the total value of taxable goods and services.', 'Total Sum', 'PERCENT'],
-        ];
-
-        doc.autoTable({
-            startY: y, // Start immediately after the main table
-            head: [], // No header for the final line
-            body: gstData,
-            margin: { left: margin, right: margin, bottom: 0 },
-            theme: 'grid',
-            styles: { fontSize: 8, cellPadding: 1.5, lineColor: [0, 0, 0] }, // Ensure borders are visible
-            columnStyles: { 0: { fontStyle: 'bold', fillColor: [240, 248, 255] }, 1: { fillColor: [240, 248, 255] }, 2: { halign: 'right' , fillColor: [240, 248, 255] }, 3: { halign: 'center', fillColor: [240, 248, 255] } }
-        });
-        y = doc.lastAutoTable.finalY + lineHeight * 2; // Move y down after the new table
-        // --- END ADDED GST Table ---
+        y = doc.lastAutoTable.finalY + lineHeight * 2;
         
         // --- 7. Terms and Conditions ---
         doc.setFontSize(12);
@@ -1199,17 +1167,15 @@
         doc.setFontSize(8); 
         doc.setTextColor(50, 50, 50); // Dark gray for text
 
-        // --- MODIFIED TERMS ARRAY WITH GST & RENUMBERING ---
         const terms = [
-            "1. Price Validity: This quotation is valid for 30 days from the date of issue.",
-            "2. Goods and Services Tax (GST): **GST is applicable at 18% on the total taxable value of goods and services**, as detailed in the Bill of Quantities (BOQ).",
-            "3. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
-            "4. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
-            "5. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
-            "6. Warranty: Standard warranty is 1 years on LED panels and accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.",
-            "7. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours."
+            `1. Price Validity: This quotation is valid for 30 days from the date of issue. All quoted prices are exclusive of 18% GST (Goods and Services Tax).`, // GST ADDED
+            "2. Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning, unless otherwise specified.",
+            "3. Civil Work/Structure: All necessary civil works (wall reinforcement, recess creation, etc.) and primary mounting structure must be provided by the client, unless explicitly included in the BOQ.",
+            "4. Power and Data: Stable power sources (UPS/Dedicated Circuit) and necessary data network drops (LAN for control) must be provided by the client near the installation area.",
+            "5. Warranty: Standard warranty is 1 year on LED panels and accessories, covering manufacturing defects. Warranty does not cover damages from misuse, power surges, or unauthorized repair.", // WARRANTY 1 YEAR
+            "6. Site Access: Unrestricted, safe site access and use of site-provided lifting equipment (if required) must be available during installation and commissioning hours.",
+            `7. Contact Information: Email: ${email} | Mobile: ${mobile}` // CONTACT INFO ADDED
         ];
-        // --- END MODIFIED TERMS ARRAY ---
         
         terms.forEach((term, index) => {
             // Check if a new page is needed
@@ -1237,116 +1203,12 @@
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
         y += lineHeight;
+        
+        // Apply Watermark to ALL pages (LAST STEP)
+        addWatermark(doc, "Pramodh Kathala");
 
         doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_BOQ.pdf`);
     }
-
-    // --- START ADDED JAVASCRIPT FOR DIAGRAM AND VIDEO ---
-
-    // Function to draw the cabinet connection diagram (Serpentine/N-Shape flow)
-    function drawConnectionMap(cols, rows) {
-        const mapContainer = document.getElementById('connection-map');
-        mapContainer.innerHTML = '';
-        
-        // Set up grid layout
-        mapContainer.style.display = 'grid';
-        mapContainer.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-        mapContainer.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
-        mapContainer.style.gap = '5px';
-        mapContainer.style.width = '100%';
-
-        for (let r = 0; r < rows; r++) {
-            // Determine the order for the row (Left-to-Right or Right-to-Left)
-            // LTR for even rows (r=0, 2, 4...), RTL for odd rows (r=1, 3, 5...)
-            const isLTR = (r % 2 === 0);
-            const rowIndices = [...Array(cols).keys()];
-            
-            for (let c_index of rowIndices) {
-                // Calculate the actual cabinet number (Rx card number)
-                let rxNum;
-                if (isLTR) {
-                    rxNum = r * cols + (c_index + 1); // 0-based row * cols + 1-based column
-                } else {
-                    rxNum = r * cols + (cols - c_index); // 0-based row * cols + (cols - 0-based column)
-                }
-                
-                const cabinet = document.createElement('div');
-                cabinet.className = 'cabinet-box';
-                cabinet.style.backgroundColor = '#fff';
-                cabinet.style.border = '1px solid #ccc';
-                cabinet.style.padding = '8px 5px';
-                cabinet.style.textAlign = 'center';
-                cabinet.style.fontSize = '0.75em';
-                cabinet.style.fontWeight = '600';
-                cabinet.style.position = 'relative';
-                cabinet.style.gridColumn = c_index + 1;
-                cabinet.style.gridRow = r + 1;
-                
-                // Display Cabinet ID and Receiving Card (Rx)
-                cabinet.innerHTML = `Rx ${rxNum}<br><span style="color: #0D47A1;">1 Port, 1 Cab</span>`;
-                
-                // --- DRAW CONNECTIONS (Arrows) ---
-                
-                // 1. Horizontal Arrows
-                if (isLTR) { 
-                    if (c_index < cols - 1) { // Not the last column
-                        cabinet.innerHTML += '<span class="arrow-h right">→</span>';
-                    }
-                } else { // RTL 
-                    if (c_index > 0) { // Not the first column
-                        cabinet.innerHTML += '<span class="arrow-h left">←</span>';
-                    }
-                }
-
-                // 2. Vertical Arrows (Down) - Only at the end of each row, except the last row
-                if (r < rows - 1) {
-                    if (isLTR && c_index === cols - 1) { // End of LTR row
-                        cabinet.innerHTML += '<span class="arrow-v bottom">↓</span>';
-                    } else if (!isLTR && c_index === 0) { // End of RTL row
-                        cabinet.innerHTML += '<span class="arrow-v bottom">↓</span>';
-                    }
-                }
-
-                mapContainer.appendChild(cabinet);
-            }
-        }
-    }
-    
-    document.getElementById('play-video-btn').addEventListener('click', function() {
-        // Ensure we have calculation data
-        if (!finalCalculationData || !finalCalculationData.finalResW) {
-            alert("Please calculate the LED wall configuration first.");
-            return;
-        }
-        
-        const videoUrl = document.getElementById('video-url').value;
-        const videoElement = document.getElementById('display-video');
-        
-        // 1. Simulate video source input (Synchronous Mode)
-        videoElement.src = videoUrl;
-        videoElement.load();
-        
-        // 2. Simulate playback on the LED wall
-        videoElement.play().catch(error => {
-            console.error("Video playback failed:", error);
-            alert("Video could not play. Check URL or browser permissions (might need to interact first).");
-        });
-        
-        // Optional: Update text to show resolution being used
-        const resolutionW = finalCalculationData.finalResW;
-        const resolutionH = finalCalculationData.finalResH;
-
-        const btn = document.getElementById('play-video-btn');
-        btn.textContent = `Playing Video at ${resolutionW}x${resolutionH} Resolution`;
-        btn.style.backgroundColor = '#1B5E20';
-        btn.style.color = 'white';
-
-        setTimeout(() => {
-            btn.textContent = 'Load & Play Video on Wall';
-            btn.style.backgroundColor = '#0D47A1';
-        }, 5000);
-    });
-    // --- END ADDED JAVASCRIPT FOR DIAGRAM AND VIDEO ---
 
     document.addEventListener('DOMContentLoaded', () => {
         toggleMeasurementFields();
@@ -1356,15 +1218,19 @@
 
         // Close modal when clicking outside
         window.onclick = function(event) {
-          const modal = document.getElementById('controllerModal');
-          if (event.target == modal) {
-            modal.style.display = "none";
+          const controllerModal = document.getElementById('controllerModal');
+          const gateModal = document.getElementById('pdfGateModal');
+          if (event.target == controllerModal) {
+            controllerModal.style.display = "none";
+          }
+          if (event.target == gateModal) {
+            gateModal.style.display = "none";
           }
         }
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink
+    © 2025 PeopleLink Unified Communications Pvt. Ltd. | Designed by Pramodh Kathala
 </footer>
 </body>
 </html>
