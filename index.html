@@ -71,7 +71,7 @@
     .details-box { border: 1px solid #e0e0e0; padding: 20px; border-radius: 8px; background: #f7f9fc; }
     .details-box h4 { margin-top: 0; color: #0D47A1; border-bottom: 2px solid #e0e0e0; padding-bottom: 8px; margin-bottom: 15px; font-size: 1.1em; }
     
-    /* Custom style for the table layout (REVERTED: Remarks/Labels on left, Actual Figures on right) */
+    /* Custom style for the table layout (Remarks/Labels on left, Actual Figures on right) */
     .vis-details { display: grid; grid-template-columns: 1fr; gap: 10px; font-size: 0.95em; color: #333; }
     .vis-details span { 
         display: flex; 
@@ -770,33 +770,27 @@
         document.querySelector('.back-btn-placeholder').classList.remove('hidden');
         document.getElementById('visualization').classList.add('visible');
 
-        // 3. Update Details Section (Column 1 - Wall Specs) - **Updated for REVERSED Order (Remark Left, Value Right)**
+        // 3. Update Details Section (Column 1 - Wall Specs) - ADDING COLON (:)
         
-        // Remarks (Left) in <strong>, Actual Figures (Red, Right) in <small>
-        
-        // Specific format: Actual Final Dimensions (WxH) (15.75ft x 8.86ft) - 4.80m x 2.70m
-        document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH)</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
-        
-        // Specific format: Actual Final Resolution (WxH) - 5120 x 2880
-        document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH)</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
-        
-        document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H)</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
-        document.getElementById('totalModules').innerHTML = `<strong>Total Modules Required</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
-        document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
-        document.getElementById('finalArea').innerHTML = `<strong>Final Area</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
-        document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
-        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch</strong><small>${data.pixelPitch_mm} mm</small>`;
-        document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH)</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
-        document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH)</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
+        document.getElementById('finalDimensions').innerHTML = `<strong>Actual Final Dimensions (WxH) :</strong><small>(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m</small>`;
+        document.getElementById('resolution').innerHTML = `<strong>Actual Final Resolution (WxH) :</strong><small>${data.finalResW} x ${data.finalResH}</small>`;
+        document.getElementById('numCabinets').innerHTML = `<strong>Total Cabinets (W x H) :</strong><small>${data.totalCabinets} (${data.numCabW} x ${data.numCabH})</small>`;
+        document.getElementById('totalModules').innerHTML = `<strong>Total Modules Required :</strong><small>${data.totalModules} (${data.modulesPerCab} per cabinet)</small>`;
+        document.getElementById('finalDiagonal').innerHTML = `<strong>Final Diagonal Size :</strong><small>${data.finalDiagonal_in.toFixed(1)} in</small>`;
+        document.getElementById('finalArea').innerHTML = `<strong>Final Area :</strong><small>${data.finalArea_m2.toFixed(2)} m²</small>`;
+        document.getElementById('totalPixels').innerHTML = `<strong>Total Pixels :</strong><small>${formatLargeNumber(data.totalPixels)}</small>`;
+        document.getElementById('pixelPitchDisplay').innerHTML = `<strong>Pixel Pitch :</strong><small>${data.pixelPitch_mm} mm</small>`;
+        document.getElementById('cabinetSize').innerHTML = `<strong>Cabinet Size (WxH) :</strong><small>${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm</small>`;
+        document.getElementById('cabinetPixels').innerHTML = `<strong>Cabinet Pixels (WxH) :</strong><small>${data.cabPixW} x ${data.cabPixH}</small>`;
 
-        // 4. Update Details Section (Column 2 - Control System & Power) - **REVERSED Order**
+        // 4. Update Details Section (Column 2 - Control System & Power) - ADDING COLON (:) & NEW ETHERNET LABELS
         const isHSeries = data.controllerType.includes("Modular");
         const controlSystemDetailsDiv = document.getElementById('controlSystemDetails');
         
         // --- 1. Primary Controller ---
         let htmlContent = `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Control System Summary</span>
-            <span id="suggestedControllerModel"><strong>Controller/Processor Model (${data.controllerType})</strong><small>${data.controllerName}</small></span>
+            <span id="suggestedControllerModel"><strong>Controller/Processor Model (${data.controllerType}) :</strong><small>${data.controllerName}</small></span>
         `;
 
         // --- 2. Modular/Splicer Specific Details (Only for H-Series) ---
@@ -804,9 +798,9 @@
             htmlContent += `
                 <div id="modularDetails" class="vis-details" style="grid-column: 1 / -1; gap: 5px; border-top: 1px solid #e0e0e0; padding-top: 10px; margin-top: 5px;">
                     <span style="grid-column: 1 / -1; font-weight: 700; color: #B71C1C; margin-bottom: 5px;">Modular Components (H-Series)</span>
-                    <span id="splicerSolution"><strong>Splicer Frame/Solution</strong><small>${data.splicerSolution || 'N/A'}</small></span>
-                    <span id="sendingCardModel"><strong>Output Card (${data.outputCardPorts} ports/card)</strong><small>${data.requiredSendCards} x ${data.outputCardModel}</small></span>
-                    <span id="inputCardModel"><strong>Input Card (User Specified)</strong><small>${data.inputCardQty} x ${data.inputCardModel}</small></span>
+                    <span id="splicerSolution"><strong>Splicer Frame/Solution :</strong><small>${data.splicerSolution || 'N/A'}</small></span>
+                    <span id="sendingCardModel"><strong>Output Card (${data.outputCardPorts} ports/card) :</strong><small>${data.requiredSendCards} x ${data.outputCardModel}</small></span>
+                    <span id="inputCardModel"><strong>Input Card (User Specified) :</strong><small>${data.inputCardQty} x ${data.inputCardModel}</small></span>
                 </div>
             `;
         }
@@ -814,17 +808,18 @@
         // --- 3. Wall Connection Summary ---
         htmlContent += `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Connection Summary</span>
-            <span id="requiredRecCards"><strong>Total Receiving Cards Required</strong><small>${data.totalRecCards}</small></span>
-            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs</strong><small>${data.requiredPorts}</small></span>
-            <span id="controllerShortPorts"><strong>Short Ethernet Cables</strong><small>${data.requiredShortEthernet}</small></span>
+            <span id="requiredRecCards"><strong>Total Receiving Cards Required :</strong><small>${data.totalRecCards}</small></span>
+            
+            <span id="controllerLongPorts"><strong>Long Ethernet Ports/Runs : (Controller to Wall)</strong><small>${data.requiredPorts}</small></span>
+            <span id="controllerShortPorts"><strong>Short Ethernet Cables : (Between Cabinets)</strong><small>${data.requiredShortEthernet}</small></span>
         `;
         
-        // --- 4. Power and Weight Section (CLEANED - Only Actual Figures, Left-Aligned with Remarks) ---
+        // --- 4. Power and Weight Section ---
         htmlContent += `
             <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Power and Weight (Actual Figures Only)</span>
-            <span id="wallPowerActual"><strong>Max Power Consumption (Actual)</strong><small>${formatNumber(data.actualPower_W_unbuffered, 0)} W</small></span>
-            <span id="wallCurrent"><strong>Max Current Draw (Actual @220V)</strong><small>${data.actualCurrent_A.toFixed(2)} A</small></span>
-            <span id="cabinetWeightActual"><strong>Total Wall Weight (Actual Cabinets)</strong><small>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</small></span>
+            <span id="wallPowerActual"><strong>Max Power Consumption (Actual) :</strong><small>${formatNumber(data.actualPower_W_unbuffered, 0)} W</small></span>
+            <span id="wallCurrent"><strong>Max Current Draw (Actual @220V) :</strong><small>${data.actualCurrent_A.toFixed(2)} A</small></span>
+            <span id="cabinetWeightActual"><strong>Total Wall Weight (Actual Cabinets) :</strong><small>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</small></span>
         `;
         
         controlSystemDetailsDiv.innerHTML = htmlContent;
@@ -875,7 +870,7 @@
         document.getElementById('downloadPdfLink').classList.add('hidden');
     }
 
-    // --- PDF Generation (Redesigned with Smaller Font) ---
+    // --- PDF Generation (Redesigned with Smaller Font & BOQ) ---
     function downloadPdf() {
         if (!finalCalculationData || finalCalculationData.totalPixels === 0) {
             alert("Please calculate the LED wall configuration first.");
@@ -890,7 +885,7 @@
 
         let y = 10;
         const margin = 15;
-        const lineHeight = 7; // Reduced line height
+        const lineHeight = 7; 
         const pageW = doc.internal.pageSize.getWidth();
         const primaryColor = [13, 71, 161]; 
         const secondaryColor = [183, 28, 28]; 
@@ -906,18 +901,18 @@
         y += lineHeight * 1.5;
 
         // --- 2. Wall Performance & Resolution ---
-        doc.setFontSize(12); // Reduced to 12pt
+        doc.setFontSize(12); 
         doc.setTextColor(...secondaryColor); 
         doc.text('1. Wall Performance & Dimensions', margin, y);
         y += lineHeight;
 
         const performanceData = [
-            ['Actual Final Dimensions (WxH)', `(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
-            ['Actual Final Resolution (WxH)', `${data.finalResW} x ${data.finalResH}`],
-            ['Aspect Ratio', data.aspectRatioText],
-            ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
-            ['Total Pixels / Area', `${formatLargeNumber(data.totalPixels)} / ${data.finalArea_m2.toFixed(2)} m²`],
-            ['Minimum Viewing Distance', `${data.minViewingDistance_ft.toFixed(2)} feet`], 
+            ['Actual Final Dimensions (WxH) :', `(${finalW_FT.toFixed(2)}ft x ${finalH_FT.toFixed(2)}ft) - ${finalW_M.toFixed(2)}m x ${finalH_M.toFixed(2)}m`],
+            ['Actual Final Resolution (WxH) :', `${data.finalResW} x ${data.finalResH}`],
+            ['Aspect Ratio :', data.aspectRatioText],
+            ['Final Diagonal Size :', `${data.finalDiagonal_in.toFixed(1)} inches`],
+            ['Total Pixels / Area :', `${formatLargeNumber(data.totalPixels)} / ${data.finalArea_m2.toFixed(2)} m²`],
+            ['Minimum Viewing Distance :', `${data.minViewingDistance_ft.toFixed(2)} feet`], 
         ];
 
         doc.autoTable({ 
@@ -926,25 +921,25 @@
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'striped', 
             headStyles: { fillColor: primaryColor, halign: 'center' },
-            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
+            styles: { fontSize: 8, cellPadding: 1.5 }, 
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
 
         // --- 3. Physical & Cabinet Specifications ---
-        doc.setFontSize(12); // Reduced to 12pt
+        doc.setFontSize(12); 
         doc.setTextColor(...secondaryColor); 
         doc.text('2. Physical & Cabinet Specifications', margin, y);
         y += lineHeight;
 
         const specsData = [
-            ['Pixel Pitch', `${data.pixelPitch_mm} mm`],
-            ['Cabinet Dimensions (W x H)', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
-            ['Cabinet Pixels (W x H)', `${data.cabPixW} x ${data.cabPixH}`],
-            ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
-            ['Total Cabinets Required', `${data.totalCabinets}`],
-            ['Total Modules Required', `${data.totalModules}`],
-            ['Brightness Range', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'], 
+            ['Pixel Pitch :', `${data.pixelPitch_mm} mm`],
+            ['Cabinet Dimensions (W x H) :', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
+            ['Cabinet Pixels (W x H) :', `${data.cabPixW} x ${data.cabPixH}`],
+            ['Cabinet Array (W x H) :', `${data.numCabW} x ${data.numCabH}`],
+            ['Total Cabinets Required :', `${data.totalCabinets}`],
+            ['Total Modules Required :', `${data.totalModules}`],
+            ['Brightness Range :', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'], 
         ];
 
         doc.autoTable({ 
@@ -952,29 +947,28 @@
             body: specsData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'plain', 
-            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
+            styles: { fontSize: 8, cellPadding: 1.5 }, 
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
         
         // --- 4. Control System & Connections ---
-        doc.setFontSize(12); // Reduced to 12pt
+        doc.setFontSize(12); 
         doc.setTextColor(...secondaryColor); 
         doc.text('3. Control System & Connections', margin, y);
         y += lineHeight;
 
         let controllerData = [
-            ['Controller/Processor Model', `${data.controllerName} (${data.controllerType})`],
-            ['Total Receiving Cards', `${data.totalRecCards}`],
-            ['Long Ethernet Ports/Runs', `${data.requiredPorts}`],
-            ['Short Ethernet Cables', `${data.requiredShortEthernet}`],
+            ['Controller/Processor Model :', `${data.controllerName} (${data.controllerType})`],
+            ['Total Receiving Cards :', `${data.totalRecCards}`],
+            ['Long Ethernet Ports/Runs : (Controller to Wall)', `${data.requiredPorts}`],
+            ['Short Ethernet Cables : (Between Cabinets)', `${data.requiredShortEthernet}`],
         ];
         
-        // H-Series components kept separate for modular system
         if (data.controllerType.includes("Modular")) {
-            controllerData.push(['Modular Splicer Frame', data.splicerSolution || 'Not Specified']);
-            controllerData.push(['Output Card (Sending)', `${data.requiredSendCards} x ${data.outputCardModel}`]);
-            controllerData.push(['Input Card (User Config)', `${data.inputCardQty} x ${data.inputCardModel}`]);
+            controllerData.push(['Modular Splicer Frame :', data.splicerSolution || 'Not Specified']);
+            controllerData.push(['Output Card (Sending) :', `${data.requiredSendCards} x ${data.outputCardModel}`]);
+            controllerData.push(['Input Card (User Config) :', `${data.inputCardQty} x ${data.inputCardModel}`]);
         }
 
         doc.autoTable({ 
@@ -982,24 +976,24 @@
             body: controllerData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'striped', 
-            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
+            styles: { fontSize: 8, cellPadding: 1.5 }, 
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
         });
         y = doc.lastAutoTable.finalY + lineHeight;
         
         // --- 5. Power and Weight (Standardized 15% Margin) ---
-        doc.setFontSize(12); // Reduced to 12pt
+        doc.setFontSize(12); 
         doc.setTextColor(...secondaryColor); 
         doc.text('4. Power and Weight', margin, y);
         y += lineHeight;
 
         const powerWeightData = [
-            ['Actual Max Power Consumption (W)', `${formatNumber(data.actualPower_W_unbuffered, 0)} W`],
-            ['Design Max Power Consumption (W)', `${formatNumber(data.maxPower_W, 0)} W`],
-            ['Max Current Draw (Actual @220V)', `${data.actualCurrent_A.toFixed(2)} A`],
-            ['Max Current Draw (Design @220V)', `${data.maxCurrent_A_buffered.toFixed(2)} A`],
-            ['Actual Wall Weight (kg)', `${formatNumber(data.actualWallWeight_unbuffered, 1)} kg`],
-            ['Total Wall Weight (Installation Design)', `${formatNumber(data.totalWallWeight_buffered, 1)} kg`],
+            ['Actual Max Power Consumption (W) :', `${formatNumber(data.actualPower_W_unbuffered, 0)} W`],
+            ['Design Max Power Consumption (W) :', `${formatNumber(data.maxPower_W, 0)} W`],
+            ['Max Current Draw (Actual @220V) :', `${data.actualCurrent_A.toFixed(2)} A`],
+            ['Max Current Draw (Design @220V) :', `${data.maxCurrent_A_buffered.toFixed(2)} A`],
+            ['Actual Wall Weight (kg) :', `${formatNumber(data.actualWallWeight_unbuffered, 1)} kg`],
+            ['Total Wall Weight (Installation Design) :', `${formatNumber(data.totalWallWeight_buffered, 1)} kg`],
         ];
 
         doc.autoTable({ 
@@ -1007,18 +1001,50 @@
             body: powerWeightData, 
             margin: { left: margin, right: margin, bottom: 0 }, 
             theme: 'plain', 
-            styles: { fontSize: 8, cellPadding: 1.5 }, // Reduced font size
+            styles: { fontSize: 8, cellPadding: 1.5 }, 
             columnStyles: { 0: { fontStyle: 'bold' }, 1: { halign: 'right' } }
+        });
+        y = doc.lastAutoTable.finalY + lineHeight * 2;
+        
+        // --- 6. Bill of Quantities (BOQ) ---
+        doc.setFontSize(12); 
+        doc.setTextColor(...secondaryColor); 
+        doc.text('5. Bill of Quantities (BOQ)', margin, y);
+        y += lineHeight;
+
+        let boqData = [
+            ['LED Cabinets', data.productName, data.totalCabinets, 'PCS'],
+            ['Controller/Processor', data.controllerName, 1, 'PCS'],
+            ['Receiving Cards (R-Card)', `Embedded in Cabinet`, data.totalRecCards, 'PCS'],
+            ['Long Ethernet Cables', `Controller to Wall runs (CAT6/7)`, data.requiredPorts, 'PCS'],
+            ['Short Ethernet Cables', `Cabinet interconnect (CAT6/7)`, data.requiredShortEthernet, 'PCS'],
+        ];
+
+        if (data.controllerType.includes("Modular")) {
+            boqData.push(['Modular Splicer Frame', data.splicerSolution || 'Not Specified', 1, 'PCS']);
+            boqData.push(['Output Card (Sending)', data.outputCardModel, data.requiredSendCards, 'PCS']);
+            boqData.push(['Input Card (User Config)', data.inputCardModel, data.inputCardQty, 'PCS']);
+        }
+
+        doc.autoTable({ 
+            startY: y + 2, 
+            head: [['Item', 'Description / Model', 'Quantity', 'Unit']],
+            body: boqData, 
+            margin: { left: margin, right: margin, bottom: 0 }, 
+            theme: 'grid', 
+            headStyles: { fillColor: primaryColor, halign: 'center' },
+            styles: { fontSize: 8, cellPadding: 1.5 },
+            columnStyles: { 0: { fontStyle: 'bold' }, 2: { halign: 'right' }, 3: { halign: 'center' } }
         });
         y = doc.lastAutoTable.finalY + 8;
         
         // Final Disclaimer
-        doc.setFontSize(7); // Reduced to 7pt
+        doc.setFontSize(7); 
         doc.setTextColor(100, 100, 100);
         doc.text(`Note on Design Figures: Design Power and Weight include a ${MARGIN_PERCENT_TEXT} safety margin over actual maximum consumption/cabinet weight for structural and electrical planning.`, margin, y, { maxWidth: pageW - 2 * margin });
         y += lineHeight;
 
-        doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}.pdf`);
+        doc.save(`PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_BOQ.pdf`);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1037,7 +1063,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_K
+    © PeopleLink_KPR
 </footer>
 </body>
 </html>
