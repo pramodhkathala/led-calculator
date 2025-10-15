@@ -188,8 +188,7 @@
                 <span id="resolution">**Actual Final Resolution (WxH):** <strong>--</strong></span>
                 <span id="finalArea">Final Area: <strong>--</strong></span>
                 <span id="totalPixels">Total Pixels: <strong>--</strong></span>
-                <span id="brightness">Brightness/Nits: <strong>--</strong></span>
-            </div>
+                </div>
         </div>
 
         <div class="details-box">
@@ -271,9 +270,10 @@
     const MM_PER_METER = 1000;
     const MM_PER_INCH = 25.4;
     const MM_PER_FOOT = MM_PER_INCH * 12;
+    const METER_TO_FEET = 3.28084; // Per user request: 1 mtr = 3.28084 ft
     const PIXELS_PER_PORT_DEFAULT = 650000; // Standard for NovaStar Ethernet port bandwidth (approx 650K/port)
     
-    // Safety Buffers (Requested change: 15%)
+    // Safety Buffers 
     const POWER_BUFFER = 1.15; 
     const WEIGHT_BUFFER = 1.15; 
 
@@ -310,9 +310,9 @@
         { name: "H-Series Modular Splicer", type: "Modular Splicer", ports: 20, maxPixels: 26000000, maxW: 16384, maxH: 8192, priority: 8 }, 
     ].sort((a, b) => a.priority - b.priority);
 
-    // New H-Series Card Defaults and Splicer Info (Updated to reflect requests)
+    // New H-Series Card Defaults and Splicer Info
     const H_SERIES_DEFAULTS = {
-        SPLICER_NAME: "H-Series Modular Splicer (H2/H5/H9/H15/H20)", // Removed Novastar
+        SPLICER_NAME: "H-Series Modular Splicer (H2/H5/H9/H15/H20)", 
         
         // Input Card Options (Simplified display name for user selection)
         INPUT_CARD_OPTIONS: [
@@ -631,20 +631,23 @@
         const finalDiagonal_mm = Math.sqrt(finalW_mm * finalW_mm + finalH_mm * finalH_mm);
         const finalDiagonal_in = finalDiagonal_mm / MM_PER_INCH;
         
+        // 7. Calculate Viewing Distance (Pitch in mm * 3.28084 ft/mm)
+        const minViewingDistance_ft = details.pitch_mm * METER_TO_FEET; // 1mm pitch = 1m viewing distance (3.28084ft)
 
-        // 7. Calculate Power & Weight (WITH 15% BUFFER)
+
+        // 8. Calculate Power & Weight
         const actualPower_W_unbuffered = finalArea_m2 * details.maxPower_W_m2; 
         const maxPower_W_buffered = actualPower_W_unbuffered * POWER_BUFFER; 
-        const maxCurrent_A = maxPower_W_buffered / 220; // Assuming 220V standard
+        const actualCurrent_A = actualPower_W_unbuffered / 220; // Actual current draw @ 220V
+        const maxCurrent_A_buffered = maxPower_W_buffered / 220; // Design current draw @ 220V (for breakers/cabling)
         const actualCabinetWeight_unbuffered = details.weight_kg * totalCabinets;
         const totalWallWeight_buffered = actualCabinetWeight_unbuffered * WEIGHT_BUFFER;
 
-        // 8. Calculate Controller Requirements (Ports & Sending Cards)
+        // 9. Calculate Controller Requirements (Ports & Sending Cards)
         const suggestedController = getSuggestedControllerModel(totalPixels, finalResW, finalResH, productKey);
         const isHSeries = suggestedController.type.includes("Modular");
         
         // Use Modal/Default values for Output Cards
-        // Check if outputCardPorts is already set from a modal interaction, otherwise use 20-port default
         const outputCardPorts = finalCalculationData.outputCardPorts || H_SERIES_DEFAULTS.OUTPUT_CARD_20_PORTS;
         const outputCardModel = finalCalculationData.outputCardModel || H_SERIES_DEFAULTS.OUTPUT_CARD_20_MODEL;
         
@@ -667,7 +670,7 @@
         // Apply controller name override if set in modal
         const controllerName = finalCalculationData.controllerOverrideName || suggestedController.name;
         
-        // 9. Store data
+        // 10. Store data
         finalCalculationData = {
             ...finalCalculationData, // Preserve overrides
             productName: details.name,
@@ -695,11 +698,13 @@
             numCabH: numCabH,
             modulesPerCab: details.modulesPerCab,
             nits_range: details.nits_range,
+            minViewingDistance_ft: minViewingDistance_ft, // <-- NEW
             
             // Power and Weight 
             actualPower_W_unbuffered: actualPower_W_unbuffered,
             maxPower_W: maxPower_W_buffered,
-            maxCurrent_A: maxCurrent_A,
+            actualCurrent_A: actualCurrent_A, // <-- NEW
+            maxCurrent_A_buffered: maxCurrent_A_buffered, // <-- NEW
             actualWallWeight_unbuffered: actualCabinetWeight_unbuffered,
             totalWallWeight_buffered: totalWallWeight_buffered,
             
@@ -756,8 +761,8 @@
         document.getElementById('resolution').innerHTML = `**Actual Final Resolution (WxH):** <strong>${data.finalResW} x ${data.finalResH}</strong>`;
         document.getElementById('finalArea').innerHTML = `Final Area: <strong>${data.finalArea_m2.toFixed(2)} m²</strong>`;
         document.getElementById('totalPixels').innerHTML = `Total Pixels: <strong>${formatLargeNumber(data.totalPixels)}</strong>`;
-        document.getElementById('brightness').innerHTML = `Brightness/Nits: <strong>${data.nits_range || 'N/A'} cd/m²</strong>`;
-
+        // Brightness removed from HTML output per request
+        
 
         // 4. Update Details Section (Column 2 - Control System & Power)
         const isHSeries = data.controllerType.includes("Modular");
@@ -773,7 +778,7 @@
         if (isHSeries) {
             htmlContent += `
                 <div id="modularDetails" class="vis-details" style="grid-column: 1 / -1; gap: 5px; border-top: 1px solid #e0e0e0; padding-top: 10px; margin-top: 5px;">
-                    <span style="grid-column: 1 / -1; font-weight: 700; color: #B71C1C; margin-bottom: 5px;">Modular Components (Splicer)</span>
+                    <span style="grid-column: 1 / -1; font-weight: 700; color: #B71C1C; margin-bottom: 5px;">Modular Components (H-Series)</span>
                     <span id="splicerSolution">Splicer Frame/Solution: <strong>${data.splicerSolution || 'Not Specified'}</strong></span>
                     <span id="sendingCardModel">Output Card: <strong>${data.requiredSendCards} x ${data.outputCardModel}</strong><small> (${data.outputCardPorts} ports/card)</small></span>
                     <span id="inputCardModel">Input Card: <strong>${data.inputCardQty} x ${data.inputCardModel}</strong><small> (User Specified)</small></span>
@@ -789,14 +794,12 @@
             <span id="controllerShortPorts">Short Ethernet Cables: <strong>${data.requiredShortEthernet}</strong><small> (Between Cabinets)</small></span>
         `;
         
-        // --- 4. Power and Weight Section (CLEANED with Actual/Design Split) ---
+        // --- 4. Power and Weight Section (CLEANED - Only Actual Figures, Left-Aligned with Remarks) ---
         htmlContent += `
-            <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Power and Weight</span>
-            <span id="wallPowerActual">Actual Max Power (W): <strong>${formatNumber(data.actualPower_W_unbuffered, 0)} W</strong></span>
-            <span id="wallPowerBuffered">Design Max Power (W): <strong>${formatNumber(data.maxPower_W, 0)} W</strong><small> (+${(POWER_BUFFER-1)*100}% margin)</small></span>
-            <span id="wallCurrent">Max Current Draw (A @220V): <strong>${data.maxCurrent_A.toFixed(2)} A</strong><small> (Design Value)</small></span>
-            <span id="cabinetWeightActual">Actual Cabinet Weight: <strong>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</strong></span>
-            <span id="cabinetWeightBuffered">Total Wall Weight (Installation Design): <strong>${formatNumber(data.totalWallWeight_buffered, 1)} kg</strong><small> (+${(WEIGHT_BUFFER-1)*100}% margin)</small></span>
+            <span style="grid-column: 1 / -1; font-weight: 700; color: #0D47A1; border-bottom: 1px solid #0D47A1; padding-bottom: 5px; margin-bottom: 5px; margin-top: 10px;">Power and Weight (Actual Figures)</span>
+            <span id="wallPowerActual">Max Power Consumption (Actual): <strong>${formatNumber(data.actualPower_W_unbuffered, 0)} W</strong></span>
+            <span id="wallCurrent">Max Current Draw (Actual): <strong>${data.actualCurrent_A.toFixed(2)} A</strong><small> (@220V)</small></span>
+            <span id="cabinetWeightActual">Total Wall Weight (Actual Cabinets): <strong>${formatNumber(data.actualWallWeight_unbuffered, 1)} kg</strong></span>
         `;
         
         controlSystemDetailsDiv.innerHTML = htmlContent;
@@ -886,7 +889,8 @@
             ['Cabinet Array (W x H)', `${data.numCabW} x ${data.numCabH}`],
             ['Total Cabinets Required', `${data.totalCabinets}`],
             ['Total Modules Required', `${data.totalModules}`],
-            ['Brightness', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'],
+            // Brightness included in PDF per request
+            ['Brightness', data.nits_range ? `${data.nits_range} cd/m²` : 'N/A'], 
         ];
 
         doc.autoTable({ startY: y + 3, body: specsData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'striped', styles: { fontSize: 9 } });
@@ -905,6 +909,8 @@
             ['Total Pixels', formatLargeNumber(data.totalPixels)],
             ['Final Diagonal Size', `${data.finalDiagonal_in.toFixed(1)} inches`],
             ['Final Area', `${data.finalArea_m2.toFixed(2)} m²`],
+            // Viewing Distance added per request
+            ['Minimum Recommended Viewing Distance', `${data.minViewingDistance_ft.toFixed(2)} feet`], 
         ];
 
         doc.autoTable({ startY: y + 3, body: performanceData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
@@ -923,6 +929,7 @@
             ['Short Ethernet Cables', `${data.requiredShortEthernet} (Between Cabinets)`],
         ];
         
+        // H-Series components kept separate for modular system
         if (data.controllerType.includes("Modular")) {
             controllerData.push(['- Splicer Frame/Solution', data.splicerSolution || 'Not Specified']);
             controllerData.push(['- Output Card (Sending)', `${data.requiredSendCards} x ${data.outputCardModel}`]);
@@ -933,7 +940,7 @@
         doc.autoTable({ startY: y + 3, body: controllerData, margin: { left: margin, right: margin, bottom: 0 }, theme: 'plain', styles: { fontSize: 9 } });
         y = doc.lastAutoTable.finalY + lineHeight;
         
-        // 5. Power and Weight
+        // 5. Power and Weight (Includes both actual and design figures for complete design spec)
         doc.setFontSize(14);
         doc.setTextColor(...secondaryColor); 
         doc.text('4. Power and Weight', margin, y);
@@ -942,7 +949,8 @@
         const powerWeightData = [
             ['Actual Max Power Consumption (W)', `${formatNumber(data.actualPower_W_unbuffered, 0)} W`],
             ['Design Max Power Consumption (W)', `${formatNumber(data.maxPower_W, 0)} W (+${(POWER_BUFFER-1)*100}% margin)`],
-            ['Max Current Draw (@220V)', `${data.maxCurrent_A.toFixed(2)} A (Design Value)`],
+            ['Max Current Draw (Actual @220V)', `${data.actualCurrent_A.toFixed(2)} A`],
+            ['Max Current Draw (Design @220V)', `${data.maxCurrent_A_buffered.toFixed(2)} A (Design Value)`],
             ['Actual Cabinet Weight (kg)', `${formatNumber(data.actualWallWeight_unbuffered, 1)} kg`],
             ['Total Wall Weight (Installation Design)', `${formatNumber(data.totalWallWeight_buffered, 1)} kg (+${(WEIGHT_BUFFER-1)*100}% structural margin)`],
         ];
@@ -975,7 +983,7 @@
     });
   </script>
 <footer class="text-center text-gray-500 text-sm mt-10">
-    © PeopleLink_PK
+    © PeopleLink_KPP
 </footer>
 </body>
 </html>
