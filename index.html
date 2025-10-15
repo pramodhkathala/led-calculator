@@ -474,9 +474,9 @@
         const pageW = doc.internal.pageSize.getWidth();
         const pageH = doc.internal.pageSize.getHeight();
         
-        // Light Blue: #42A5F5 (RGB: 66, 165, 245)
-        // Set very low opacity and light blue color for watermark
-        doc.setFontSize(50);
+        // Light Hex: #FFB6C1 (RGB:255, 182, 193)
+        // Set very low opacity and light hex color for watermark
+        doc.setFontSize(30);
         doc.setTextColor(66, 165, 245); 
         doc.setGState(new doc.GState({opacity: 0.1})); 
 
@@ -1196,4 +1196,5 @@
 </footer>
 </body>
 </html>
+
 
