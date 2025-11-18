@@ -894,8 +894,8 @@
         const inModel = data.inputCardModel || 'H_1xHDMI';
         const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'TBD';
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 2, unit:'PCS' });
-
-        list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'TBD', desc: 'H Series PSU (800W)', qty: Math.max(1, Math.ceil((data.designPowerW/800))), unit:'PCS' });
+        
+        list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'TBD', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' });
       }
 
       // Ethernet Ports & Short Ethernet
@@ -1212,7 +1212,7 @@
         "4) Power & Data Requirements: Stable, dedicated power sources (UPS/circuit) must be provided. Long-distance LAN and Power cable laying from Controller to Wall location (Long Length) is the Client/Partner scope. Short Lan/Power cables between Cabinets are included.",
         "5) Warranty: Standard manufacturer's warranty is 1 year on LED panels, modules, and accessories. Excludes misuse, electrical surges, unauthorized repairs, and physical damage.",
         "6) Site Access: Unrestricted site access, safe working environment, and suitable lifting equipment (if required) must be available during installation & commissioning.",
-        "7) Transportation & Installation Damage: Up to 3% of the total quantity of Modules/Cabinets damaged during transportation or installation shall be acceptable and managed by the Client/Partner. Modules/Cabinets damaged above this 3% threshold will be replaced by the supplier."
+        "7) Transportation & Installation Damage: Up to 3% of the total quantity of Modules/Cabinets damaged during transportation or installation shall be acceptable and managed by the Client/Partner."
       ];
       terms.forEach(t=>{
         const split = doc.splitTextToSize(t, pageW - margin*2);
@@ -1347,4 +1347,5 @@
   </script>
 </body>
 </html>
+
 
