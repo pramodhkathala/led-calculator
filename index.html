@@ -61,80 +61,147 @@
 
     .details-panel { padding: 14px; border: 1px solid #e6eef8; border-radius: 6px; margin-top: 12px; background: #fbfcfd; font-size: 9pt; }
 
-    /* Visualization — full-color cabinet tiles */
-    .vis-container { margin-top: 12px; text-align: center; }
-    .led-wall-wrapper { display:flex; justify-content:center; gap:20px; align-items:flex-start; flex-wrap:wrap; }
-    .led-wall {
-      border: 2px solid rgba(31,41,55,0.08);
-      display: inline-grid;
-      width: 70%;
-      min-width: 320px;
-      aspect-ratio: 16/9;
-      max-height: 420px;
-      overflow: hidden;
-      position: relative;
-      background: linear-gradient(180deg,#f7fbff 0,#f3f8ff 100%);
-      border-radius:6px;
-    }
+/* Visualization — COB/MicroLED seamless wall with dynamic pixels + background image */
+.vis-container {
+  margin-top: 12px;
+  text-align: center;
+}
 
-    /* cabinet grid */
-    #cabinetOverlay {
-      width: 100%;
-      height: 100%;
-      display: grid;
-      padding:6px;
-      gap:6px;
-      box-sizing:border-box;
-    }
+.led-wall-wrapper {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  align-items:flex-start;
+  flex-wrap:wrap;
+}
 
-    /* Each cabinet cell */
-    .cab-cell {
-      border-radius:6px;
-      position:relative;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#ffffff;
-      font-weight:700;
-      font-size:12px;
-      overflow:hidden;
-      box-shadow: 0 6px 20px rgba(0,123,255,0.08), inset 0 -6px 16px rgba(0,0,0,0.06);
-      border: 1px solid rgba(255,255,255,0.06);
-    }
+/* Main LED wall container – now shows background image */
+.led-wall {
+  border: 1px solid rgba(0,0,0,0.4);
+  display: inline-grid;
+  width: 70%;
+  min-width: 320px;
+  aspect-ratio: 16/9;
+  max-height: 420px;
+  overflow: hidden;
+  position: relative;
 
-    /* small top-left label for cabinet index */
-    .cab-cell .label {
-      position:absolute;
-      top:6px;
-      left:6px;
-      background: rgba(0,0,0,0.65);
-      padding:4px 6px;
-      border-radius:3px;
-      font-size:10px;
-      color:#fff;
-      font-weight:600;
-    }
+  /* Fallback if image not loaded */
+  background-color:#020b10;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-size:cover;
 
-    /* Full tile fill — uses var(--viz) and a subtle gradient for depth */
-    .cab-fill {
-      position:absolute;
-      inset:0;                /* fill entire cell */
-      border-radius:6px;
-      display:block;
-      background: linear-gradient(180deg, var(--viz), rgba(0,123,255,0.85));
-      opacity:1;
-      pointer-events:none;
-      mix-blend-mode: normal;
-    }
-    .cab-fill::after { display:none !important; }
-    .cab-cell:hover .label { background: rgba(0,0,0,0.78); transform: translateY(-1px); transition: all 120ms ease; }
+  border-radius:6px;
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
 
-    /* Controller box & connections */
-    .controller-area { width: 24%; min-width:180px; text-align:center; }
-    .controller-box { background:#fff; border:1px solid #e3e8ef; padding:10px; border-radius:8px; box-shadow:0 6px 20px rgba(12,34,60,0.04); display:inline-block; font-weight:700; color:var(--brand); }
-    .connections-svg { width:100%; height:140px; overflow:visible; }
+/* cabinet grid */
+#cabinetOverlay {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  padding:6px;
+  gap:0px;                 /* NO gap between tiles */
+  box-sizing:border-box;
+}
 
-    #visDimensions { font-size: 0.95rem; font-weight: 600; margin-top: 8px; color:var(--brand); }
+/* Each cabinet cell — seamless COB style, only seams & slight depth */
+.cab-cell {
+  border-radius:2px;
+  position:relative;
+  overflow:hidden;
+  background: transparent;  /* let background image show through */
+
+  /* Very subtle cabinet boundary — mostly visible only when zoomed/hovered */
+  border:1px solid rgba(255,255,255,0.02);
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.55),
+    0 0 0 1px rgba(0,0,0,0.18);
+}
+
+/* When user hovers/focuses (acts like “zoom in”), outlines become clearer */
+.led-wall:hover .cab-cell {
+  border-color: rgba(255,255,255,0.12);
+  box-shadow:
+    inset 0 0 6px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(0,0,0,0.4);
+}
+
+/* small top-left label for cabinet index */
+.cab-cell .label {
+  position:absolute;
+  top:4px;
+  left:4px;
+  background: rgba(0,0,0,0.65);
+  padding:3px 5px;
+  border-radius:3px;
+  font-size:9px;
+  color:#fff;
+  font-weight:600;
+}
+
+/* LED “glass” layer – transparent, only for pixel texture */
+.cab-fill {
+  position:absolute;
+  inset:0;
+  border-radius:2px;
+  display:block;
+  background: transparent;      /* no solid color, so image shows */
+  opacity:1;
+  pointer-events:none;
+}
+
+/* Fine-pitch pixel grain overlay – size controlled from JS via CSS vars */
+.cab-fill::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:
+    radial-gradient(rgba(255,255,255,0.18) 1px, transparent 1px),
+    radial-gradient(rgba(255,255,255,0.10) 1px, transparent 1px);
+  background-size:
+    var(--px-grid-size-1, 3px) var(--px-grid-size-1, 3px),
+    var(--px-grid-size-2, 1.5px) var(--px-grid-size-2, 1.5px);
+  opacity:0.14;
+  pointer-events:none;
+  mix-blend-mode:soft-light;
+}
+
+.cab-cell:hover .label {
+  background: rgba(0,0,0,0.85);
+  transform: translateY(-1px);
+  transition: all 120ms ease;
+}
+
+/* Controller box & connections (you can hide later if needed) */
+.controller-area {
+  width: 24%;
+  min-width:180px;
+  text-align:center;
+}
+.controller-box {
+  background:#fff;
+  border:1px solid #e3e8ef;
+  padding:10px;
+  border-radius:8px;
+  box-shadow:0 6px 20px rgba(12,34,60,0.04);
+  display:inline-block;
+  font-weight:700;
+  color:var(--brand);
+}
+.connections-svg {
+  width:100%;
+  height:140px;
+  overflow:visible;
+}
+
+#visDimensions {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-top: 8px;
+  color:var(--brand);
+}
 
     /* BOQ styles */
     #boqPreviewTable { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 9pt; }
@@ -278,29 +345,47 @@
       </div>
     </div>
 
-    <!-- Visualization area -->
-    <div class="card vis-panel" style="margin-top: 18px;">
-      <div style="font-weight:700; color:var(--brand); margin-bottom:12px;">Wall Visualization & Connections</div>
-      <div class="vis-container">
-        <div class="led-wall-wrapper">
-          <div class="led-wall" id="ledWallElement" aria-hidden="true">
-            <div id="cabinetOverlay">
-              <div style="grid-column: 1 / -1; grid-row: 1 / -1; background: #f7f9fb; color: #333; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600;">
-                Calculate to see visualization
-              </div>
-            </div>
-          </div>
+<!-- Visualization area -->
+<div class="card vis-panel" style="margin-top: 18px;">
+  <div style="font-weight:700; color:var(--brand); margin-bottom:12px;">
+    Physical LED Wall Visualization
+  </div>
 
-          <div class="controller-area">
-            <div class="controller-box" id="controllerBox">Suggested Controller<br><span id="controllerBoxName" style="font-weight:600;font-size:12px;color:#0b3b84">--</span></div>
-            <!-- connections svg -->
-            <svg class="connections-svg" id="connectionsSvg" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true"></svg>
-            <div style="font-size:12px; margin-top:6px; color:var(--muted)">Controller → Wall representation (visual only)</div>
+  <div class="vis-container">
+    <div class="led-wall-wrapper">
+      <!-- LED wall grid -->
+      <div class="led-wall" id="ledWallElement" aria-hidden="true">
+        <div id="cabinetOverlay">
+          <div style="
+            grid-column: 1 / -1;
+            grid-row: 1 / -1;
+            background: #0b0b0b;
+            color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+          ">
+            Calculate to see COB / SMD wall visualization
           </div>
         </div>
-        <div id="visDimensions">-- m × -- m</div>
+      </div>
+
+      <!-- Controller area remains (for ports visualization) -->
+      <div class="controller-area">
+        <div class="controller-box" id="controllerBox">
+          Suggested Controller<br>
+          <span id="controllerBoxName" style="font-weight:600;font-size:12px;color:#0b3b84">--</span>
+        </div>
+        <svg class="connections-svg" id="connectionsSvg" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div style="font-size:12px; margin-top:6px; color:var(--muted);">
+          Logical ports &amp; connection runs (visual only)
+        </div>
       </div>
     </div>
+
+    <div id="visDimensions">-- m × -- m</div>
 
     <div id="boqPreviewContainer" style="margin-top: 18px;"></div>
 
@@ -736,63 +821,104 @@
       applySpecColors();
     }
 
-    function renderCabinetOverlay(data){
-      const overlay = document.getElementById('cabinetOverlay');
-      overlay.innerHTML = '';
-      overlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
-      overlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
+// Dynamically scale pixel texture based on pixel pitch (mm)
+function applyPixelDensity(pitchMm) {
+  // Safety clamp
+  const p = Math.max(0.8, Math.min(pitchMm || 2.5, 12));
 
-      // tooltip
-      let tooltip = document.getElementById('cabTooltip');
-      if(!tooltip){
-        tooltip = document.createElement('div');
-        tooltip.id = 'cabTooltip';
-        tooltip.style.position = 'absolute';
-        tooltip.style.zIndex = 9999;
-        tooltip.style.padding = '6px 8px';
-        tooltip.style.background = '#fff';
-        tooltip.style.border = '1px solid rgba(31,41,55,0.08)';
-        tooltip.style.borderRadius = '6px';
-        tooltip.style.boxShadow = '0 12px 34px rgba(12,34,60,0.06)';
-        tooltip.style.display = 'none';
-        tooltip.style.fontSize = '12px';
-        document.body.appendChild(tooltip);
-      }
+  // smaller pitch → finer pattern; larger pitch → coarser pattern
+  const size1 = Math.max(1.5, Math.min(p * 1.6, 7)); // main grid
+  const size2 = Math.max(0.8, size1 / 2);            // secondary grid
 
-      for(let r=0;r<data.numCabH;r++){
-        for(let c=0;c<data.numCabW;c++){
-          const cell = document.createElement('div');
-          cell.className = 'cab-cell';
-          cell.style.position = 'relative';
-          cell.style.overflow = 'hidden';
+  document.querySelectorAll('.cab-fill').forEach(el => {
+    el.style.setProperty('--px-grid-size-1', `${size1}px`);
+    el.style.setProperty('--px-grid-size-2', `${size2}px`);
+  });
+}
 
-          // use the CSS .cab-fill for full bright tile
-          const fill = document.createElement('div');
-          fill.className = 'cab-fill';
-          cell.appendChild(fill);
+// Nature / water sample images for live wall preview
+const WALL_IMAGES = [
+  "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1200", // waterfall
+  "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1200", // forest lake
+  "https://images.pexels.com/photos/158607/cairn-fog-mystical-background-158607.jpeg?auto=compress&cs=tinysrgb&w=1200", // misty forest
+  "https://images.pexels.com/photos/14676/pexels-photo-14676.jpeg?auto=compress&cs=tinysrgb&w=1200", // green valley
+  "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&w=1200"  // blue ocean
+];
 
-          const label = document.createElement('div');
-          label.className = 'label';
-          label.textContent = `${r+1}×${c+1}`;
-          cell.appendChild(label);
+// Apply a random greenery / water image to the wall
+function setWallBackgroundImage() {
+  const wall = document.getElementById('ledWallElement');
+  if (!wall) return;
+  const img = WALL_IMAGES[Math.floor(Math.random() * WALL_IMAGES.length)];
+  wall.style.backgroundImage = `url("${img}")`;
+}
 
-          // tooltip handlers
-          cell.addEventListener('mouseenter', e=>{
-            tooltip.textContent = `Cabinet: ${r+1} x ${c+1} — Pixels: ${formatLarge(data.cabPixW)}×${formatLarge(data.cabPixH)}`;
-            tooltip.style.display='block';
-          });
-          cell.addEventListener('mousemove', e=>{
-            tooltip.style.left = (e.pageX + 12) + 'px';
-            tooltip.style.top = (e.pageY + 12) + 'px';
-          });
-          cell.addEventListener('mouseleave', ()=> tooltip.style.display='none');
 
-          overlay.appendChild(cell);
-        }
-      }
+function renderCabinetOverlay(data){
+  const overlay = document.getElementById('cabinetOverlay');
+  if(!overlay) return;
 
-      document.getElementById('visDimensions').textContent = `${(data.finalW_mm/MM_PER_METER).toFixed(2)} m × ${(data.finalH_mm/MM_PER_METER).toFixed(2)} m`;
+  overlay.innerHTML = '';
+  overlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
+  overlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
+
+  // set live background image inside wall
+  setWallBackgroundImage();
+
+  // Tooltip (re-used for all cells)
+  let tooltip = document.getElementById('cabTooltip');
+  if(!tooltip){
+    tooltip = document.createElement('div');
+    tooltip.id = 'cabTooltip';
+    tooltip.style.position = 'fixed';
+    tooltip.style.background = 'rgba(15,23,42,0.92)';
+    tooltip.style.color = '#fff';
+    tooltip.style.padding = '4px 8px';
+    tooltip.style.borderRadius = '4px';
+    tooltip.style.fontSize = '11px';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.zIndex = '9999';
+    tooltip.style.display = 'none';
+    document.body.appendChild(tooltip);
+  }
+
+  for(let r=0; r<data.numCabH; r++){
+    for(let c=0; c<data.numCabW; c++){
+      const cell = document.createElement('div');
+      cell.className = 'cab-cell';
+
+      const fill = document.createElement('div');
+      fill.className = 'cab-fill';
+      cell.appendChild(fill);
+
+      const label = document.createElement('div');
+      label.className = 'label';
+      // You can switch to only column index if you prefer: `${c+1}`
+      label.textContent = `${r+1}×${c+1}`;
+      cell.appendChild(label);
+
+      // tooltip handlers
+      cell.addEventListener('mouseenter', e=>{
+        tooltip.textContent = `Cabinet ${r+1} × ${c+1} — Pixels: ${formatLarge(data.cabPixW)} × ${formatLarge(data.cabPixH)}`;
+        tooltip.style.display='block';
+      });
+      cell.addEventListener('mousemove', e=>{
+        tooltip.style.left = (e.clientX + 12) + 'px';
+        tooltip.style.top = (e.clientY + 12) + 'px';
+      });
+      cell.addEventListener('mouseleave', ()=> tooltip.style.display='none');
+
+      overlay.appendChild(cell);
     }
+  }
+
+  // Update physical dimensions label
+  document.getElementById('visDimensions').textContent =
+    `${(data.finalW_mm/MM_PER_METER).toFixed(2)} m × ${(data.finalH_mm/MM_PER_METER).toFixed(2)} m`;
+
+  // Dynamic pixel density based on pitch
+  applyPixelDensity(data.pixelPitch_mm);
+}
 
     function renderControllerConnections(data){
       const svg = document.getElementById('connectionsSvg');
