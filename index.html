@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -964,34 +965,20 @@
       return list;
     }
 
-    function renderBOQPreview(data){
-      const list = generateBOQList(data);
-      let html = `<div class="details-panel" style="margin-top:12px"><div style="font-weight:700;color:var(--brand);margin-bottom:8px">Bill of Quantities (Compact View)</div>`;
-
-      html += `<style>#boqPreviewTable th, #boqPreviewTable td { font-size: 9pt; padding: 6px 8px; } #boqPreviewTable { width: 100%; border-collapse: collapse; }</style>`;
-      html += `<table id="boqPreviewTable"><thead><tr>
-        <th style="width:3%">S.No</th>
-        <th style="width:20%">Item</th>
-        <th style="width:34%">Description</th>
-        <th style="width:15%">Partcode</th>
-        <th style="width:5%; text-align:right">Qty</th>
-        <th style="width:8%">Unit</th>
-        <th style="width:9%; text-align:right">Unit Price (INR)</th>
-        <th style="width:9%; text-align:right">Total Price (INR)</th>
-      </tr></thead><tbody>`;
-
-      list.forEach((row, i)=>{
-        html += `<tr><td>${i+1}</td><td>${escapeHtml(row.item)}</td><td>${escapeHtml(row.desc)}</td><td>${escapeHtml(row.partcode)}</td><td class="right">${row.qty}</td><td>${row.unit}</td><td></td><td></td></tr>`;
-      });
-
-      const spanCols = 6;
-      html += `<tr><td colspan="${spanCols}" style="font-weight:700;text-align:right;background:#f8f6f2">Sub Total Amount (INR)</td><td colspan="2" style="font-weight:700;text-align:right;background:#f8f6f2"></td></tr>`;
-      html += `<tr><td colspan="${spanCols}" style="font-weight:700;text-align:right;background:#f8f6f2">GST</td><td colspan="2" style="font-weight:700;text-align:right;background:#f8f6f2"></td></tr>`;
-      html += `<tr><td colspan="${spanCols}" style="font-weight:700;text-align:right;background:#ffeedd">Grand Total (INR)</td><td colspan="2" style="font-weight:700;text-align:right;background:#ffeedd"></td></tr>`;
-
-      html += `</tbody></table></div>`;
-      document.getElementById('boqPreviewContainer').innerHTML = html;
-    }
+function renderBOQPreview(data){
+  const list = generateBOQList(data);
+  let html = `<div class="details-panel" style="margin-top:12px"><div style="font-weight:700;color:var(--brand);margin-bottom:8px">Bill of Quantities (Compact View)</div>`;
+  html += `<style>#boqPreviewTable th, #boqPreviewTable td { font-size: 9pt; padding: 6px 8px; } #boqPreviewTable { width: 100%; border-collapse: collapse; }</style>`;
+  // Only 6 columns needed now: S.No, Item, Description, Partcode, Qty, Unit
+  html += `<table id="boqPreviewTable"><thead><tr> <th style="width:3%">S.No</th> <th style="width:20%">Item</th> <th style="width:34%">Description</th> <th style="width:15%">Partcode</th> <th style="width:5%; text-align:right">Qty</th> <th style="width:8%">Unit</th> </tr></thead><tbody>`;
+  list.forEach((row, i)=>{
+    // Removed two empty <td> for price data
+    html += `<tr><td>${i+1}</td><td>${escapeHtml(row.item)}</td><td>${escapeHtml(row.desc)}</td><td>${escapeHtml(row.partcode)}</td><td class="right">${row.qty}</td><td>${row.unit}</td></tr>`;
+  });
+  // --- REMOVED FOOTER ROWS ---
+  html += `</tbody></table></div>`;
+  document.getElementById('boqPreviewContainer').innerHTML = html;
+}
 
     /************************************************************************
      * Modals: controller edit
@@ -1180,13 +1167,13 @@
       // Section 2: BOQ
       doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('2. Bill of Quantities (BOQ)', margin, y); y += 6;
       if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
-      const boqList = generateBOQList(data);
-
-      const boqHead = [['S.No','Item','Description','Partcode','Qty','Unit','Unit Price (INR)','Total Price (INR)']];
-      const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, String(r.qty), r.unit, '', '']);
-      boqBody.push([{ content: 'Sub Total Amount (INR)', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold', fillColor: [248,246,242] } }, { content:'', colSpan:2, styles:{halign:'right'}}]);
-      boqBody.push([{ content: 'GST', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold', fillColor: [248,246,242] } }, { content:'', colSpan:2, styles:{halign:'right'}}]);
-      boqBody.push([{ content: 'Grand Total (INR)', colSpan: 6, styles: { halign: 'right', fontStyle: 'bold', fillColor: [255,238,221] } }, { content:'', colSpan:2, styles:{halign:'right'}}]);
+      // ... existing code ...
+const boqList = generateBOQList(data);
+// --- MODIFICATION 1: Removed price headers ---
+const boqHead = [['S.No','Item','Description','Partcode','Qty','Unit']];
+// --- MODIFICATION 2: Removed empty strings for price data ---
+const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, String(r.qty), r.unit]);
+// ... existing code ...
 
       doc.autoTable({
         startY: y,
@@ -1200,6 +1187,8 @@
       });
 
       y = doc.lastAutoTable.finalY + LINE;
+
+
 
       // Section 3: Terms & Conditions
       if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
@@ -1232,33 +1221,44 @@
     /************************************************************************
      * CSV export
      ************************************************************************/
-    function downloadBOQCSV(){
-      const d = finalCalculationData;
-      if(!d || !d.totalPixels){ alert('Please calculate configuration first.'); return; }
-      const list = generateBOQList(d);
-      let csv = 'LED Video Wall Technical & BOQ Summary\n';
-      csv += 'Key: Actual Size (m), Diagonal (in), Resolution (WxH)\n';
-      csv += `Summary Data,"${(d.finalW_mm/MM_PER_METER).toFixed(2)}x${(d.finalH_mm/MM_PER_METER).toFixed(2)}",${d.finalDiagonal_in},"${formatLarge(d.finalResW)}x${formatLarge(d.finalResH)}"\n\n`;
-      csv += 'Bill of Quantities\n';
-      csv += 'S.No,Item,Description,Partcode,Qty,Unit,"Unit Price (INR)","Total Price (INR)"\n';
-      list.forEach((r,i)=>{
-        csv += `${i+1},"${r.item}","${r.desc}","${r.partcode}",${r.qty},"${r.unit}",,\n`;
-      });
-      csv += ',,,"Sub Total Amount (INR)",,,,\n';
-      csv += ',,,"GST",,,,\n';
-      csv += ',,,"Grand Total (INR)",,,,\n';
+function downloadBOQCSV(){
+  const d = finalCalculationData;
+  if(!d || !d.totalPixels){
+    alert('Please calculate configuration first.');
+    return;
+  }
+  const list = generateBOQList(d);
+  
+  let csv = '';
 
-      const blob = new Blob([csv], { type:'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      link.href = url;
-      link.download = `PeopleLink_LED_Boq_${d.finalResW}x${d.finalResH}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-    }
+  // 1. HEADER: Only the BOQ columns, without price
+  csv += 'S.No,"Item","Description","Partcode","Qty","Unit"\n';
 
+  // 2. BOQ ROWS: The core data rows. Use JSON.stringify and replace surrounding quotes 
+  // to ensure proper escaping of quotes within the data itself.
+  list.forEach((row,i)=>{
+    // Stringify and slice/replace to ensure a clean quoted string that handles internal quotes
+    const item = JSON.stringify(row.item).slice(1, -1).replace(/"/g, '""');
+    const desc = JSON.stringify(row.desc).slice(1, -1).replace(/"/g, '""');
+
+    // Use double quotes around string data to contain commas/special characters
+    csv += `${i+1},"${item}","${desc}","${row.partcode}",${row.qty},"${row.unit}"\n`;
+  });
+  
+  // No summary or footer
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  if (link.download !== undefined) { 
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `PeopleLink_LED_BOQ_Only_${d.finalResW}x${d.finalResH}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+}
     /************************************************************************
      * Spec color application helper (label vs value colours)
      ************************************************************************/
