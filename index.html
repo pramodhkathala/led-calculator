@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -836,23 +837,54 @@ function applyPixelDensity(pitchMm) {
   });
 }
 
-// Nature / water sample images for live wall preview
+// Updated Nature + Animals + Water + Animated GIF Visual Pack
 const WALL_IMAGES = [
-  "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1200", // waterfall
-  "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1200", // forest lake
-  "https://images.pexels.com/photos/158607/cairn-fog-mystical-background-158607.jpeg?auto=compress&cs=tinysrgb&w=1200", // misty forest
-  "https://images.pexels.com/photos/14676/pexels-photo-14676.jpeg?auto=compress&cs=tinysrgb&w=1200", // green valley
-  "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&w=1200"  // blue ocean
+  // 🌊 Water / Scenery
+  "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+  "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+
+  // 🌿 Green Forest / Nature
+  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+
+  // 🦁 Animals (HD Wildlife)
+  "https://images.unsplash.com/photo-1518791841217-8f162f1e1131",
+  "https://images.unsplash.com/photo-1501706362039-c6e13d1a23bc",
+  "https://images.unsplash.com/photo-1456926631375-92c8ce872def",
+
+  // 🎞 Animated Live Visuals (GIFs)
+  "https://media.giphy.com/media/l0HlOvJ7yaacpuSas/giphy.gif",
+  "https://media.giphy.com/media/3oEjHB1EKuujDjYFW0/giphy.gif",
+  "https://media.giphy.com/media/3o7WTqoV3Y6xqfZpZC/giphy.gif"
 ];
 
-// Apply a random greenery / water image to the wall
+let wallIndex = 0;
+let wallTimerId;
+
+// Apply rotating visuals to wall (slideshow mode)
 function setWallBackgroundImage() {
   const wall = document.getElementById('ledWallElement');
   if (!wall) return;
-  const img = WALL_IMAGES[Math.floor(Math.random() * WALL_IMAGES.length)];
-  wall.style.backgroundImage = `url("${img}")`;
+
+  if (wallTimerId) clearInterval(wallTimerId);
+
+  function apply() {
+    wall.style.backgroundImage = `url("${WALL_IMAGES[wallIndex]}")`;
+    wall.style.backgroundSize = "cover";
+    wall.style.backgroundPosition = "center";
+    wallIndex = (wallIndex + 1) % WALL_IMAGES.length;
+  }
+
+  apply();
+  wallTimerId = setInterval(apply, 8000);
 }
 
+// 🔥 Auto-start slideshow when page loads
+document.addEventListener("DOMContentLoaded", setWallBackgroundImage);
 
 function renderCabinetOverlay(data){
   const overlay = document.getElementById('cabinetOverlay');
@@ -1320,17 +1352,14 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
       if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
       doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('3. Standard Terms & Conditions', margin, y); y += 6;
       doc.setFontSize(bodyFontSize); doc.setFont('Helvetica','normal'); doc.setTextColor(50,50,50);
-       const terms = [
+      const terms = [
         "1) Price Validity: This quotation is valid for 30 days from the date of issue.",
-        "2) Taxes: Applicable GST @ 18% will be charged extra on the total invoice value.",
-        "3) Payment Terms: 100% advance along with Purchase Order.",
-        "4) All civil work, wall preparation, fabrication, primary mounting/hanging structure, welding, conduiting, and site readiness activities are the Client/Partner’s responsibility, unless specifically included in the BOQ.",
-        "5) Power & Earthing Requirements: Client must provide dedicated stable power, proper earthing, and required UPS/MCB/Stabilizer as per LED wall load.",
-        "6) Cabling: Long-distance LAN and power cabling from controller to LED wall is under Client scope.",
-        "7) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
-        "8) Warranty: 1-year OEM warranty excluding physical damage, unauthorized repairs, and electrical surges.",
-        "9) Installation Access: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
-        "10) Transportation: Transportation charges are extra and will be applied as per actuals."
+        "2) Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning.",
+        "3) Civil & Structural Work: All civil works, primary mounting/hanging structure, and necessary site preparation are the sole responsibility of the Client/Partner, unless explicitly included in the BOQ.",
+        "4) Power & Data Requirements: Stable, dedicated power sources (UPS/circuit) must be provided. Long-distance LAN and Power cable laying from Controller to Wall location (Long Length) is the Client/Partner scope. Short Lan/Power cables between Cabinets are included.",
+        "5) Warranty: Standard manufacturer's warranty is 1 year on LED panels, modules, and accessories. Excludes misuse, electrical surges, unauthorized repairs, and physical damage.",
+        "6) Site Access: Unrestricted site access, safe working environment, and suitable lifting equipment (if required) must be available during installation & commissioning.",
+        "7) Transportation & Installation Damage: Up to 3% of the total quantity of Modules/Cabinets damaged during transportation or installation shall be acceptable and managed by the Client/Partner."
       ];
       terms.forEach(t=>{
         const split = doc.splitTextToSize(t, pageW - margin*2);
