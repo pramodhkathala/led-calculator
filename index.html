@@ -1315,19 +1315,21 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
       y = doc.lastAutoTable.finalY + LINE;
 
 
-
       // Section 3: Terms & Conditions
       if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
-      doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('3. Standard Terms & Conditions', margin, y); y += 6;
+      
+      doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('3. Terms & Conditions', margin, y); y += 6;
       doc.setFontSize(bodyFontSize); doc.setFont('Helvetica','normal'); doc.setTextColor(50,50,50);
       const terms = [
         "1) Price Validity: This quotation is valid for 30 days from the date of issue.",
-        "2) Payment Terms: Standard terms are 50% advance, 40% upon delivery, and 10% upon successful commissioning.",
-        "3) Civil & Structural Work: All civil works, primary mounting/hanging structure, and necessary site preparation are the sole responsibility of the Client/Partner, unless explicitly included in the BOQ.",
-        "4) Power & Data Requirements: Stable, dedicated power sources (UPS/circuit) must be provided. Long-distance LAN and Power cable laying from Controller to Wall location (Long Length) is the Client/Partner scope. Short Lan/Power cables between Cabinets are included.",
-        "5) Warranty: Standard manufacturer's warranty is 1 year on LED panels, modules, and accessories. Excludes misuse, electrical surges, unauthorized repairs, and physical damage.",
-        "6) Site Access: Unrestricted site access, safe working environment, and suitable lifting equipment (if required) must be available during installation & commissioning.",
-        "7) Transportation & Installation Damage: Up to 3% of the total quantity of Modules/Cabinets damaged during transportation or installation shall be acceptable and managed by the Client/Partner."
+        "2) Payment Terms: 100% advance along with Purchase Order.",
+        "3) All civil work, wall preparation, fabrication, primary mounting/hanging structure, welding, conduiting, and site readiness activities are the Client/Partner’s responsibility, unless specifically included in the BOQ.",
+        "4) Power & Earthing Requirements: Client must provide dedicated stable power, proper earthing, and required UPS/MCB/Stabilizer as per LED wall load.",
+        "5) Cabling: Long-distance LAN and power cabling from controller to LED wall is under Client scope.",
+        "6) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
+        "7) Warranty: 1-year OEM warranty excluding physical damage, unauthorized repairs, and electrical surges.",
+        "8) Installation Access: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
+        "9) Transportation: Transportation charges are extra and will be applied as per actuals."
       ];
       terms.forEach(t=>{
         const split = doc.splitTextToSize(t, pageW - margin*2);
@@ -1473,5 +1475,3 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
-
-
