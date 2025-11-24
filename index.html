@@ -517,15 +517,15 @@
       'H9': { part:'TP-XMF-H9', desc:'LED Video Wall Controller (H9)' },
       'H15': { part:'TP-XMF-H15', desc:'LED Video Wall Controller (H15)' },
       'H15E': { part:'TP-XMF-H15E', desc:'LED Video Wall Controller (H15 Enhanced)' },
-      'H20': { part:'TBD', desc:'LED Video Wall Controller (H20)' },
+      'H20': { part:'NA', desc:'LED Video Wall Controller (H20)' },
 
-      'H_20_RJ45': { part:'TP-XOC-RJ45-20', desc:'H_20 x RJ45 Sending Card' },
+      'H_20 x RJ45 Sending Card': { part:'TP-XOC-RJ45-20', desc:'H_20 x RJ45 Sending Card' },
       'H_16_RJ45': { part:'TP-XOC-RJ45-16-OF2', desc:'H_16 x RJ45 + 2x Fiber Sending Card' },
       'H_4_HDMI_Out': { part:'TP-XOC-HDMI4', desc:'H_4 x HDMI Output Card' },
 
-      'H_1xHDMI': { part:'TP-XIC-HDMI', desc:'H_1 x HDMI 2.0 Input Card' },
-      'H_2xHDMI': { part:'TP-XIC-HDMI2', desc:'H_2 x HDMI 2.0 Input Card' },
-      'H_4xHDMI': { part:'TP-XIC-HDMI4', desc:'H_4 x HDMI Input Card' },
+      'H_1 x HDMI 2.0 Input Card': { part:'TP-XIC-HDMI', desc:'H_1 x HDMI 2.0 Input Card' },
+      'H_2 x HDMI 2.0 Input Card': { part:'TP-XIC-HDMI2', desc:'H_2 x HDMI 2.0 Input Card' },
+      'H_4 x HDMI Input Card': { part:'TP-XIC-HDMI4', desc:'H_4 x HDMI Input Card' },
 
       'H_800W_PSU': { part:'TP-XPS-H800W', desc:'H_800W Power Supply' },
 
@@ -536,7 +536,7 @@
 
       /* Indoor SMD: separate cabinet + module mapping (cabinet = PPL-ALD-CU) */
       'PPL-ALD-CU': { part:'PPL-ALD-CU', desc:'PeopleLink Video Wall Cabinet Unit (Indoor) 640x480mm' },
-      'PPL-SMD-MDL-20': { part:'NA', desc:'SMD 2.0 mm Module (TBD)' },
+      'PPL-SMD-MDL-20': { part:'NA', desc:'SMD 2.0 mm Module (NA)' },
       'PDS-TP-15-T':  { part:'PDS-TP-15-T', desc:'SMD 2.5 mm Module (PDS-TP-15-T)' },
 
       /* SMD Indoor integrated cabinet (1.8/1.86) */
@@ -545,8 +545,8 @@
       /* Outdoor SMD: cabinet+module included for p4 & p6, p8/p10 NA */
       'PPL-SMD-MDL-CU-40': { part:'PPL-SMD-MDL-CU-40', desc:'PeopleLink Outdoor P4 Cabinet & Module (Integrated)' },
       'PPL-SMD-MDL-CU-60': { part:'PPL-SMD-MDL-CU-60', desc:'PeopleLink Outdoor P6 Cabinet & Module (Integrated)' },
-      'PPL-SMD-MDL-CU-80': { part:'NA', desc:'PeopleLink Outdoor P8 Cabinet & Module (Integrated) - TBD' },
-      'PPL-SMD-MDL-CU-100':{ part:'NA', desc:'PeopleLink Outdoor P10 Cabinet & Module (Integrated) - TBD' },
+      'PPL-SMD-MDL-CU-80': { part:'NA', desc:'PeopleLink Outdoor P8 Cabinet & Module (Integrated) - NA' },
+      'PPL-SMD-MDL-CU-100':{ part:'NA', desc:'PeopleLink Outdoor P10 Cabinet & Module (Integrated) - NA' },
 
       'ALED-INST-IN':     { part:'ALED-INST-IN',     desc:'Installation & Configuration - Indoor' },
       'ALED-INST-OU':     { part:'ALED-INST-OU',     desc:'Installation & Configuration - Outdoor' },
@@ -596,7 +596,7 @@
     function populateModalOutputCards(){
       const sel = document.getElementById('modalOutputCardModel');
       sel.innerHTML = '';
-      const cards = [{ model:'H_20_RJ45', ports:20 },{ model:'H_16_RJ45', ports:16 },{ model:'H_4_HDMI_Out', ports:4 }];
+      const cards = [{ model:'H_20 x RJ45 Sending Card', ports:20 },{ model:'H_16_RJ45', ports:16 },{ model:'H_4_HDMI_Out', ports:4 }];
       cards.forEach(c=>{
         const o = document.createElement('option');
         o.value = `${c.model}|${c.ports}`;
@@ -607,7 +607,7 @@
     function populateModalInputCards(){
       const sel = document.getElementById('modalInputCardModel');
       sel.innerHTML = '';
-      const items = ['H_1xHDMI','H_2xHDMI','H_4xHDMI'];
+      const items = ['H_1 x HDMI 2.0 Input Card','H_2 x HDMI 2.0 Input Card','H_4 x HDMI Input Card'];
       items.forEach(m=>{
         const o = document.createElement('option');
         o.value = m;
@@ -751,8 +751,8 @@
         requiredPortsBuffered, requiredShortEthernet, requiredLongEthRuns, requiredSendCards,
         controllerName: finalControllerObj.name, controllerType: finalControllerObj.type, suggestedControllerObj: finalControllerObj,
         outputCardPorts: finalCalculationData?.outputCardPorts || outputCardPorts_default,
-        outputCardModel: finalCalculationData?.outputCardModel || 'H_20_RJ45',
-        inputCardModel: finalCalculationData?.inputCardModel || 'H_2xHDMI', inputCardQty: finalCalculationData?.inputCardQty || 1,
+        outputCardModel: finalCalculationData?.outputCardModel || 'H_20 x RJ45 Sending Card',
+        inputCardModel: finalCalculationData?.inputCardModel || 'H_2 x HDMI 2.0 Input Card', inputCardQty: finalCalculationData?.inputCardQty || 1,
         splicerSolution: finalCalculationData?.splicerSolution || (finalControllerObj.type==='Modular' ? `${finalControllerObj.name} Splicer` : 'N/A'),
         minViewing_m, minViewing_ft
       };
@@ -990,13 +990,13 @@ function renderCabinetOverlay(data){
         list.push({ item:'Indoor Video Wall Cabinet Unit', partcode:cabPart, desc:'Indoor Cabinet (PPL-ALD-CU)', qty:data.totalCabinets, unit:'PCS' });
 
         let moduleKey = (productKey === 'indoor_20') ? 'PPL-SMD-MDL-20' : 'PDS-TP-15-T';
-        const modulePart = PARTS_CATALOG[moduleKey] ? PARTS_CATALOG[moduleKey].part : 'TBD';
+        const modulePart = PARTS_CATALOG[moduleKey] ? PARTS_CATALOG[moduleKey].part : 'NA';
         const moduleQty = data.totalModules;
         list.push({ item:`Modules (${productKey === 'indoor_20' ? '2.0 mm' : '2.5 mm'})`, partcode:modulePart, desc: `${productKey === 'indoor_20' ? 'SMD 2.0 mm Module' : 'SMD 2.5 mm Module'}`, qty:moduleQty, unit:'PCS' });
 
       } else {
         const ledPartKey = LED_PART_KEY_BY_PRODUCT[productKey] || 'PPL-ALD-CU';
-        const ledPart = PARTS_CATALOG[ledPartKey] ? PARTS_CATALOG[ledPartKey].part : 'TBD';
+        const ledPart = PARTS_CATALOG[ledPartKey] ? PARTS_CATALOG[ledPartKey].part : 'NA';
         list.push({ item:'LED Cabinets (Including Modules)', partcode:ledPart, desc:data.productName, qty:data.totalCabinets, unit:'PCS' });
       }
 
@@ -1011,15 +1011,15 @@ function renderCabinetOverlay(data){
       if(data.controllerName.includes('4K Prime') || data.controllerName.includes('4K')) ctrlKey='4K';
 
       if(PARTS_CATALOG[ctrlKey]) list.push({ item:'Controller/Processor', partcode:PARTS_CATALOG[ctrlKey].part, desc:PARTS_CATALOG[ctrlKey].desc, qty:1, unit:'PCS' });
-      else list.push({ item:'Controller/Processor', partcode:'TBD', desc:data.controllerName, qty:1, unit:'PCS' });
+      else list.push({ item:'Controller/Processor', partcode:'NA', desc:data.controllerName, qty:1, unit:'PCS' });
 
       // Modular-specific items (output/input cards & PSU)
       if(isModular){
-        const outModel = data.outputCardModel || 'H_20_RJ45';
+        const outModel = data.outputCardModel || 'H_20 x RJ45 Sending Card';
         const outPart = PARTS_CATALOG[outModel] ? PARTS_CATALOG[outModel].part : 'NA';
         list.push({ item:'Output (Sending) Card', partcode:outPart, desc: outModel, qty:data.requiredSendCards, unit:'PCS' });
 
-        const inModel = data.inputCardModel || 'H_2xHDMI';
+        const inModel = data.inputCardModel || 'H_2 x HDMI 2.0 Input Card';
         const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'NA';
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 1, unit:'PCS' });
         
@@ -1083,7 +1083,7 @@ function renderCabinetOverlay(data){
       // Total Power Cables (same for indoor & outdoor)
       list.push({
         item: 'Total Power Cables (Input Runs)',
-        partcode: 'TBD',
+        partcode: 'NA',
         desc: '2.5 sq.mm × 3C FRLS cable on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)',
         qty: data.requiredPowerRuns,
         unit: 'Runs'
@@ -1120,7 +1120,7 @@ function renderBOQPreview(data){
       const sel = document.getElementById('modalControllerModel');
       if(Array.from(sel.options).some(o=>o.value === ctrlName)) sel.value = ctrlName;
 
-      const outModel = finalCalculationData.outputCardModel || 'H_20_RJ45';
+      const outModel = finalCalculationData.outputCardModel || 'H_20 x RJ45 Sending Card';
       const outSel = document.getElementById('modalOutputCardModel');
       Array.from(outSel.options).forEach(o=>{ if(o.value.startsWith(outModel)) outSel.value=o.value; });
 
@@ -1492,6 +1492,5 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
-
 
 
