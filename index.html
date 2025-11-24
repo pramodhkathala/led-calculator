@@ -518,13 +518,13 @@
       'H15E': { part:'TP-XMF-H15E', desc:'LED Video Wall Controller (H15 Enhanced)' },
       'H20': { part:'TBD', desc:'LED Video Wall Controller (H20)' },
 
-      'H_20_RJ45': { part:'TP-XOC-RJ45-20', desc:'H_20 x RJ45 Sending Card' },
-      'H_16_RJ45': { part:'TP-XOC-RJ45-16-OF2', desc:'H_16 x RJ45 + 2x Fiber Sending Card' },
+      'H_20 x RJ45 Sending Card': { part:'TP-XOC-RJ45-20', desc:'H_20 x RJ45 Sending Card' },
+      'H_16 x RJ45 + 2x Fiber Sending Card': { part:'TP-XOC-RJ45-16-OF2', desc:'H_16 x RJ45 + 2x Fiber Sending Card' },
       'H_4_HDMI_Out': { part:'TP-XOC-HDMI4', desc:'H_4 x HDMI Output Card' },
 
-      'H_1xHDMI': { part:'TP-XIC-HDMI', desc:'H_1 x HDMI 2.0 Input Card' },
-      'H_2xHDMI': { part:'TP-XIC-HDMI2', desc:'H_2 x HDMI 2.0 Input Card' },
-      'H_4xHDMI': { part:'TP-XIC-HDMI4', desc:'H_4 x HDMI Input Card' },
+      'H_1 x HDMI 2.0 Input Card': { part:'TP-XIC-HDMI', desc:'H_1 x HDMI 2.0 Input Card' },
+      'H_2 x HDMI 2.0 Input Card': { part:'TP-XIC-HDMI2', desc:'H_2 x HDMI 2.0 Input Card' },
+      'H_4 x HDMI Input Card': { part:'TP-XIC-HDMI4', desc:'H_4 x HDMI Input Card' },
 
       'H_800W_PSU': { part:'TP-XPS-H800W', desc:'H_800W Power Supply' },
 
@@ -595,7 +595,7 @@
     function populateModalOutputCards(){
       const sel = document.getElementById('modalOutputCardModel');
       sel.innerHTML = '';
-      const cards = [{ model:'H_20_RJ45', ports:20 },{ model:'H_16_RJ45', ports:16 },{ model:'H_4_HDMI_Out', ports:4 }];
+      const cards = [{ model:'H_20 x RJ45 Sending Card', ports:20 },{ model:'H_16 x RJ45 + 2x Fiber Sending Card', ports:16 },{ model:'H_4_HDMI_Out', ports:4 }];
       cards.forEach(c=>{
         const o = document.createElement('option');
         o.value = `${c.model}|${c.ports}`;
@@ -606,7 +606,7 @@
     function populateModalInputCards(){
       const sel = document.getElementById('modalInputCardModel');
       sel.innerHTML = '';
-      const items = ['H_1xHDMI','H_2xHDMI','H_4xHDMI'];
+      const items = ['H_1 x HDMI 2.0 Input Card','H_2 x HDMI 2.0 Input Card','H_4 x HDMI Input Card'];
       items.forEach(m=>{
         const o = document.createElement('option');
         o.value = m;
@@ -750,8 +750,8 @@
         requiredPortsBuffered, requiredShortEthernet, requiredLongEthRuns, requiredSendCards,
         controllerName: finalControllerObj.name, controllerType: finalControllerObj.type, suggestedControllerObj: finalControllerObj,
         outputCardPorts: finalCalculationData?.outputCardPorts || outputCardPorts_default,
-        outputCardModel: finalCalculationData?.outputCardModel || 'H_20_RJ45',
-        inputCardModel: finalCalculationData?.inputCardModel || 'H_1xHDMI', inputCardQty: finalCalculationData?.inputCardQty || 2,
+        outputCardModel: finalCalculationData?.outputCardModel || 'H_20 x RJ45 Sending Card',
+        inputCardModel: finalCalculationData?.inputCardModel || 'H_1 x HDMI 2.0 Input Card', inputCardQty: finalCalculationData?.inputCardQty || 2,
         splicerSolution: finalCalculationData?.splicerSolution || (finalControllerObj.type==='Modular' ? `${finalControllerObj.name} Splicer` : 'N/A'),
         minViewing_m, minViewing_ft
       };
@@ -1014,11 +1014,11 @@ function renderCabinetOverlay(data){
 
       // Modular-specific items (output/input cards & PSU)
       if(isModular){
-        const outModel = data.outputCardModel || 'H_20_RJ45';
+        const outModel = data.outputCardModel || 'H_20 x RJ45 Sending Card';
         const outPart = PARTS_CATALOG[outModel] ? PARTS_CATALOG[outModel].part : 'TBD';
         list.push({ item:'Output (Sending) Card', partcode:outPart, desc: outModel, qty:data.requiredSendCards, unit:'PCS' });
 
-        const inModel = data.inputCardModel || 'H_1xHDMI';
+        const inModel = data.inputCardModel || 'H_1 x HDMI 2.0 Input Card';
         const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'TBD';
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 2, unit:'PCS' });
         
@@ -1119,12 +1119,12 @@ function renderBOQPreview(data){
       const sel = document.getElementById('modalControllerModel');
       if(Array.from(sel.options).some(o=>o.value === ctrlName)) sel.value = ctrlName;
 
-      const outModel = finalCalculationData.outputCardModel || 'H_20_RJ45';
+      const outModel = finalCalculationData.outputCardModel || 'H_20 x RJ45 Sending Card';
       const outSel = document.getElementById('modalOutputCardModel');
       Array.from(outSel.options).forEach(o=>{ if(o.value.startsWith(outModel)) outSel.value=o.value; });
 
       document.getElementById('modalMaxPortsPerCard').value = outSel.value.split('|')[1] || '';
-      document.getElementById('modalInputCardModel').value = finalCalculationData.inputCardModel || 'H_1xHDMI';
+      document.getElementById('modalInputCardModel').value = finalCalculationData.inputCardModel || 'H_1 x HDMI 2.0 Input Card';
       document.getElementById('modalInputCardQty').value = finalCalculationData.inputCardQty || 2;
       document.getElementById('modalSplicerSolution').value = finalCalculationData.splicerSolution || '';
 
@@ -1213,7 +1213,7 @@ function renderBOQPreview(data){
       doc.setTextColor(...primaryRGB);
       doc.setFontSize(13);
       doc.setFont('Helvetica','bold');
-      doc.text('PeopleLink LED Video Wall - Project Proposal', pageW/2, 12, { align:'center' });
+      doc.text('PeopleLink LED Video Wall - Proposal', pageW/2, 12, { align:'center' });
 
       doc.setFontSize(bodyFontSize);
       doc.setFont('Helvetica','normal');
@@ -1343,21 +1343,20 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
       doc.text('Disclaimer: This document is system-generated. All specifications and calculations must be validated with the Pre-Sales team prior to finalization or execution.', margin, doc.internal.pageSize.getHeight() - 15);
       doc.text('© 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights revered', pageW/2, doc.internal.pageSize.getHeight() - 8, { align:'center' });
 
-// Pixel pitch label: example → "1.56P"
-const pitchLabel = `${data.pixelPitch}P`;
+// Pixel Pitch (convert mm to "1.56P" format)
+const pitchLabel = (data.pixelPitch_mm / 1000).toFixed(2) + "P";
 
-// Convert mm → ft (1 ft = 304.8 mm)
-const wFt = (data.finalWidthMM / 304.8).toFixed(1);
-const hFt = (data.finalHeightMM / 304.8).toFixed(1);
+// Convert mm → ft
+const wFt = (data.finalW_mm / 304.8).toFixed(1);
+const hFt = (data.finalH_mm / 304.8).toFixed(1);
 
-// Type (COB / SMD)
-const wallType = data.type ? data.type.toUpperCase() : "LED";  
+// LED type (COB / SMD)
+const wallType = data.ledType ? data.ledType.toUpperCase() : "LED";
 
 // Final filename → PeopleLink_COB_1.56P_16x9ft.pdf
 const filename = `PeopleLink_${wallType}_${pitchLabel}_${wFt}x${hFt}ft.pdf`;
 
 doc.save(filename);
-}
 
     /************************************************************************
      * CSV export
@@ -1488,4 +1487,5 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
+
 
