@@ -1016,19 +1016,19 @@ function renderCabinetOverlay(data){
       // Modular-specific items (output/input cards & PSU)
       if(isModular){
         const outModel = data.outputCardModel || 'H_20_RJ45';
-        const outPart = PARTS_CATALOG[outModel] ? PARTS_CATALOG[outModel].part : 'TBD';
+        const outPart = PARTS_CATALOG[outModel] ? PARTS_CATALOG[outModel].part : 'NA';
         list.push({ item:'Output (Sending) Card', partcode:outPart, desc: outModel, qty:data.requiredSendCards, unit:'PCS' });
 
-        const inModel = data.inputCardModel || 'H_1xHDMI';
-        const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'TBD';
-        list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 2, unit:'PCS' });
+        const inModel = data.inputCardModel || 'H_2xHDMI';
+        const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'NA';
+        list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 1, unit:'PCS' });
         
-        list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'TBD', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' });
+        list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' });
       }
 
       // Ethernet Ports & Short Ethernet
-      list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'TBD', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
-      list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'TBD', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
+      list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'NA', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
+      list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'NA', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
 
       const isOutdoor =
         data.productKey === 'outdoor_40' ||
@@ -1492,3 +1492,4 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
+
