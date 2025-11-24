@@ -1322,14 +1322,15 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
       doc.setFontSize(bodyFontSize); doc.setFont('Helvetica','normal'); doc.setTextColor(50,50,50);
       const terms = [
         "1) Price Validity: This quotation is valid for 30 days from the date of issue.",
-        "2) Payment Terms: 100% advance along with Purchase Order.",
-        "3) All civil work, wall preparation, fabrication, primary mounting/hanging structure, welding, conduiting, and site readiness activities are the Client/Partner’s responsibility, unless specifically included in the BOQ.",
-        "4) Power & Earthing Requirements: Client must provide dedicated stable power, proper earthing, and required UPS/MCB/Stabilizer as per LED wall load.",
-        "5) Cabling: Long-distance LAN and power cabling from controller to LED wall is under Client scope.",
-        "6) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
-        "7) Warranty: 1-year OEM warranty excluding physical damage, unauthorized repairs, and electrical surges.",
-        "8) Installation Access: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
-        "9) Transportation: Transportation charges are extra and will be applied as per actuals."
+        "2) Taxes: Applicable GST @ 18% will be charged extra on the total invoice value.",
+        "3) Payment Terms: 100% advance along with Purchase Order.",
+        "4) All civil work, wall preparation, fabrication, primary mounting/hanging structure, welding, conduiting, and site readiness activities are the Client/Partner’s responsibility, unless specifically included in the BOQ.",
+        "5) Power & Earthing Requirements: Client must provide dedicated stable power, proper earthing, and required UPS/MCB/Stabilizer as per LED wall load.",
+        "6) Cabling: Long-distance LAN and power cabling from controller to LED wall is under Client scope.",
+        "7) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
+        "8) Warranty: 1-year OEM warranty excluding physical damage, unauthorized repairs, and electrical surges.",
+        "9) Installation Access: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
+        "10) Transportation: Transportation charges are extra and will be applied as per actuals."
       ];
       terms.forEach(t=>{
         const split = doc.splitTextToSize(t, pageW - margin*2);
@@ -1342,9 +1343,21 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
       doc.text('Disclaimer: This document is system-generated. All specifications and calculations must be validated with the Pre-Sales team prior to finalization or execution.', margin, doc.internal.pageSize.getHeight() - 15);
       doc.text('© 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights revered', pageW/2, doc.internal.pageSize.getHeight() - 8, { align:'center' });
 
-      const filename = `PeopleLink_LED_Config_${data.finalResW}x${data.finalResH}_Proposal.pdf`;
-      doc.save(filename);
-    }
+// Pixel pitch label: example → "1.56P"
+const pitchLabel = `${data.pixelPitch}P`;
+
+// Convert mm → ft (1 ft = 304.8 mm)
+const wFt = (data.finalWidthMM / 304.8).toFixed(1);
+const hFt = (data.finalHeightMM / 304.8).toFixed(1);
+
+// Type (COB / SMD)
+const wallType = data.type ? data.type.toUpperCase() : "LED";  
+
+// Final filename → PeopleLink_COB_1.56P_16x9ft.pdf
+const filename = `PeopleLink_${wallType}_${pitchLabel}_${wFt}x${hFt}ft.pdf`;
+
+doc.save(filename);
+}
 
     /************************************************************************
      * CSV export
@@ -1475,3 +1488,4 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
+
