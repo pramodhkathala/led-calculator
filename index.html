@@ -752,7 +752,7 @@
         controllerName: finalControllerObj.name, controllerType: finalControllerObj.type, suggestedControllerObj: finalControllerObj,
         outputCardPorts: finalCalculationData?.outputCardPorts || outputCardPorts_default,
         outputCardModel: finalCalculationData?.outputCardModel || 'H_20_RJ45',
-        inputCardModel: finalCalculationData?.inputCardModel || 'H_1xHDMI', inputCardQty: finalCalculationData?.inputCardQty || 2,
+        inputCardModel: finalCalculationData?.inputCardModel || 'H_2xHDMI', inputCardQty: finalCalculationData?.inputCardQty || 1,
         splicerSolution: finalCalculationData?.splicerSolution || (finalControllerObj.type==='Modular' ? `${finalControllerObj.name} Splicer` : 'N/A'),
         minViewing_m, minViewing_ft
       };
@@ -1492,4 +1492,5 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
+
 
