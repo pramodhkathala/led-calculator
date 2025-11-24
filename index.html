@@ -704,7 +704,7 @@
       const designWeight = actualWeight * WEIGHT_BUFFER;
 
       // Power Runs Calculation
-      const powerWPerRun = 1000;
+      const powerWPerRun = 2000;
       const requiredPowerRuns = Math.max(1, Math.ceil(designPowerW / powerWPerRun));
 
       // port rules
@@ -1084,7 +1084,7 @@ function renderCabinetOverlay(data){
       list.push({
         item: 'Total Power Cables (Input Runs)',
         partcode: 'TBD',
-        desc: 'Power cables @ 1000W/run. (Long-distance cable Partner Scope)',
+        desc: '2.5 sq.mm × 3C FRLS cable on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)',
         qty: data.requiredPowerRuns,
         unit: 'Runs'
       });
@@ -1492,5 +1492,6 @@ function downloadBOQCSV(){
   </script>
 </body>
 </html>
+
 
 
