@@ -1027,8 +1027,8 @@ function renderCabinetOverlay(data){
       }
 
       // Ethernet Ports & Short Ethernet
-      list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'NA', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
-      list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'NA', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
+      list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'Partner Scope', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
+      list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'Not Required', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
 
       const isOutdoor =
         data.productKey === 'outdoor_40' ||
@@ -1083,7 +1083,7 @@ function renderCabinetOverlay(data){
       // Total Power Cables (same for indoor & outdoor)
       list.push({
         item: 'Total Power Cables (Input Runs)',
-        partcode: 'NA',
+        partcode: 'Partner Scope',
         desc: '2.5 sq.mm × 3C FRLS cable on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)',
         qty: data.requiredPowerRuns,
         unit: 'Runs'
