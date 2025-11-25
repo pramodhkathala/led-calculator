@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +6,82 @@
   <title>PeopleLink LED Video Wall Configuration — Final</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+/* --- PLAYLIST: Videos + Images --- */
+const VIZ_PLAYLIST = [
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-waterfall-forest-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-ocean-waves-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-green-forest-wind-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-sky-clouds-timelapse-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-birds-flying-slowmo-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-underwater-fishes-1080p.mp4" },
+  { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
+  { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
+  { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
+  { type: "image", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
+  { type: "image", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
+];
+
+function loadVisualizationContent() {
+    const vizVideo = document.getElementById("vizVideo");
+    const ledWall = document.getElementById("ledWallElement");
+
+    const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
+
+    if (item.type === "video") {
+        ledWall.style.backgroundImage = "none";
+        vizVideo.style.display = "block";
+        vizVideo.src = item.url;
+        vizVideo.load();
+        vizVideo.play().catch(()=>{});
+    } else {
+        vizVideo.style.display = "none";
+        vizVideo.pause();
+        ledWall.style.backgroundImage = `url('${item.url}')`;
+        ledWall.style.backgroundSize = "cover";
+        ledWall.style.backgroundPosition = "center";
+    }
+}
+
+</script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js">
+/* --- PLAYLIST: Videos + Images --- */
+const VIZ_PLAYLIST = [
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-waterfall-forest-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-ocean-waves-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-green-forest-wind-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-sky-clouds-timelapse-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-birds-flying-slowmo-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-underwater-fishes-1080p.mp4" },
+  { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
+  { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
+  { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
+  { type: "image", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
+  { type: "image", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
+];
+
+function loadVisualizationContent() {
+    const vizVideo = document.getElementById("vizVideo");
+    const ledWall = document.getElementById("ledWallElement");
+
+    const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
+
+    if (item.type === "video") {
+        ledWall.style.backgroundImage = "none";
+        vizVideo.style.display = "block";
+        vizVideo.src = item.url;
+        vizVideo.load();
+        vizVideo.play().catch(()=>{});
+    } else {
+        vizVideo.style.display = "none";
+        vizVideo.pause();
+        ledWall.style.backgroundImage = `url('${item.url}')`;
+        ledWall.style.backgroundSize = "cover";
+        ledWall.style.backgroundPosition = "center";
+    }
+}
+
+</script>
 
   <style>
     :root{
@@ -62,33 +135,32 @@
 
     .details-panel { padding: 14px; border: 1px solid #e6eef8; border-radius: 6px; margin-top: 12px; background: #fbfcfd; font-size: 9pt; }
 
-/* Visualization — COB/MicroLED seamless wall with dynamic pixels + background image */
+/* Visualization — COB/MicroLED seamless wall with dynamic video/pixels */
 .vis-container {
   margin-top: 12px;
-  text-align: center;
+  text-align: center; /* Ensures the LED wall element is centered */
 }
 
 .led-wall-wrapper {
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  align-items:flex-start;
-  flex-wrap:wrap;
+  display:block;
+  max-width: 100%;
+  margin: 0 auto;
 }
 
-/* Main LED wall container – now shows background image */
+/* Main LED wall container – dynamically sized by JS aspect ratio, centered by margin:auto and parent text-align:center */
 .led-wall {
   border: 1px solid rgba(0,0,0,0.4);
   display: inline-grid;
-  width: 70%;
+  width: 70%; /* NEW: Allows it to fit nicely within the window */
   min-width: 320px;
-  aspect-ratio: 16/9;
-  max-height: 420px;
+  /* aspect-ratio set dynamically by JS based on cabinet W/H ratio */
+  max-height: 50vh; /* NEW: Added max-height to fit window better */
   overflow: hidden;
   position: relative;
+  margin: 0 auto; /* Center the block element */
 
-  /* Fallback if image not loaded */
-  background-color:#020b10;
+  /* Fallback if video not loaded (CHANGED COLOR) */
+  background-color:var(--page-bg);
   background-position:center;
   background-repeat:no-repeat;
   background-size:cover;
@@ -97,7 +169,31 @@
   transition: box-shadow 180ms ease, border-color 180ms ease;
 }
 
-/* cabinet grid */
+/* New: Style for embedded video - Transition Video (Plays when 'Calculate' is pressed) */
+#transitionVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 10; /* Above everything else during transition */
+  background: #000;
+}
+
+/* New: Style for the Visualization video background (Plays the live content) */
+#vizVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 1; /* Below the cabinet grid overlay */
+  /* Keep the natural color filter */
+  filter: brightness(0.95) contrast(1.05) saturate(1.05);
+}
+
+/* cabinet grid: Ensure it's transparent to show video through */
 #cabinetOverlay {
   width: 100%;
   height: 100%;
@@ -105,6 +201,9 @@
   padding:6px;
   gap:0px;                 /* NO gap between tiles */
   box-sizing:border-box;
+  position: relative; /* Ensure it stays on top of the video */
+  z-index: 2;
+  background: transparent !important;
 }
 
 /* Each cabinet cell — seamless COB style, only seams & slight depth */
@@ -112,13 +211,13 @@
   border-radius:2px;
   position:relative;
   overflow:hidden;
-  background: transparent;  /* let background image show through */
+  background: transparent;  /* let video show through */
 
-  /* Very subtle cabinet boundary — mostly visible only when zoomed/hovered */
-  border:1px solid rgba(255,255,255,0.02);
+  /* Sharpened cabinet boundary for better visualization of fit */
+  border:1px solid rgba(255,255,255,0.06);
   box-shadow:
-    inset 0 0 6px rgba(0,0,0,0.55),
-    0 0 0 1px rgba(0,0,0,0.18);
+    inset 0 0 4px rgba(0,0,0,0.45),
+    0 0 0 1px rgba(0,0,0,0.1);
 }
 
 /* When user hovers/focuses (acts like “zoom in”), outlines become clearer */
@@ -140,6 +239,7 @@
   font-size:9px;
   color:#fff;
   font-weight:600;
+  z-index: 3; /* Ensure label is on top of everything */
 }
 
 /* LED “glass” layer – transparent, only for pixel texture */
@@ -148,9 +248,10 @@
   inset:0;
   border-radius:2px;
   display:block;
-  background: transparent;      /* no solid color, so image shows */
+  background: transparent;      /* no solid color, so video shows */
   opacity:1;
   pointer-events:none;
+  z-index: 2; /* Below the label */
 }
 
 /* Fine-pitch pixel grain overlay – size controlled from JS via CSS vars */
@@ -175,27 +276,7 @@
   transition: all 120ms ease;
 }
 
-/* Controller box & connections (you can hide later if needed) */
-.controller-area {
-  width: 24%;
-  min-width:180px;
-  text-align:center;
-}
-.controller-box {
-  background:#fff;
-  border:1px solid #e3e8ef;
-  padding:10px;
-  border-radius:8px;
-  box-shadow:0 6px 20px rgba(12,34,60,0.04);
-  display:inline-block;
-  font-weight:700;
-  color:var(--brand);
-}
-.connections-svg {
-  width:100%;
-  height:140px;
-  overflow:visible;
-}
+/* Controller area styles removed as requested */
 
 #visDimensions {
   font-size: 0.95rem;
@@ -221,8 +302,35 @@
     .hseries-only { display: none; }
 
     .download-buttons { margin-top: 12px; border-top: 1px solid #e6eef8; padding-top: 12px; text-align: right; }
-    @media (max-width: 980px){ .grid-3{grid-template-columns:1fr} .led-wall{width:100%} .controller-area{width:100%} .led-wall-wrapper{flex-direction:column-reverse; align-items:center} }
-  </style>
+    @media (max-width: 980px){ .grid-3{grid-template-columns:1fr} .led-wall{width:100%; max-width:100%;} .led-wall-wrapper{flex-direction:column-reverse; align-items:center} }
+  
+/* --- Force LED wall to display actual aspect ratio and scale --- */
+.led-wall {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+}
+
+
+/* --- Auto-fit LED visualization in compact view --- */
+#ledWallElement {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 70vh !important;
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+
+/* Cabinet matrix clean style */
+.cabinet-cell {
+    background: transparent !important;
+    border: 1px solid rgba(0,0,0,0.2) !important;
+    color: rgba(0,0,0,0.4) !important;
+}
+
+</style>
 </head>
 <body>
   <div class="main-wrapper">
@@ -237,20 +345,20 @@
           <select id="productModel" onchange="resetForm()">
             <option value="">-- Select Model --</option>
             <optgroup label="COB LED Products">
-              <option value="cob_09">PeopleLink COB (0.9375mm)</option>
-              <option value="cob_125">PeopleLink COB (1.25mm)</option>
-              <option value="cob_15">PeopleLink COB (1.5625mm)</option>
+              <option value="cob_09">PeopleLink COB (0.9375 mm)</option>
+              <option value="cob_125">PeopleLink COB (1.25 mm)</option>
+              <option value="cob_15">PeopleLink COB (1.5625 mm)</option>
             </optgroup>
             <optgroup label="SMD Indoor LED Products">
-              <option value="indoor_186">PeopleLink SMD Indoor (1.86mm)</option>
-              <option value="indoor_20">PeopleLink SMD Indoor (2.0mm)</option>
-              <option value="indoor_25">PeopleLink SMD Indoor (2.5mm)</option>
+              <option value="indoor_186">PeopleLink SMD Indoor (1.86 mm)</option>
+              <option value="indoor_20">PeopleLink SMD Indoor (2.0 mm)</option>
+              <option value="indoor_25">PeopleLink SMD Indoor (2.5 mm)</option>
             </optgroup>
             <optgroup label="SMD Outdoor LED Products">
-              <option value="outdoor_40">PeopleLink SMD Outdoor (4.0mm)</option>
-              <option value="outdoor_667">PeopleLink SMD Outdoor (6.67mm)</option>
-              <option value="outdoor_80">PeopleLink SMD Outdoor (8.0mm)</option>
-              <option value="outdoor_100">PeopleLink SMD Outdoor (10.0mm)</option>
+              <option value="outdoor_40">PeopleLink SMD Outdoor (4.0 mm)</option>
+              <option value="outdoor_667">PeopleLink SMD Outdoor (6.67 mm)</option>
+              <option value="outdoor_80">PeopleLink SMD Outdoor (8.0 mm)</option>
+              <option value="outdoor_100">PeopleLink SMD Outdoor (10.0 mm)</option>
             </optgroup>
           </select>
         </div>
@@ -320,6 +428,8 @@
             <div class="spec-item"><span>Total Modules:</span><span id="spec_modules">--</span></div>
             <div class="spec-item"><span>Cabinet Size (mm):</span><span id="spec_cabsize">--</span></div>
             <div class="spec-item"><span>Cabinet Pixels (WxH):</span><span id="spec_cabpix">--</span></div>
+            <div class="spec-item"><span>Module Size (mm):</span><span id="spec_modsize">--</span></div>
+            <div class="spec-item"><span>Brightness (Nits):</span><span id="spec_nits">--</span></div>
             <div class="spec-item"><span>Design Power (Est.):</span><span id="spec_power">--</span></div>
             <div class="spec-item"><span>Design Weight (Est.):</span><span id="spec_weight">--</span></div>
           </div>
@@ -346,53 +456,51 @@
       </div>
     </div>
 
-<!-- Visualization area -->
 <div class="card vis-panel" style="margin-top: 18px;">
-  <div style="font-weight:700; color:var(--brand); margin-bottom:12px;">
+  <div style="font-weight:700; color:var(--brand); margin-bottom:12px; text-align:center;">
     Physical LED Wall Visualization
   </div>
 
   <div class="vis-container">
     <div class="led-wall-wrapper">
-      <!-- LED wall grid -->
       <div class="led-wall" id="ledWallElement" aria-hidden="true">
+        
+        
+<video id="vizVideo" style="object-fit:cover;width:100%;height:100%;" loop muted playsinline preload="auto" style="display:none;">
+</video>
+
+
+        <video id="transitionVideo" muted playsinline preload="auto" style="display:none;">
+          <source src="https://storage.googleapis.com/test-assets-pub/videos/data_transition.mp4" type="video/mp4">
+          <source src="https://storage.googleapis.com/test-assets-pub/videos/data_transition.webm" type="video/webm">
+          Your browser does not support the video tag.
+        </video>
+        
         <div id="cabinetOverlay">
-          <div style="
+          <div id="placeholderMessage" style="
             grid-column: 1 / -1;
             grid-row: 1 / -1;
-            background: #0b0b0b;
-            color: #ddd;
+            background: #eef6fb; /* CHANGED: Light color instead of black (matches page-bg) */
+            color: #374151;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.95rem;
             font-weight: 500;
           ">
-            Calculate to see COB / SMD wall visualization
+            Calculate to see LED Wall Visualization
           </div>
         </div>
       </div>
 
-      <!-- Controller area remains (for ports visualization) -->
-      <div class="controller-area">
-        <div class="controller-box" id="controllerBox">
-          Suggested Controller<br>
-          <span id="controllerBoxName" style="font-weight:600;font-size:12px;color:#0b3b84">--</span>
-        </div>
-        <svg class="connections-svg" id="connectionsSvg" viewBox="0 0 300 140" preserveAspectRatio="none" aria-hidden="true"></svg>
-        <div style="font-size:12px; margin-top:6px; color:var(--muted);">
-          Logical ports &amp; connection runs (visual only)
-        </div>
       </div>
-    </div>
 
-    <div id="visDimensions">-- m × -- m</div>
+    <div id="visDimensions" style="font-size: 0.95rem; font-weight: 600; margin-top: 8px; color:var(--brand);">-- ft × -- ft</div>
 
     <div id="boqPreviewContainer" style="margin-top: 18px;"></div>
 
   </div>
 
-  <!-- Controller Modal -->
   <div id="controllerModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -437,7 +545,6 @@
     </div>
   </div>
 
-  <!-- Contact Modal -->
   <div id="contactModal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -479,16 +586,17 @@
     const LINE_HEIGHT_PDF = 3.8; // uniform PDF line spacing
 
     const LED_PRODUCTS = {
-      'cob_09': { name:"PeopleLink COB (0.9375mm)", pitch_mm:0.9375, cabW_mm:600, cabH_mm:337.5, cabPixW:640, cabPixH:360, modulesPerCab:8, weight_kg:4.6, nits_range:"600-1000", maxPower_W_m2:300 },
-      'cob_125': { name:"PeopleLink COB (1.25mm)", pitch_mm:1.25, cabW_mm:600, cabH_mm:337.5, cabPixW:480, cabPixH:270, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
-      'cob_15': { name:"PeopleLink COB (1.5625mm)", pitch_mm:1.5625, cabW_mm:600, cabH_mm:337.5, cabPixW:384, cabPixH:216, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
-      'indoor_186': { name:"PeopleLink SMD Indoor (1.86mm)", pitch_mm:1.86, cabW_mm:640, cabH_mm:480, cabPixW:344, cabPixH:258, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
-      'indoor_20': { name:"PeopleLink SMD Indoor (2.0mm)", pitch_mm:2.0, cabW_mm:640, cabH_mm:480, cabPixW:320, cabPixH:240, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
-      'indoor_25': { name:"PeopleLink SMD Indoor (2.5mm)", pitch_mm:2.5, cabW_mm:640, cabH_mm:480, cabPixW:256, cabPixH:192, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
-      'outdoor_40': { name:"PeopleLink SMD Outdoor (4.0mm)", pitch_mm:4.0, cabW_mm:960, cabH_mm:960, cabPixW:240, cabPixH:240, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
-      'outdoor_667': { name:"PeopleLink SMD Outdoor (6.67mm)", pitch_mm:6.67, cabW_mm:960, cabH_mm:960, cabPixW:144, cabPixH:144, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
-      'outdoor_80': { name:"PeopleLink SMD Outdoor (8.0mm)", pitch_mm:8.0, cabW_mm:960, cabH_mm:960, cabPixW:120, cabPixH:120, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
-      'outdoor_100': { name:"PeopleLink SMD Outdoor (10.0mm)", pitch_mm:10.0, cabW_mm:960, cabH_mm:960, cabPixW:96, cabPixH:96, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 }
+      'cob_09': { name:"PeopleLink COB (0.9375 mm)", pitch_mm:0.9375, cabW_mm:600, cabH_mm:337.5, cabPixW:640, cabPixH:360, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-1000", maxPower_W_m2:300 },
+      'cob_125': { name:"PeopleLink COB (1.25 mm)", pitch_mm:1.25, cabW_mm:600, cabH_mm:337.5, cabPixW:480, cabPixH:270, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
+      'cob_15': { name:"PeopleLink COB (1.5625 mm)", pitch_mm:1.5625, cabW_mm:600, cabH_mm:337.5, cabPixW:384, cabPixH:216, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
+      'indoor_186': { name:"PeopleLink SMD Indoor (1.86 mm)", pitch_mm:1.86, cabW_mm:640, cabH_mm:480, cabPixW:344, cabPixH:258, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
+      'indoor_20': { name:"PeopleLink SMD Indoor (2.0 mm)", pitch_mm:2.0, cabW_mm:640, cabH_mm:480, cabPixW:320, cabPixH:240, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
+      'indoor_25': { name:"PeopleLink SMD Indoor (2.5 mm)", pitch_mm:2.5, cabW_mm:640, cabH_mm:480, cabPixW:256, cabPixH:192, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
+      // NOTE: Outdoor cabinets are 960 mm x 960 mm (Square)
+      'outdoor_40': { name:"PeopleLink SMD Outdoor (4.0 mm)", pitch_mm:4.0, cabW_mm:960, cabH_mm:960, cabPixW:240, cabPixH:240, moduleW_mm:320, moduleH_mm:160, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
+      'outdoor_667': { name:"PeopleLink SMD Outdoor (6.67 mm)", pitch_mm:6.67, cabW_mm:960, cabH_mm:960, cabPixW:144, cabPixH:144, moduleW_mm:320, moduleH_mm:160, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
+      'outdoor_80': { name:"PeopleLink SMD Outdoor (8.0 mm)", pitch_mm:8.0, cabW_mm:960, cabH_mm:960, cabPixW:120, cabPixH:120, moduleW_mm:320, moduleH_mm:160, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 },
+      'outdoor_100': { name:"PeopleLink SMD Outdoor (10.0 mm)", pitch_mm:10.0, cabW_mm:960, cabH_mm:960, cabPixW:96, cabPixH:96, moduleW_mm:320, moduleH_mm:160, modulesPerCab:18, weight_kg:8.28, nits_range:"4500-5000", maxPower_W_m2:937.5 }
     };
 
     const CONTROLLER_MODELS = [
@@ -534,7 +642,7 @@
       'PPL-COB-125': { part:'PPL-COB-MDL-CU-12', desc:'PeopleLink Active LED | 1.25PP COB (Including Modules)' },
       'PPL-COB-156': { part:'PPL-COB-MDL-CU-15', desc:'PeopleLink Active LED | 1.56PP COB (Including Modules)' },
 
-      /* Indoor SMD: separate cabinet + module mapping (cabinet = PPL-ALD-CU) */
+      /* SMD Indoor: separate cabinet + module mapping (cabinet = PPL-ALD-CU) */
       'PPL-ALD-CU': { part:'PPL-ALD-CU', desc:'PeopleLink Video Wall Cabinet Unit (Indoor) 640x480mm' },
       'PPL-SMD-MDL-20': { part:'NA', desc:'SMD 2.0 mm Module (NA)' },
       'PDS-TP-15-T':  { part:'PDS-TP-15-T', desc:'SMD 2.5 mm Module (PDS-TP-15-T)' },
@@ -548,9 +656,9 @@
       'PPL-SMD-MDL-CU-80': { part:'NA', desc:'PeopleLink Outdoor P8 Cabinet & Module (Integrated) - NA' },
       'PPL-SMD-MDL-CU-100':{ part:'NA', desc:'PeopleLink Outdoor P10 Cabinet & Module (Integrated) - NA' },
 
-      'ALED-INST-IN':     { part:'ALED-INST-IN',     desc:'Installation & Configuration - Indoor' },
-      'ALED-INST-OU':     { part:'ALED-INST-OU',     desc:'Installation & Configuration - Outdoor' },
-      'ALED-TRS-IN-REG':  { part:'ALED-TRS-IN-REG',  desc:'Transportation (Indoor) - Per Cabinet' },
+      'ALED-INST-IN':     { part:'ALED-INST-IN', desc:'Installation & Configuration - Indoor' },
+      'ALED-INST-OU':     { part:'ALED-INST-OU', desc:'Installation & Configuration - Outdoor' },
+      'ALED-TRS-IN-REG':  { part:'ALED-TRS-IN-REG', desc:'Transportation (Indoor) - Per Cabinet' },
     };
 
     const LED_PART_KEY_BY_PRODUCT = {
@@ -558,15 +666,19 @@
       'cob_125': 'PPL-COB-125',
       'cob_15': 'PPL-COB-156',
       'indoor_186': 'PPL-SMD-MDL-CU-18', // 1.86 integrated
-      'indoor_20': 'PPL-ALD-CU',         // cabinet only (modules separate)
-      'indoor_25': 'PPL-ALD-CU',         // cabinet only (modules separate)
+      'indoor_20': 'PPL-ALD-CU', // cabinet only (modules separate)
+      'indoor_25': 'PPL-ALD-CU', // cabinet only (modules separate)
       'outdoor_40': 'PPL-SMD-MDL-CU-40',
       'outdoor_667': 'PPL-SMD-MDL-CU-60',
       'outdoor_80': 'PPL-SMD-MDL-CU-80',
       'outdoor_100': 'PPL-SMD-MDL-CU-100'
     };
 
-    const CABINETS_PER_LONG_LAN = { 'cob_09': 2, 'cob_125': 5, 'cob_15': 7 };
+    const CABINETS_PER_LONG_LAN = {
+      'cob_09': 2,
+      'cob_125': 5,
+      'cob_15': 7
+    };
 
     let finalCalculationData = {};
     let contactInfo = { email:'', phone:'' };
@@ -577,75 +689,34 @@
     function gcd(a,b){ return b===0 ? a : gcd(b, a%b); }
     function fmt(n, d=0){ return Number(n).toLocaleString(undefined, {minimumFractionDigits:d, maximumFractionDigits:d}); }
     function formatLarge(n){ return n.toLocaleString(undefined, { maximumFractionDigits: 0 }); }
-    function m2ToSqFt(m2) { return m2 * 10.7639; }
-    function escapeHtml(s){ if(s===null||s===undefined) return ''; return s.toString().replace(/[&<>"'`=\/]/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;","/":"&#x2F;","`":"&#x60;","=":"&#x3D;"}[c]; }); }
-
-    /************************************************************************
-     * Modal population
-     ************************************************************************/
-    function populateModalControllers(){
-      const sel = document.getElementById('modalControllerModel');
-      sel.innerHTML = '';
-      CONTROLLER_MODELS.forEach(c=>{
-        const opt = document.createElement('option');
-        opt.value = c.name;
-        opt.textContent = `${c.name} (${c.type})`;
-        sel.appendChild(opt);
-      });
-    }
-    function populateModalOutputCards(){
-      const sel = document.getElementById('modalOutputCardModel');
-      sel.innerHTML = '';
-      const cards = [{ model:'H_20 x RJ45 Sending Card', ports:20 },{ model:'H_16_RJ45', ports:16 },{ model:'H_4_HDMI_Out', ports:4 }];
-      cards.forEach(c=>{
-        const o = document.createElement('option');
-        o.value = `${c.model}|${c.ports}`;
-        o.textContent = `${c.model} (${c.ports} ports)`;
-        sel.appendChild(o);
-      });
-    }
-    function populateModalInputCards(){
-      const sel = document.getElementById('modalInputCardModel');
-      sel.innerHTML = '';
-      const items = ['H_1 x HDMI 2.0 Input Card','H_2 x HDMI 2.0 Input Card','H_4 x HDMI Input Card'];
-      items.forEach(m=>{
-        const o = document.createElement('option');
-        o.value = m;
-        o.textContent = PARTS_CATALOG[m] ? PARTS_CATALOG[m].desc : m;
-        sel.appendChild(o);
-      });
-    }
-    function updatePortsFromOutputCard(){
-      const val = document.getElementById('modalOutputCardModel').value;
-      if(!val) return;
-      const parts = val.split('|');
-      document.getElementById('modalMaxPortsPerCard').value = parts[1] || '';
+    function m2ToSqFt(m2){ return m2 * 10.764; }
+    function mmToM(mm) { return mm / MM_PER_METER; } // NEW: mm to m conversion
+    function mToFt(m) { return m * 3.28084; } // NEW: m to ft conversion
+    function ftToM(ft) { return ft / 3.28084; } // NEW: ft to m conversion
+    function inToMm(i){ return i * MM_PER_INCH; }
+    function mmToIn(mm){ return mm / MM_PER_INCH; }
+    function escapeHtml(unsafe){
+      return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
     }
 
-    /************************************************************************
-     * Calculation
-     ************************************************************************/
-    function toggleMeasurementFields(){
-      const unit = document.getElementById('unit').value;
-      const diag = unit === 'inches';
-      document.getElementById('widthGroup').classList.toggle('hidden', diag);
-      document.getElementById('heightGroup').classList.toggle('hidden', diag);
-      document.getElementById('diagonalGroup').classList.toggle('hidden', !diag);
-      const unitText = unit === 'feet' ? ' (ft)' : unit === 'inches' ? ' (in)' : ' (m)';
-      document.getElementById('widthLabel').textContent = 'Desired Width' + unitText;
-      document.getElementById('heightLabel').textContent = 'Desired Height' + unitText;
+    let tooltip = null;
+    function getOrCreateTooltip() {
+      if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.style.cssText = `
+          position: fixed; background: rgba(0,0,0,0.85); color: #fff; padding: 6px 10px; 
+          border-radius: 4px; font-size: 10px; pointer-events: none; z-index: 10000;
+          display: none; white-space: nowrap;
+        `;
+        document.body.appendChild(tooltip);
+      }
+      return tooltip;
     }
 
-    function calculateLEDWall(){
-      const productKey = document.getElementById('productModel').value;
-      const unit = document.getElementById('unit').value;
-      const widthInput = parseFloat(document.getElementById('width').value || 0);
-      const heightInput = parseFloat(document.getElementById('height').value || 0);
-      const diagonalRaw = parseFloat(document.getElementById('diagonal').value || 0);
-      const diagonalInput = diagonalRaw ? Math.round(diagonalRaw) : 0;
-      const aspectRatioKey = document.getElementById('aspectRatio').value;
+    function calculate(productKey, unit, widthInput, heightInput, diagonalInput, aspectRatioKey){
       const err = document.getElementById('errorMessage');
       err.style.display='none';
+
       if(!productKey || !unit || ((unit!=='inches' && !(widthInput||heightInput)) || (unit==='inches' && !diagonalInput))){
         err.textContent = 'ERROR: Select model, unit and enter valid dimensions.';
         err.style.display='block';
@@ -653,7 +724,11 @@
       }
 
       const details = LED_PRODUCTS[productKey];
-      if(!details){ err.textContent='ERROR: selected product unknown.'; err.style.display='block'; return null; }
+      if(!details){
+        err.textContent='ERROR: selected product unknown.';
+        err.style.display='block';
+        return null;
+      }
 
       let desiredW_mm=0, desiredH_mm=0;
       const ratioIsAuto = (aspectRatioKey === 'auto' || !aspectRatioKey);
@@ -669,9 +744,16 @@
         const unitFactor = unit === 'meters' ? MM_PER_METER : MM_PER_FOOT;
         if(!ratioIsAuto){
           const [rw,rh] = aspectRatioKey.split(':').map(Number);
-          if(widthInput){ desiredW_mm = widthInput * unitFactor; desiredH_mm = (widthInput / rw) * rh * unitFactor; }
-          else if(heightInput){ desiredH_mm = heightInput * unitFactor; desiredW_mm = (heightInput / rh) * rw * unitFactor; }
-          else { desiredW_mm = widthInput * unitFactor; desiredH_mm = heightInput * unitFactor; }
+          if(widthInput){
+            desiredW_mm = widthInput * unitFactor;
+            desiredH_mm = (widthInput / rw) * rh * unitFactor;
+          } else if(heightInput){
+            desiredH_mm = heightInput * unitFactor;
+            desiredW_mm = (heightInput / rh) * rw * unitFactor;
+          } else {
+            desiredW_mm = widthInput * unitFactor;
+            desiredH_mm = heightInput * unitFactor;
+          }
         } else {
           desiredW_mm = widthInput * unitFactor || (heightInput ? heightInput * unitFactor * (details.cabW_mm/details.cabH_mm) : 0);
           desiredH_mm = heightInput * unitFactor || (widthInput ? widthInput * unitFactor * (details.cabH_mm/details.cabW_mm) : 0);
@@ -680,6 +762,7 @@
 
       const numCabW = Math.max(1, Math.round(desiredW_mm / details.cabW_mm));
       const numCabH = Math.max(1, Math.round(desiredH_mm / details.cabH_mm));
+
       const totalCabinets = numCabW * numCabH;
       const totalModules = totalCabinets * details.modulesPerCab;
       const finalW_mm = numCabW * details.cabW_mm;
@@ -688,16 +771,19 @@
       const finalResW = numCabW * details.cabPixW;
       const finalResH = numCabH * details.cabPixH;
       const totalPixels = finalResW * finalResH;
-      const ratioG = gcd(finalResW, finalResH);
-      const aspectRatioText = `${finalResW/ratioG}:${finalResH/ratioG}`;
-      const finalDiagonal_in = Math.round(Math.sqrt(finalW_mm*finalW_mm + finalH_mm*finalH_mm) / MM_PER_INCH);
-      const pixelDensity = Math.round((totalPixels) / (finalArea_m2 || 1));
 
-      // Min viewing distance: use pitch_mm as meters (rounded to 2 decimals)
-      const minViewing_m = Number(details.pitch_mm.toFixed(2));
-      const minViewing_ft = Number((minViewing_m * 3.28084).toFixed(2));
+      let rgcd = gcd(finalResW, finalResH);
+      const aspectW = finalResW / rgcd;
+      const aspectH = finalResH / rgcd;
+      const aspectRatioText = `${aspectW}:${aspectH}`;
 
-      // power & weight
+      const finalDiagonal_in = mmToIn(Math.sqrt(finalW_mm*finalW_mm + finalH_mm*finalH_mm));
+      const finalDiagonal_m = mmToM(Math.sqrt(finalW_mm*finalW_mm + finalH_mm*finalH_mm));
+      const pixelDensity = 1 / ((details.pitch_mm/1000) * (details.pitch_mm/1000));
+      // Min Viewing Distance (m) = Pitch (mm) / 0.8
+      const minViewingDistance_m = details.pitch_mm;
+
+      // Power & Weight Calculation
       const actualPowerW = finalArea_m2 * details.maxPower_W_m2;
       const designPowerW = actualPowerW * POWER_BUFFER;
       const actualWeight = details.weight_kg * totalCabinets;
@@ -743,53 +829,83 @@
 
       const finalControllerObj = CONTROLLER_MODELS.find(c=>c.name === (finalCalculationData.controllerOverrideName || suggested.name)) || suggested;
 
-      finalCalculationData = {
-        productKey, productName: details.name, pixelPitch_mm: details.pitch_mm,
-        cabinetW_mm: details.cabW_mm, cabinetH_mm: details.cabH_mm, cabPixW: details.cabPixW, cabPixH: details.cabPixH, modulesPerCab: details.modulesPerCab,
-        numCabW, numCabH, totalCabinets, totalModules, finalW_mm, finalH_mm, finalArea_m2, finalResW, finalResH, totalPixels,
-        aspectRatioText, finalDiagonal_in, pixelDensity, actualPowerW, designPowerW, requiredPowerRuns, actualWeight, designWeight,
-        requiredPortsBuffered, requiredShortEthernet, requiredLongEthRuns, requiredSendCards,
-        controllerName: finalControllerObj.name, controllerType: finalControllerObj.type, suggestedControllerObj: finalControllerObj,
-        outputCardPorts: finalCalculationData?.outputCardPorts || outputCardPorts_default,
-        outputCardModel: finalCalculationData?.outputCardModel || 'H_20 x RJ45 Sending Card',
-        inputCardModel: finalCalculationData?.inputCardModel || 'H_2 x HDMI 2.0 Input Card', inputCardQty: finalCalculationData?.inputCardQty || 1,
-        splicerSolution: finalCalculationData?.splicerSolution || (finalControllerObj.type==='Modular' ? `${finalControllerObj.name} Splicer` : 'N/A'),
-        minViewing_m, minViewing_ft
+      return {
+        productKey,
+        productName: details.name,
+        pixelPitch_mm: details.pitch_mm,
+        cabinetW_mm: details.cabW_mm,
+        cabinetH_mm: details.cabH_mm,
+        moduleW_mm: details.moduleW_mm,
+        moduleH_mm: details.moduleH_mm,
+        moduleDims: `${details.moduleW_mm}mm × ${details.moduleH_mm}mm`,
+        nitsRange: details.nits_range,
+        cabPixW: details.cabPixW,
+        cabPixH: details.cabPixH,
+        modulesPerCab: details.modulesPerCab,
+        numCabW,
+        numCabH,
+        totalCabinets,
+        totalModules,
+        finalW_mm,
+        finalH_mm,
+        finalArea_m2,
+        finalResW,
+        finalResH,
+        totalPixels,
+        aspectRatioText,
+        finalDiagonal_in,
+        finalDiagonal_m,
+        pixelDensity,
+        minViewingDistance_m,
+        actualPowerW,
+        designPowerW,
+        actualWeight,
+        designWeight,
+        requiredPowerRuns,
+        requiredPortsBuffered,
+        requiredShortEthernet,
+        controllerName: finalControllerObj.name,
+        controllerType: finalControllerObj.type,
+        requiredSendCards: finalControllerObj.type === 'Modular' ? requiredSendCards : 0,
+        outputCardModel: finalCalculationData.outputCardModel || 'H_20 x RJ45 Sending Card',
+        inputCardModel: finalCalculationData.inputCardModel || 'H_2 x HDMI 2.0 Input Card',
+        inputCardQty: finalCalculationData.inputCardQty || 2,
+        splicerSolution: finalCalculationData.splicerSolution || 'NA',
+        ledType: productKey.split('_')[0]
       };
-
-      return finalCalculationData;
     }
-
-    /************************************************************************
-     * Visualization & UI update
-     ************************************************************************/
-    function showVisualization(){
-      const d = calculateLEDWall();
-      if(!d) return;
-
+    
+    // New function to handle the final rendering after the transition
+    function updateResultsDisplay(data){
+      const d = data;
       const finalAreaSqFt = m2ToSqFt(d.finalArea_m2);
-
-      // Actual Dimensions display (WxH m) / (WxH ft)
-      const w_m = (d.finalW_mm/MM_PER_METER).toFixed(2);
-      const h_m = (d.finalH_mm/MM_PER_METER).toFixed(2);
-      const w_ft = (d.finalW_mm/MM_PER_FOOT).toFixed(2);
-      const h_ft = (d.finalH_mm/MM_PER_FOOT).toFixed(2);
-      const dimsText = `${w_m} × ${h_m} m / ${w_ft} × ${h_ft} ft`;
-
+      const finalW_m = mmToM(d.finalW_mm).toFixed(2);
+      const finalH_m = mmToM(d.finalH_mm).toFixed(2);
+      const finalW_ft = mToFt(finalW_m).toFixed(2);
+      const finalH_ft = mToFt(finalH_m).toFixed(2);
+      const minView_ft = mToFt(d.minViewingDistance_m).toFixed(2);
+      
+      // Apply display updates for spec, ctrl, power, weight, etc.
       document.getElementById('spec_model').textContent = d.productName;
-      document.getElementById('spec_pitch').textContent = d.pixelPitch_mm + ' mm';
-      document.getElementById('spec_dims').textContent = dimsText;
+      document.getElementById('spec_pitch').textContent = `${d.pixelPitch_mm.toFixed(2)} mm`;
+      // Updated formatting for Actual Dimensions
+      document.getElementById('spec_dims').textContent = `${finalW_m} m × ${finalH_m} m / ${finalW_ft} ft × ${finalH_ft} ft`;
       document.getElementById('spec_res').textContent = `${formatLarge(d.finalResW)} × ${formatLarge(d.finalResH)}`;
-      document.getElementById('spec_diag').textContent = `${d.finalDiagonal_in}″`;
+      // Updated formatting for Diagonal
+      document.getElementById('spec_diag').textContent = `${Math.round(d.finalDiagonal_in)}\"`;
       document.getElementById('aspectRatioText').textContent = d.aspectRatioText;
-      document.getElementById('spec_density').textContent = `${formatLarge(d.pixelDensity)} px/m²`;
-      document.getElementById('spec_viewing').textContent = `${d.minViewing_m} m / ${d.minViewing_ft} ft`;
+      document.getElementById('spec_density').textContent = `${fmt(d.pixelDensity,0)} pixels/m²`;
+      // Updated formatting for Min Viewing Distance
+      document.getElementById('spec_viewing').textContent = `${d.minViewingDistance_m.toFixed(2)} m / ${minView_ft} ft`;
       document.getElementById('spec_area').textContent = `${d.finalArea_m2.toFixed(2)} m² / ${finalAreaSqFt.toFixed(2)} sq.ft`;
       document.getElementById('spec_total_pixels').textContent = `${formatLarge(d.totalPixels)}`;
       document.getElementById('spec_cabs').textContent = `${d.numCabW} × ${d.numCabH} (${d.totalCabinets})`;
       document.getElementById('spec_modules').textContent = `${d.totalModules} (${d.modulesPerCab} per cabinet)`;
       document.getElementById('spec_cabsize').textContent = `${d.cabinetW_mm}mm x ${d.cabinetH_mm}mm`;
       document.getElementById('spec_cabpix').textContent = `${formatLarge(d.cabPixW)} × ${formatLarge(d.cabPixH)}`;
+      // New fields
+      document.getElementById('spec_modsize').textContent = d.moduleDims;
+      document.getElementById('spec_nits').textContent = d.nitsRange;
 
       document.getElementById('ctrl_name').textContent = d.controllerName + (d.controllerType ? ` (${d.controllerType})` : '');
       document.getElementById('ctrl_longeth_combined').textContent = `${d.requiredPortsBuffered} Ports`;
@@ -804,204 +920,181 @@
         document.querySelectorAll('.hseries-only').forEach(el=>el.style.display='none');
       }
 
-      // adapt visualization size by number of rows (reduce height for tall walls)
+      // --- Visualization Logic (Video Playing) ---
       const ledWallEl = document.getElementById('ledWallElement');
+      const vizVideo = document.getElementById('vizVideo');
+      const transitionVideo = document.getElementById('transitionVideo');
+
+      // 1. Set dynamic aspect ratio for accurate visualization (Cabinet Width & Height must match)
+      const wallAR = d.finalW_mm / d.finalH_mm;
+      ledWallEl.style.aspectRatio = `${wallAR} / 1`;
+
+      // 2. Adjust max height to fit window better
       const dynamicMaxH = Math.min(480, Math.max(200, d.numCabH * 42));
       ledWallEl.style.maxHeight = dynamicMaxH + 'px';
 
-      // render grid
+      // 3. Render grid
       renderCabinetOverlay(d);
 
-      // render controller connections (vis only)
-      renderControllerConnections(d);
+      // 4. Start Visualization Video (This is the "live image/GIF" effect)
+      if (vizVideo) {
+          vizVideo.style.display = 'block';
+          vizVideo.currentTime = 0; // Ensure it starts from the beginning
+          vizVideo.play().catch(e => console.log("Autoplay blocked for visualization video:", e));
+      }
+      
+      // 5. Hide transition video if it was running
+      if(transitionVideo) {
+          transitionVideo.pause();
+          transitionVideo.style.display = 'none';
+          transitionVideo.currentTime = 0;
+      }
 
       // render BOQ
       renderBOQPreview(d);
-
+      loadVisualizationContent();
       // apply colours to spec values
       applySpecColors();
     }
 
-// Dynamically scale pixel texture based on pixel pitch (mm)
-function applyPixelDensity(pitchMm) {
-  // Safety clamp
-  const p = Math.max(0.8, Math.min(pitchMm || 2.5, 12));
 
-  // smaller pitch → finer pattern; larger pitch → coarser pattern
-  const size1 = Math.max(1.5, Math.min(p * 1.6, 7)); // main grid
-  const size2 = Math.max(0.8, size1 / 2);            // secondary grid
+    function showVisualization(){
+      const data = calculate(
+          document.getElementById('productModel').value,
+          document.getElementById('unit').value,
+          parseFloat(document.getElementById('width').value || 0),
+          parseFloat(document.getElementById('height').value || 0),
+          parseFloat(document.getElementById('diagonal').value || 0),
+          document.getElementById('aspectRatio').value
+      );
 
-  document.querySelectorAll('.cab-fill').forEach(el => {
-    el.style.setProperty('--px-grid-size-1', `${size1}px`);
-    el.style.setProperty('--px-grid-size-2', `${size2}px`);
-  });
-}
+      if(!data) return;
 
-// Nature / water sample images for live wall preview
-const WALL_IMAGES = [
-  "https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg?auto=compress&cs=tinysrgb&w=1200", // waterfall
-  "https://images.pexels.com/photos/417074/pexels-photo-417074.jpeg?auto=compress&cs=tinysrgb&w=1200", // forest lake
-  "https://images.pexels.com/photos/158607/cairn-fog-mystical-background-158607.jpeg?auto=compress&cs=tinysrgb&w=1200", // misty forest
-  "https://images.pexels.com/photos/14676/pexels-photo-14676.jpeg?auto=compress&cs=tinysrgb&w=1200", // green valley
-  "https://images.pexels.com/photos/248797/pexels-photo-248797.jpeg?auto=compress&cs=tinysrgb&w=1200"  // blue ocean
-];
+      // Store data globally
+      finalCalculationData = data; 
+      
+      // --- VIDEO TRANSITION LOGIC ---
+      const transitionVideo = document.getElementById('transitionVideo');
+      const vizVideo = document.getElementById('vizVideo');
+      const placeholder = document.getElementById('placeholderMessage');
 
-// Apply a random greenery / water image to the wall
-function setWallBackgroundImage() {
-  const wall = document.getElementById('ledWallElement');
-  if (!wall) return;
-  const img = WALL_IMAGES[Math.floor(Math.random() * WALL_IMAGES.length)];
-  wall.style.backgroundImage = `url("${img}")`;
-}
+      // 1. Hide old content and prepare for transition
+      if(placeholder) placeholder.style.display = 'none';
+      if(vizVideo) vizVideo.style.display = 'none'; // Temporarily hide visualization video
 
-
-function renderCabinetOverlay(data){
-  const overlay = document.getElementById('cabinetOverlay');
-  if(!overlay) return;
-
-  overlay.innerHTML = '';
-  overlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
-  overlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
-
-  // set live background image inside wall
-  setWallBackgroundImage();
-
-  // Tooltip (re-used for all cells)
-  let tooltip = document.getElementById('cabTooltip');
-  if(!tooltip){
-    tooltip = document.createElement('div');
-    tooltip.id = 'cabTooltip';
-    tooltip.style.position = 'fixed';
-    tooltip.style.background = 'rgba(15,23,42,0.92)';
-    tooltip.style.color = '#fff';
-    tooltip.style.padding = '4px 8px';
-    tooltip.style.borderRadius = '4px';
-    tooltip.style.fontSize = '11px';
-    tooltip.style.pointerEvents = 'none';
-    tooltip.style.zIndex = '9999';
-    tooltip.style.display = 'none';
-    document.body.appendChild(tooltip);
-  }
-
-  for(let r=0; r<data.numCabH; r++){
-    for(let c=0; c<data.numCabW; c++){
-      const cell = document.createElement('div');
-      cell.className = 'cab-cell';
-
-      const fill = document.createElement('div');
-      fill.className = 'cab-fill';
-      cell.appendChild(fill);
-
-      const label = document.createElement('div');
-      label.className = 'label';
-      // You can switch to only column index if you prefer: `${c+1}`
-      label.textContent = `${r+1}×${c+1}`;
-      cell.appendChild(label);
-
-      // tooltip handlers
-      cell.addEventListener('mouseenter', e=>{
-        tooltip.textContent = `Cabinet ${r+1} × ${c+1} — Pixels: ${formatLarge(data.cabPixW)} × ${formatLarge(data.cabPixH)}`;
-        tooltip.style.display='block';
-      });
-      cell.addEventListener('mousemove', e=>{
-        tooltip.style.left = (e.clientX + 12) + 'px';
-        tooltip.style.top = (e.clientY + 12) + 'px';
-      });
-      cell.addEventListener('mouseleave', ()=> tooltip.style.display='none');
-
-      overlay.appendChild(cell);
-    }
-  }
-
-  // Update physical dimensions label
-  document.getElementById('visDimensions').textContent =
-    `${(data.finalW_mm/MM_PER_METER).toFixed(2)} m × ${(data.finalH_mm/MM_PER_METER).toFixed(2)} m`;
-
-  // Dynamic pixel density based on pitch
-  applyPixelDensity(data.pixelPitch_mm);
-}
-
-    function renderControllerConnections(data){
-      const svg = document.getElementById('connectionsSvg');
-      // clear
-      while(svg.firstChild) svg.removeChild(svg.firstChild);
-
-      const rectW = 40;
-      const rectH = 18;
-      const svgW = svg.viewBox.baseVal.width || 300;
-      const svgH = svg.viewBox.baseVal.height || 140;
-
-      const cx = svgW / 2;
-      const cy = 18;
-
-      const ctrlGrp = document.createElementNS('http://www.w3.org/2000/svg','g');
-      const circle = document.createElementNS('http://www.w3.org/2000/svg','rect');
-      circle.setAttribute('x', cx - rectW/2);
-      circle.setAttribute('y', cy - rectH/2);
-      circle.setAttribute('rx', 6);
-      circle.setAttribute('ry', 6);
-      circle.setAttribute('width', rectW);
-      circle.setAttribute('height', rectH);
-      circle.setAttribute('fill', '#ffffff');
-      circle.setAttribute('stroke', '#dfe9f5');
-      circle.setAttribute('stroke-width', '1');
-      ctrlGrp.appendChild(circle);
-      const txt = document.createElementNS('http://www.w3.org/2000/svg','text');
-      txt.setAttribute('x', cx);
-      txt.setAttribute('y', cy + 4);
-      txt.setAttribute('text-anchor','middle');
-      txt.setAttribute('font-size','9');
-      txt.setAttribute('fill','#0b3b84');
-      txt.setAttribute('font-weight','700');
-      txt.textContent = 'Controller';
-      ctrlGrp.appendChild(txt);
-      svg.appendChild(ctrlGrp);
-
-      const runs = Math.min(6, data.requiredPortsBuffered || 1);
-      const startY = cy + rectH/2;
-      const wallY = svgH - 12;
-      for(let i=0;i<runs;i++){
-        const x = (svgW / (runs+1)) * (i+1);
-        const line = document.createElementNS('http://www.w3.org/2000/svg','path');
-        const d = `M ${cx} ${startY} C ${cx} ${startY+12} ${x} ${startY+12} ${x} ${wallY}`;
-        line.setAttribute('d', d);
-        line.setAttribute('fill','none');
-        line.setAttribute('stroke', '#9fc7ff');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-linecap','round');
-        line.setAttribute('opacity','0.95');
-        svg.appendChild(line);
+      // 2. Show and play the calculate configuration video
+      if(transitionVideo) {
+          transitionVideo.style.display = 'block';
+          transitionVideo.currentTime = 0; // Rewind to start
+          transitionVideo.play().catch(e => console.log("Autoplay blocked for transition video:", e));
       }
 
-      document.getElementById('controllerBoxName').textContent = (data.controllerName || '--');
+      // 3. Wait for a short duration before rendering the final wall
+      const transitionDurationMs = 1500; // 1.5 seconds
+
+      setTimeout(() => {
+          // Proceed with the final rendering
+          updateResultsDisplay(data);
+
+      }, transitionDurationMs);
     }
 
-    /************************************************************************
-     * BOQ generation & preview (spare modules removed from BOQ display)
-     ************************************************************************/
+    // Dynamically scale pixel texture based on pixel pitch (mm)
+    function applyPixelDensity(pitchMm) {
+      // Safety clamp
+      const p = Math.max(0.8, Math.min(pitchMm || 2.5, 12));
+      // smaller pitch → finer pattern; larger pitch → coarser pattern
+      const size1 = Math.max(1.5, Math.min(p * 1.6, 7)); // main grid
+      const size2 = Math.max(0.8, size1 / 2); // secondary grid
+
+      document.querySelectorAll('.cab-fill').forEach(el => {
+        el.style.setProperty('--px-grid-size-1', `${size1}px`);
+        el.style.setProperty('--px-grid-size-2', `${size2}px`);
+      });
+    }
+
+    function renderCabinetOverlay(data){
+      const overlay = document.getElementById('cabinetOverlay');
+      const tooltip = getOrCreateTooltip();
+      
+      // Clear overlay content
+      overlay.innerHTML = '';
+      
+      const placeholder = document.getElementById('placeholderMessage');
+      if (placeholder) placeholder.style.display = 'none'; 
+
+      overlay.style.gridTemplateColumns = `repeat(${data.numCabW}, 1fr)`;
+      overlay.style.gridTemplateRows = `repeat(${data.numCabH}, 1fr)`;
+
+      // Create cells
+      for(let r=0; r<data.numCabH; r++){
+        for(let c=0; c<data.numCabW; c++){
+          const cell = document.createElement('div');
+          cell.classList.add('cab-cell');
+          
+          // Add the pixel texture overlay
+          const fill = document.createElement('div');
+          fill.classList.add('cab-fill');
+          cell.appendChild(fill);
+
+          // small top-left label
+          const label = document.createElement('div');
+          label.classList.add('label');
+          label.textContent = `${r*data.numCabW + c + 1}`; // Cabinet Index
+          cell.appendChild(label);
+
+          // tooltip handlers
+          cell.addEventListener('mouseenter', e=>{
+            tooltip.textContent = `Cabinet ${r+1} × ${c+1} — Pixels: ${formatLarge(data.cabPixW)} × ${formatLarge(data.cabPixH)}`;
+            tooltip.style.display='block';
+          });
+          cell.addEventListener('mousemove', e=>{
+            tooltip.style.left = (e.clientX + 12) + 'px';
+            tooltip.style.top = (e.clientY + 12) + 'px';
+          });
+          cell.addEventListener('mouseleave', ()=> tooltip.style.display='none');
+          overlay.appendChild(cell);
+        }
+      }
+
+      // Update physical dimensions label (ft)
+      const wFt = (data.finalW_mm / MM_PER_FOOT).toFixed(1);
+      const hFt = (data.finalH_mm / MM_PER_FOOT).toFixed(1);
+      document.getElementById('visDimensions').textContent = `${wFt} ft × ${hFt} ft`;
+
+      // Dynamic pixel density based on pitch
+      applyPixelDensity(data.pixelPitch_mm);
+    }
+
     function generateBOQList(data){
       const list = [];
-      const isModular = data.controllerType && data.controllerType.includes('Modular');
-      const productKey = data.productKey;
+      const isModular = data.controllerType === 'Modular';
+      const isIndoor = data.productKey.includes('indoor') || data.productKey.includes('cob');
 
-      // For indoor 2.0 & 2.5 we add Cabinet (PPL-ALD-CU) + Module separately
-      if(productKey === 'indoor_20' || productKey === 'indoor_25'){
-        const cabPart = PARTS_CATALOG['PPL-ALD-CU'] ? PARTS_CATALOG['PPL-ALD-CU'].part : 'PPL-ALD-CU';
-        list.push({ item:'Indoor Video Wall Cabinet Unit', partcode:cabPart, desc:'Indoor Cabinet (PPL-ALD-CU)', qty:data.totalCabinets, unit:'PCS' });
+      // LED Cabinets
+      const ledPartKey = LED_PART_KEY_BY_PRODUCT[data.productKey];
+      
+      // Special logic for SMD Indoor 2.0 / 2.5 (cabinet + module separately)
+      if(data.productKey === 'indoor_20' || data.productKey === 'indoor_25'){
+        list.push({ item:'Video Wall Cabinet Unit', partcode:PARTS_CATALOG['PPL-ALD-CU'].part, desc:PARTS_CATALOG['PPL-ALD-CU'].desc, qty:data.totalCabinets, unit:'PCS' });
+        
+        let modulePartKey, moduleDesc;
+        if(data.productKey === 'indoor_20'){
+            modulePartKey = 'PPL-SMD-MDL-20';
+            moduleDesc = 'SMD 2.0 mm Module';
+        } else { // indoor_25
+            modulePartKey = 'PDS-TP-15-T';
+            moduleDesc = 'SMD 2.5 mm Module';
+        }
 
-        let moduleKey = (productKey === 'indoor_20') ? 'PPL-SMD-MDL-20' : 'PDS-TP-15-T';
-        const modulePart = PARTS_CATALOG[moduleKey] ? PARTS_CATALOG[moduleKey].part : 'NA';
-        const moduleQty = data.totalModules;
-        list.push({ item:`Modules (${productKey === 'indoor_20' ? '2.0 mm' : '2.5 mm'})`, partcode:modulePart, desc: `${productKey === 'indoor_20' ? 'SMD 2.0 mm Module' : 'SMD 2.5 mm Module'}`, qty:moduleQty, unit:'PCS' });
+        const modulePart = PARTS_CATALOG[modulePartKey] ? PARTS_CATALOG[modulePartKey].part : 'NA';
+        list.push({ item:'LED Modules', partcode:modulePart, desc:moduleDesc, qty:data.totalModules, unit:'PCS' });
 
       } else {
-        const ledPartKey = LED_PART_KEY_BY_PRODUCT[productKey] || 'PPL-ALD-CU';
+        // Integrated cabinet (COB, SMD 1.86, Outdoor)
         const ledPart = PARTS_CATALOG[ledPartKey] ? PARTS_CATALOG[ledPartKey].part : 'NA';
         list.push({ item:'LED Cabinets (Including Modules)', partcode:ledPart, desc:data.productName, qty:data.totalCabinets, unit:'PCS' });
       }
-
-      // --- Spare modules removed from BOQ display (calculations remain unchanged) ---
-      // (previously we pushed a spare modules line here — removed per request)
 
       // Controller
       let ctrlKey = data.controllerName.split(' ')[0];
@@ -1018,11 +1111,11 @@ function renderCabinetOverlay(data){
         const outModel = data.outputCardModel || 'H_20 x RJ45 Sending Card';
         const outPart = PARTS_CATALOG[outModel] ? PARTS_CATALOG[outModel].part : 'NA';
         list.push({ item:'Output (Sending) Card', partcode:outPart, desc: outModel, qty:data.requiredSendCards, unit:'PCS' });
-
+        
         const inModel = data.inputCardModel || 'H_2 x HDMI 2.0 Input Card';
         const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'NA';
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 1, unit:'PCS' });
-        
+
         list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' });
       }
 
@@ -1030,88 +1123,53 @@ function renderCabinetOverlay(data){
       list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'Partner Scope', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
       list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'Not Required', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
 
-      const isOutdoor =
-        data.productKey === 'outdoor_40' ||
-        data.productKey === 'outdoor_667' ||
-        data.productKey === 'outdoor_80' ||
-        data.productKey === 'outdoor_100';
+      const isOutdoor = data.productKey.includes('outdoor');
+      const installPart = isOutdoor ? PARTS_CATALOG['ALED-INST-OU'].part : PARTS_CATALOG['ALED-INST-IN'].part;
+      const installDesc = isOutdoor ? PARTS_CATALOG['ALED-INST-OU'].desc : PARTS_CATALOG['ALED-INST-IN'].desc;
+      list.push({ item:'Installation & Configuration', partcode:installPart, desc:installDesc, qty:data.totalCabinets, unit:'Cabinet' });
 
-      if (isOutdoor) {
-        // Outdoor Installation
-        list.push({
-          item: 'Installation / Configuration (Outdoor)',
-          partcode: PARTS_CATALOG['ALED-INST-OU']
-            ? PARTS_CATALOG['ALED-INST-OU'].part
-            : 'ALED-INST-OU',
-          desc: 'Installation & configuration (outdoor)',
-          qty: data.totalCabinets,
-          unit: 'Per Cabinet'
-        });
-
-        // Outdoor Transportation – no part code (NA), LS
-        list.push({
-          item: 'Transportation (Outdoor)',
-          partcode: 'NA',
-          desc: 'Transportation (Outdoor) – LS',
-          qty: data.totalCabinets,
-          unit: 'LS'
-        });
-      } else {
-        // Indoor Installation
-        list.push({
-          item: 'Installation / Configuration (Indoor)',
-          partcode: PARTS_CATALOG['ALED-INST-IN']
-            ? PARTS_CATALOG['ALED-INST-IN'].part
-            : 'ALED-INST-IN',
-          desc: 'Installation & configuration (indoor)',
-          qty: data.totalCabinets,
-          unit: 'Per Cabinet'
-        });
-
-        // Indoor Transportation
-        list.push({
-          item: 'Transportation (Indoor)',
-          partcode: PARTS_CATALOG['ALED-TRS-IN-REG']
-            ? PARTS_CATALOG['ALED-TRS-IN-REG'].part
-            : 'ALED-TRS-IN-REG',
-          desc: 'Transportation (Indoor) - Per Cabinet',
-          qty: data.totalCabinets,
-          unit: 'Per Cabinet'
-        });
+      if(isIndoor && data.totalCabinets > 10){
+        list.push({ item:'Transportation - Regional', partcode: PARTS_CATALOG['ALED-TRS-IN-REG'] ? PARTS_CATALOG['ALED-TRS-IN-REG'].part : 'NA', desc: 'Transportation (Indoor) - Per Cabinet', qty: data.totalCabinets, unit: 'Cabinet' });
       }
 
-      // Total Power Cables (same for indoor & outdoor)
-      list.push({
-        item: 'Total Power Cables (Input Runs)',
-        partcode: 'Partner Scope',
-        desc: '2.5 sq.mm × 3C FRLS cable on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)',
-        qty: data.requiredPowerRuns,
-        unit: 'Runs'
-      });
+      // Power Runs
+      list.push({ item: 'Power Supply Runs', partcode: 'Partner Scope', desc: 'Dedicated power circuits based on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)', qty: data.requiredPowerRuns, unit: 'Runs' });
 
       return list;
     }
+    
+    function renderBOQPreview(data){
+      const list = generateBOQList(data);
+      let html = `<div class="details-panel" style="margin-top:12px"><div style="font-weight:700;color:var(--brand);margin-bottom:8px">Bill of Quantities (Compact View)</div>`;
+      html += `<style>#boqPreviewTable th, #boqPreviewTable td { font-size: 9pt; padding: 6px 8px; } #boqPreviewTable { width: 100%; border-collapse: collapse; }</style>`;
+      
+      // Only 6 columns needed now: S.No, Item, Description, Partcode, Qty, Unit
+      html += `<table id="boqPreviewTable"><thead><tr>
+        <th style="width:3%">S.No</th> 
+        <th style="width:20%">Item</th> 
+        <th style="width:34%">Description</th> 
+        <th style="width:15%">Partcode</th> 
+        <th style="width:5%; text-align:right">Qty</th> 
+        <th style="width:8%">Unit</th> 
+        </tr></thead><tbody>`;
 
-function renderBOQPreview(data){
-  const list = generateBOQList(data);
-  let html = `<div class="details-panel" style="margin-top:12px"><div style="font-weight:700;color:var(--brand);margin-bottom:8px">Bill of Quantities (Compact View)</div>`;
-  html += `<style>#boqPreviewTable th, #boqPreviewTable td { font-size: 9pt; padding: 6px 8px; } #boqPreviewTable { width: 100%; border-collapse: collapse; }</style>`;
-  // Only 6 columns needed now: S.No, Item, Description, Partcode, Qty, Unit
-  html += `<table id="boqPreviewTable"><thead><tr> <th style="width:3%">S.No</th> <th style="width:20%">Item</th> <th style="width:34%">Description</th> <th style="width:15%">Partcode</th> <th style="width:5%; text-align:right">Qty</th> <th style="width:8%">Unit</th> </tr></thead><tbody>`;
-  list.forEach((row, i)=>{
-    // Removed two empty <td> for price data
-    html += `<tr><td>${i+1}</td><td>${escapeHtml(row.item)}</td><td>${escapeHtml(row.desc)}</td><td>${escapeHtml(row.partcode)}</td><td class="right">${row.qty}</td><td>${row.unit}</td></tr>`;
-  });
-  // --- REMOVED FOOTER ROWS ---
-  html += `</tbody></table></div>`;
-  document.getElementById('boqPreviewContainer').innerHTML = html;
-}
+      list.forEach((row, i)=>{
+        html += `<tr><td>${i+1}</td><td>${escapeHtml(row.item)}</td><td>${escapeHtml(row.desc)}</td><td>${escapeHtml(row.partcode)}</td><td class="right">${row.qty}</td><td>${row.unit}</td></tr>`;
+      });
+      
+      html += `</tbody></table></div>`;
+      document.getElementById('boqPreviewContainer').innerHTML = html;
+    }
 
     /************************************************************************
      * Modals: controller edit
      ************************************************************************/
     function openControllerModal(){
-      if(!finalCalculationData || !finalCalculationData.totalPixels){ document.getElementById('errorMessage').textContent='Please calculate first.'; document.getElementById('errorMessage').style.display='block'; return; }
+      if(!finalCalculationData || !finalCalculationData.totalPixels){
+        document.getElementById('errorMessage').textContent='Please calculate first.';
+        document.getElementById('errorMessage').style.display='block';
+        return;
+      }
       populateModalControllers();
       populateModalOutputCards();
       populateModalInputCards();
@@ -1122,77 +1180,135 @@ function renderBOQPreview(data){
 
       const outModel = finalCalculationData.outputCardModel || 'H_20 x RJ45 Sending Card';
       const outSel = document.getElementById('modalOutputCardModel');
-      Array.from(outSel.options).forEach(o=>{ if(o.value.startsWith(outModel)) outSel.value=o.value; });
-
+      Array.from(outSel.options).forEach(o=>{
+        if(o.value.startsWith(outModel)) outSel.value=o.value;
+      });
       document.getElementById('modalMaxPortsPerCard').value = outSel.value.split('|')[1] || '';
-      document.getElementById('modalInputCardModel').value = finalCalculationData.inputCardModel || 'H_1xHDMI';
+
+      document.getElementById('modalInputCardModel').value = finalCalculationData.inputCardModel || 'H_2 x HDMI 2.0 Input Card';
       document.getElementById('modalInputCardQty').value = finalCalculationData.inputCardQty || 2;
       document.getElementById('modalSplicerSolution').value = finalCalculationData.splicerSolution || '';
 
+      // Show/hide H-series fields based on selected controller
       onModalControllerChange();
-      document.getElementById('controllerModal').style.display='flex';
+
+      document.getElementById('controllerModal').style.display = 'flex';
     }
-    function closeControllerModal(){ document.getElementById('controllerModal').style.display='none'; }
+
+    function closeControllerModal(){
+      document.getElementById('controllerModal').style.display = 'none';
+      if(tooltip) tooltip.style.display = 'none';
+    }
+
+    function populateModalControllers(){
+      const select = document.getElementById('modalControllerModel');
+      select.innerHTML = '';
+      CONTROLLER_MODELS.sort((a,b)=>a.priority-b.priority).forEach(c=>{
+        const opt = document.createElement('option');
+        opt.value = c.name;
+        opt.textContent = `${c.name} (${c.type}) - ${formatLarge(c.maxPixels)}px max`;
+        select.appendChild(opt);
+      });
+    }
+
+    function populateModalOutputCards(){
+      const select = document.getElementById('modalOutputCardModel');
+      select.innerHTML = `
+        <option value="H_20 x RJ45 Sending Card|20">20x RJ45 (20 Ports)</option>
+        <option value="H_16_RJ45|16">16x RJ45 + 2x Fiber (16 Ports)</option>
+        <option value="H_4_HDMI_Out|4">4x HDMI Output (4 Ports)</option>
+      `;
+    }
+
+    function populateModalInputCards(){
+      const select = document.getElementById('modalInputCardModel');
+      select.innerHTML = `
+        <option value="H_1 x HDMI 2.0 Input Card">1x HDMI 2.0 Input Card</option>
+        <option value="H_2 x HDMI 2.0 Input Card">2x HDMI 2.0 Input Card</option>
+        <option value="H_4 x HDMI Input Card">4x HDMI Input Card</option>
+      `;
+    }
 
     function onModalControllerChange(){
-      const sel = document.getElementById('modalControllerModel').value;
-      const ctrl = CONTROLLER_MODELS.find(c=>c.name === sel);
-      const isH = ctrl && ctrl.type === 'Modular';
-      document.querySelectorAll('.hseries-fields input, .hseries-fields select').forEach(el=>{
-        el.disabled = !isH;
-        el.parentNode.parentNode.classList.toggle('hseries-only', !isH);
-      });
-      document.querySelectorAll('.hseries-fields > .input-group').forEach(el => {
-          el.style.display = isH ? 'block' : 'none';
-      });
-      document.querySelector('.hseries-fields > .input-group:last-child').style.display = isH ? 'flex' : 'none';
-      updatePortsFromOutputCard();
+      const model = document.getElementById('modalControllerModel').value;
+      const controller = CONTROLLER_MODELS.find(c=>c.name===model);
+      const hSeriesFields = document.querySelector('.hseries-fields');
+      if(controller && controller.type === 'Modular'){
+        hSeriesFields.style.display = 'block';
+        document.querySelectorAll('.hseries-only').forEach(el=>el.style.display='flex');
+      } else {
+        hSeriesFields.style.display = 'none';
+        document.querySelectorAll('.hseries-only').forEach(el=>el.style.display='none');
+      }
+    }
+
+    function updatePortsFromOutputCard(){
+      const select = document.getElementById('modalOutputCardModel');
+      const [model, ports] = select.value.split('|');
+      document.getElementById('modalMaxPortsPerCard').value = ports;
     }
 
     function applyModalChanges(){
-      const selectedController = document.getElementById('modalControllerModel').value;
-      const outputCardVal = document.getElementById('modalOutputCardModel').value.split('|')[0];
-      const outputCardPorts = parseInt(document.getElementById('modalOutputCardModel').value.split('|')[1] || '20', 10);
-      const inputCardModel = document.getElementById('modalInputCardModel').value;
-      const inputCardQty = parseInt(document.getElementById('modalInputCardQty').value || '2', 10);
-      const splicer = document.getElementById('modalSplicerSolution').value;
+      const controllerName = document.getElementById('modalControllerModel').value;
+      const controller = CONTROLLER_MODELS.find(c=>c.name===controllerName);
 
-      finalCalculationData.controllerOverrideName = selectedController;
-      finalCalculationData.outputCardModel = outputCardVal;
-      finalCalculationData.outputCardPorts = outputCardPorts;
-      finalCalculationData.inputCardModel = inputCardModel;
-      finalCalculationData.inputCardQty = inputCardQty;
-      finalCalculationData.splicerSolution = splicer;
-
+      if(controller.type === 'Modular'){
+        const [outputCardModel] = document.getElementById('modalOutputCardModel').value.split('|');
+        finalCalculationData.controllerOverrideName = controllerName;
+        finalCalculationData.outputCardModel = outputCardModel;
+        finalCalculationData.inputCardModel = document.getElementById('modalInputCardModel').value;
+        finalCalculationData.inputCardQty = parseInt(document.getElementById('modalInputCardQty').value || 1);
+        finalCalculationData.splicerSolution = document.getElementById('modalSplicerSolution').value;
+      } else {
+        finalCalculationData.controllerOverrideName = controllerName;
+        // Clear modular-specific overrides for All-in-One
+        delete finalCalculationData.outputCardModel;
+        delete finalCalculationData.inputCardModel;
+        delete finalCalculationData.inputCardQty;
+        delete finalCalculationData.splicerSolution;
+      }
+      
       closeControllerModal();
-      showVisualization();
+      // Re-calculate and re-render the visualization with the new controller settings
+      showVisualization(); 
     }
 
     /************************************************************************
-     * Contact modal & PDF / CSV export (PDF uses wood color for table head)
+     * Modals: contact / PDF download
      ************************************************************************/
     function openContactModal(){
-      if(!finalCalculationData || !finalCalculationData.totalPixels){ document.getElementById('errorMessage').textContent='Please calculate configuration first.'; document.getElementById('errorMessage').style.display='block'; return; }
+      document.getElementById('contactModal').style.display = 'flex';
+      document.getElementById('contactError').textContent='';
       document.getElementById('downloadEmail').value = contactInfo.email || '';
       document.getElementById('downloadPhone').value = contactInfo.phone || '';
-      document.getElementById('contactError').style.display='none';
-      document.getElementById('contactModal').style.display='flex';
     }
-    function closeContactModal(){ document.getElementById('contactModal').style.display='none'; }
+
+    function closeContactModal(){
+      document.getElementById('contactModal').style.display = 'none';
+    }
 
     function handleDownloadRequest(){
       const e = document.getElementById('downloadEmail').value.trim();
       const p = document.getElementById('downloadPhone').value.trim();
+
+      document.getElementById('contactError').textContent='';
+
       if(e){
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!re.test(e)){ document.getElementById('contactError').textContent='Invalid email'; document.getElementById('contactError').style.display='block'; return; }
+        if(!re.test(e)){
+          document.getElementById('contactError').textContent='Invalid email';
+          document.getElementById('contactError').style.display='block';
+          return;
+        }
       }
-      contactInfo.email = e; contactInfo.phone = p;
+
+      contactInfo.email = e;
+      contactInfo.phone = p;
       closeContactModal();
       proceedToDownloadPdf();
     }
 
-    // Full PDF generation with LINE_HEIGHT_PDF used consistently
+    // Full PDF generation with LINE_HEIGHT_PDF used consistently (UPDATED)
     function proceedToDownloadPdf(){
       const data = finalCalculationData;
       const { jsPDF } = window.jspdf;
@@ -1200,13 +1316,19 @@ function renderBOQPreview(data){
       const pageW = doc.internal.pageSize.getWidth();
       let y = 18;
       const margin = 14;
-      const LINE = LINE_HEIGHT_PDF;
+      const LINE = LINE_HEIGHT_PDF; // uniform PDF line spacing
       // wood color rgb (#A67C52)
       const woodRGB = [166,124,82];
       const primaryRGB = [31,41,55];
       const finalAreaSqFt = m2ToSqFt(data.finalArea_m2);
+      const finalW_m = mmToM(data.finalW_mm).toFixed(2);
+      const finalH_m = mmToM(data.finalH_mm).toFixed(2);
+      const finalW_ft = mToFt(finalW_m).toFixed(2);
+      const finalH_ft = mToFt(finalH_m).toFixed(2);
+      const minView_ft = mToFt(data.minViewingDistance_m).toFixed(2);
 
       const bodyFontSize = 8;
+
       doc.setFont('Helvetica','normal');
       doc.setFontSize(bodyFontSize);
 
@@ -1215,7 +1337,7 @@ function renderBOQPreview(data){
       doc.setFontSize(13);
       doc.setFont('Helvetica','bold');
       doc.text('PeopleLink LED Video Wall - Project Proposal', pageW/2, 12, { align:'center' });
-
+      
       doc.setFontSize(bodyFontSize);
       doc.setFont('Helvetica','normal');
       doc.setTextColor(60,60,60);
@@ -1232,75 +1354,90 @@ function renderBOQPreview(data){
       y += 6;
 
       doc.setFontSize(bodyFontSize);
-      doc.setFont('Helvetica','bold');
-      doc.text('Model:', margin, y);
       doc.setFont('Helvetica','normal');
-      const pitchString = data.pixelPitch_mm.toFixed(data.pixelPitch_mm >= 10 ? 0 : 2).replace(/\.00$/, '');
-      const modelType = data.productName.includes('COB') ? 'COB' : 'SMD';
-      const formattedModelName = `PeopleLink ${modelType} P${pitchString}`;
-      doc.text(formattedModelName, margin + 45, y);
-      y += LINE;
+      doc.setTextColor(31,41,55);
 
-      // Dimensions and Resolution (two columns) - remove "Final" word
-      const w_m = (data.finalW_mm/MM_PER_METER).toFixed(2);
-      const h_m = (data.finalH_mm/MM_PER_METER).toFixed(2);
-      const w_ft = (data.finalW_mm/MM_PER_FOOT).toFixed(2);
-      const h_ft = (data.finalH_mm/MM_PER_FOOT).toFixed(2);
-      const topDims = `${w_m} × ${h_m} m / ${w_ft} × ${h_ft} ft`;
-      const topRes = `${formatLarge(data.finalResW)} × ${formatLarge(data.finalResH)}`;
+      const col1KeyX = margin;
+      const col1ValueX = col1KeyX + 45;
+      const col2KeyX = pageW / 2 + 5;
+      const col2ValueX = col2KeyX + 45;
 
-      doc.setFont('Helvetica','bold'); doc.text('Actual Dimensions (WxH):', margin, y);
-      doc.setFont('Helvetica','normal'); doc.text(topDims, margin + 45, y);
-      doc.setFont('Helvetica','bold'); doc.text('Actual Resolution (WxH):', pageW / 2 + 5, y);
-      doc.setFont('Helvetica','normal'); doc.text(topRes, pageW / 2 + 5 + 45, y);
-      y += LINE;
-
-      const specs = [
-        ['Pixel Pitch:', `${data.pixelPitch_mm} mm`],
-        ['Aspect Ratio:', `${data.aspectRatioText}`],
-        ['Diagonal:', `${data.finalDiagonal_in} in`],
-        ['Pixel Density:', `${formatLarge(data.pixelDensity)} px/m²`],
-        ['Min Viewing Distance:', `${data.minViewing_m} m / ${data.minViewing_ft} ft`],
-        ['Final Area:', `${data.finalArea_m2.toFixed(2)} m² / ${finalAreaSqFt.toFixed(2)} sq.ft`],
-        ['Total Pixels:', `${formatLarge(data.totalPixels)}`],
-        ['Total Cabinets:', `${data.numCabW} × ${data.numCabH} (${data.totalCabinets})`],
-        ['Total Modules Required:', `${data.totalModules} (${data.modulesPerCab} per cabinet)`],
-        ['Cabinet Size (WxH):', `${data.cabinetW_mm} mm × ${data.cabinetH_mm} mm`],
-        ['Cabinet Pixels (WxH):', `${formatLarge(data.cabPixW)} × ${formatLarge(data.cabPixH)}`],
-        ['Design Power (Est.):', `${fmt(data.designPowerW,0)} W (15% buffer)`],
-        ['Design Weight (Est.):', `${fmt(data.designWeight,1)} kg (15% buffer)`]
+      const col1Items = [
+        ['Model:', data.productName],
+        ['Pixel Pitch:', `${data.pixelPitch_mm.toFixed(2)} mm`],
+        ['Actual Dimensions (WxH):', `${finalW_m} m × ${finalH_m} m / ${finalW_ft} ft × ${finalH_ft} ft`], // UPDATED
+        ['Actual Resolution (WxH):', `${formatLarge(data.finalResW)} × ${formatLarge(data.finalResH)}`],
+        ['Diagonal:', `${Math.round(data.finalDiagonal_in)}\"`], // UPDATED
+        ['Aspect Ratio:', data.aspectRatioText],
+        ['Pixel Density:', `${fmt(data.pixelDensity,0)} pixels/m²`],
       ];
 
-      const col1Items = specs.slice(0,5);
-      const col2Items = specs.slice(5);
-      const col1KeyX = margin; const col1ValueX = col1KeyX + 45;
-      const col2KeyX = pageW / 2 + 5; const col2ValueX = col2KeyX + 45;
+      const col2Items = [
+        ['Min Viewing Distance:', `${data.minViewingDistance_m.toFixed(2)} m / ${minView_ft} ft`], // UPDATED
+        ['Final Area:', `${data.finalArea_m2.toFixed(2)} m² / ${finalAreaSqFt.toFixed(2)} sq.ft`],
+        ['Total Pixels:', formatLarge(data.totalPixels)],
+        ['Cabinets (WxH):', `${data.numCabW} × ${data.numCabH} (${data.totalCabinets})`],
+        ['Total Modules:', `${data.totalModules} (${data.modulesPerCab} per cabinet)`],
+        ['Cabinet Size (mm):', `${data.cabinetW_mm}mm x ${data.cabinetH_mm}mm`],
+        ['Module Size (mm):', data.moduleDims], // NEW
+        ['Cabinet Pixels (WxH):', `${formatLarge(data.cabPixW)} × ${formatLarge(data.cabPixH)}`],
+        ['Brightness (Nits):', data.nitsRange], // NEW
+      ];
+
       let colY = y;
       col1Items.forEach(s => {
-        doc.setFont('Helvetica','bold'); doc.text(s[0], col1KeyX, colY);
-        doc.setFont('Helvetica','normal'); doc.text(s[1], col1ValueX, colY);
+        doc.setFont('Helvetica','bold');
+        doc.text(s[0], col1KeyX, colY);
+        doc.setFont('Helvetica','normal');
+        doc.text(s[1], col1ValueX, colY);
         colY += LINE;
       });
 
       let col2Y = y;
       col2Items.forEach(s => {
-        doc.setFont('Helvetica','bold'); doc.text(s[0], col2KeyX, col2Y);
-        doc.setFont('Helvetica','normal'); doc.text(s[1], col2ValueX, col2Y);
+        doc.setFont('Helvetica','bold');
+        doc.text(s[0], col2KeyX, col2Y);
+        doc.setFont('Helvetica','normal');
+        doc.text(s[1], col2ValueX, col2Y);
         col2Y += LINE;
       });
 
       y = Math.max(colY, col2Y) + LINE;
 
+      const powerWeightItems = [
+        ['Design Power (Est.):', `${fmt(data.designPowerW,0)} W`],
+        ['Design Weight (Est.):', `${fmt(data.designWeight,1)} kg`],
+      ];
+      
+      doc.setFont('Helvetica','bold');
+      doc.text(powerWeightItems[0][0], col1KeyX, y);
+      doc.setFont('Helvetica','normal');
+      doc.text(powerWeightItems[0][1], col1ValueX, y);
+      y += LINE;
+
+      doc.setFont('Helvetica','bold');
+      doc.text(powerWeightItems[1][0], col1KeyX, y);
+      doc.setFont('Helvetica','normal');
+      doc.text(powerWeightItems[1][1], col1ValueX, y);
+      y += LINE * 2;
+
+
       // Section 2: BOQ
-      doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('2. Bill of Quantities (BOQ)', margin, y); y += 6;
-      if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
-      // ... existing code ...
-const boqList = generateBOQList(data);
-// --- MODIFICATION 1: Removed price headers ---
-const boqHead = [['S.No','Item','Description','Partcode','Qty','Unit']];
-// --- MODIFICATION 2: Removed empty strings for price data ---
-const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, String(r.qty), r.unit]);
-// ... existing code ...
+      if(y > doc.internal.pageSize.getHeight() - 70){
+        doc.addPage();
+        y = margin;
+      }
+      doc.setTextColor(...primaryRGB);
+      doc.setFontSize(10);
+      doc.setFont('Helvetica','bold');
+      doc.text('2. Bill of Quantities (BOQ)', margin, y);
+      y += 6;
+
+      const boqList = generateBOQList(data);
+      // Removed price headers
+      const boqHead = [['S.No','Item','Description','Partcode','Qty','Unit']]; 
+      // Removed empty strings for price data
+      const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, String(r.qty), r.unit]); 
 
       doc.autoTable({
         startY: y,
@@ -1308,171 +1445,272 @@ const boqBody = boqList.map((r,i)=>[String(i+1), r.item, r.desc, r.partcode, Str
         body: boqBody,
         margin: { left: margin, right: margin },
         theme: 'grid',
-        styles: { fontSize: bodyFontSize, cellPadding:1.5, font: 'Helvetica' },
-        headStyles: { fillColor: woodRGB, textColor: 255, fontStyle: 'bold' },
-        columnStyles: { 4: { halign: 'right' }, 6: { halign: 'right' }, 7: { halign: 'right' } }
+        styles: { 
+          fontSize: bodyFontSize, 
+          cellPadding:1.5, 
+          font: 'Helvetica' 
+        },
+        headStyles: { 
+          fillColor: woodRGB, 
+          textColor: 255, 
+          fontStyle: 'bold', 
+          lineWidth: 0.2, 
+          lineColor: 255 
+        },
+        bodyStyles: { 
+          textColor: [55, 65, 81], 
+          lineWidth: 0.1, 
+          lineColor: [209, 213, 219] 
+        },
+        columnStyles: {
+          4: {halign: 'right'} // Qty column
+        }
       });
-
-      y = doc.lastAutoTable.finalY + LINE;
-
-
-      // Section 3: Terms & Conditions
-      if(y > doc.internal.pageSize.getHeight() - 70){ doc.addPage(); y = margin; }
+      y = doc.autoTable.previous.finalY + LINE * 2;
       
-      doc.setTextColor(...primaryRGB); doc.setFontSize(10); doc.setFont('Helvetica','bold'); doc.text('3. Terms & Conditions', margin, y); y += 6;
-      doc.setFontSize(bodyFontSize); doc.setFont('Helvetica','normal'); doc.setTextColor(50,50,50);
-      const terms = [
-        "1) Price Validity: This quotation is valid for 30 days from the date of issue.",
-	"2) Taxes: Applicable GST @ 18% will be charged extra on the total invoice value.",
-        "3) Payment Terms: 100% advance along with Purchase Order.",
-        "4) All civil work, wall preparation, fabrication, primary mounting/hanging structure, welding, conduiting, and site readiness activities are the Client/Partner’s responsibility, unless specifically included in the BOQ.",
-        "5) Power & Earthing Requirements: Client must provide dedicated stable power, proper earthing, and required UPS/MCB/Stabilizer as per LED wall load.",
-        "6) Cabling: Long-distance LAN and power cabling from controller to LED wall is under Client scope.",
-        "7) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
-        "8) Warranty: 1-year OEM warranty excluding physical damage, unauthorized repairs, and electrical surges.",
-        "9) Installation Access: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
-        "10) Transportation: Transportation charges are extra and will be applied as per actuals."
+      // Section 3: Controller & Connectivity
+      if(y > doc.internal.pageSize.getHeight() - 70){
+        doc.addPage();
+        y = margin;
+      }
+      doc.setTextColor(...primaryRGB);
+      doc.setFontSize(10);
+      doc.setFont('Helvetica','bold');
+      doc.text('3. Controller & Connectivity', margin, y);
+      y += 6;
+      doc.setFontSize(bodyFontSize);
+      doc.setFont('Helvetica','normal');
+      doc.setTextColor(31,41,55);
+
+      const ctrlItems = [
+        ['Controller Model:', data.controllerName + (data.controllerType ? ` (${data.controllerType})` : '')],
+        ['Ports Required (Long LAN):', `${data.requiredPortsBuffered} Ports`],
+        ['Short Ethernet (Inter-Cabinet):', `${data.requiredShortEthernet} (Included with Cabinet)`],
+        ['Design Power Runs Required:', `${data.requiredPowerRuns}`],
       ];
+
+      if(data.controllerType === 'Modular'){
+        ctrlItems.splice(1, 0, 
+          ['Modular Sending Cards:', `${data.requiredSendCards} x ${data.outputCardModel}`],
+          ['Modular Input Card(s):', `${data.inputCardQty} x ${data.inputCardModel}`],
+          ['Splicer/Frame Solution:', data.splicerSolution || 'NA']
+        );
+      }
+
+      let ctrlY = y;
+      ctrlItems.forEach(s => {
+        doc.setFont('Helvetica','bold');
+        doc.text(s[0], col1KeyX, ctrlY);
+        doc.setFont('Helvetica','normal');
+        doc.text(s[1], col1ValueX, ctrlY);
+        ctrlY += LINE;
+      });
+      y = ctrlY + LINE;
+
+
+      // Section 4: Terms
+      if(y > doc.internal.pageSize.getHeight() - 70){
+        doc.addPage();
+        y = margin;
+      }
+      doc.setTextColor(...primaryRGB);
+      doc.setFontSize(10);
+      doc.setFont('Helvetica','bold');
+      doc.text('4. Terms & Conditions', margin, y);
+      y += 6;
+      doc.setFontSize(bodyFontSize - 1);
+      doc.setFont('Helvetica','normal');
+      doc.setTextColor(60,60,60);
+
+      const terms = [
+        "1) Price Validity: This proposal is valid for 30 days from the date of issue.",
+        "2) Taxes: GST @ 18% is applicable extra on the total value of the BOQ.",
+        "3) Payment Terms: 100% advance along with Purchase Order.",
+        "4) Power: Final electrical wiring to the video wall's power inputs is excluded. Client to provide required power sockets/breakers at the installation point.",
+        "5) Structure: Wall mount/ Pole Mount/ hanging structure required for LED cabinet installation is excluded. Client is responsible for procuring and installing the structure.",
+        "6) Controller Cables: Long-distance fiber or CAT cables for connecting the controller to the wall are excluded and are in the partner/client scope.",
+        "7) Power Backup: UPS/Power backup for the LED wall is excluded.",
+        "8) Dead Pixel Standard: Up to 0.3% dead pixels/blind spots acceptable per industry standards.",
+        "9) Warranty: 1-Year comprehensive warranty on the LED wall (including cabinets, modules, and controller) from the date of installation. Warranty excludes physical damage and natural calamities.",
+	"10) Site Readiness: Client must provide unrestricted site access, installation permissions, and required ladder scaffolding/boom lift/lifting equipment if installation height demands.",
+	"11) Installation: On-site Installation, Testing, and Commissioning are included as separate line items in the BOQ. Any charges related to civil work, electrical work, or structural mounting/frame are excluded and are client's scope.",
+	"12) Transportation: Transportation charges are extra and will be applied as per actuals."
+      ];
+
       terms.forEach(t=>{
         const split = doc.splitTextToSize(t, pageW - margin*2);
         doc.text(split, margin, y);
         y += (split.length * LINE);
-        if(y > doc.internal.pageSize.getHeight() - 30){ doc.addPage(); y = margin; }
+        if(y > doc.internal.pageSize.getHeight() - 30){
+          doc.addPage();
+          y = margin;
+        }
       });
 
-      doc.setFontSize(7); doc.setTextColor(150,170,200);
+      doc.setFontSize(7);
+      doc.setTextColor(150,170,200);
       doc.text('Disclaimer: This document is system-generated. All specifications and calculations must be validated with the Pre-Sales team prior to finalization or execution.', margin, doc.internal.pageSize.getHeight() - 15);
       doc.text('© 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights revered', pageW/2, doc.internal.pageSize.getHeight() - 8, { align:'center' });
 
-     // Pixel pitch label: converts 1.5625 → "1.56P", 2.0 → "2P"
-const pitchLabel = data.pixelPitch_mm
-  ? data.pixelPitch_mm.toFixed(2).replace(/\.00$/, '') + "P"
-  : "NA";
+      // Pixel pitch label: converts 1.5625 → "1.56P", 2.0 → "2P"
+      const pitchLabel = data.pixelPitch_mm ? data.pixelPitch_mm.toFixed(2).replace(/\.00$/, '') + "P" : "NA";
+      // Convert mm → ft
+      const wFt_fn = (data.finalW_mm / 304.8).toFixed(1);
+      const hFt_fn = (data.finalH_mm / 304.8).toFixed(1);
+      // LED type
+      const wallType = data.ledType ? data.ledType.toUpperCase() : "LED";
+      // Final filename → PeopleLink_COB_1.56P_16x9ft.pdf
+      const filename = `PeopleLink_${wallType}_${pitchLabel}_${wFt_fn}x${hFt_fn}ft.pdf`;
 
-// Convert mm → ft
-const wFt = (data.finalW_mm / 304.8).toFixed(1);
-const hFt = (data.finalH_mm / 304.8).toFixed(1);
-
-// LED type
-const wallType = data.ledType ? data.ledType.toUpperCase() : "LED";
-
-// Final filename → PeopleLink_COB_1.56P_16x9ft.pdf
-const filename = `PeopleLink_${wallType}_${pitchLabel}_${wFt}x${hFt}ft.pdf`;
-
-doc.save(filename);
-
+      doc.save(filename);
     }
 
     /************************************************************************
      * CSV export
      ************************************************************************/
-function downloadBOQCSV(){
-  const d = finalCalculationData;
-  if(!d || !d.totalPixels){
-    alert('Please calculate configuration first.');
-    return;
-  }
-  const list = generateBOQList(d);
-  
-  let csv = '';
+    function downloadBOQCSV(){
+      if(!finalCalculationData || !finalCalculationData.totalCabinets){
+        document.getElementById('errorMessage').textContent='Please calculate first.';
+        document.getElementById('errorMessage').style.display='block';
+        return;
+      }
+      const boqList = generateBOQList(finalCalculationData);
+      let csv = "S.No,Item,Description,Partcode,Qty,Unit\n";
+      boqList.forEach((row, i)=>{
+        csv += `${i+1},"${row.item}","${row.desc}","${row.partcode}",${row.qty},"${row.unit}"\n`;
+      });
 
-  // 1. HEADER: Only the BOQ columns, without price
-  csv += 'S.No,"Item","Description","Partcode","Qty","Unit"\n';
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.setAttribute("href", url);
 
-  // 2. BOQ ROWS: The core data rows. Use JSON.stringify and replace surrounding quotes 
-  // to ensure proper escaping of quotes within the data itself.
-  list.forEach((row,i)=>{
-    // Stringify and slice/replace to ensure a clean quoted string that handles internal quotes
-    const item = JSON.stringify(row.item).slice(1, -1).replace(/"/g, '""');
-    const desc = JSON.stringify(row.desc).slice(1, -1).replace(/"/g, '""');
+      const pitchLabel = finalCalculationData.pixelPitch_mm ? finalCalculationData.pixelPitch_mm.toFixed(2).replace(/\.00$/, '') + "P" : "NA";
+      const wFt = (finalCalculationData.finalW_mm / 304.8).toFixed(1);
+      const hFt = (finalCalculationData.finalH_mm / 304.8).toFixed(1);
 
-    // Use double quotes around string data to contain commas/special characters
-    csv += `${i+1},"${item}","${desc}","${row.partcode}",${row.qty},"${row.unit}"\n`;
-  });
-  
-  // No summary or footer
+      link.setAttribute("download", `PeopleLink_BOQ_${pitchLabel}_${wFt}x${hFt}ft.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  if (link.download !== undefined) { 
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `PeopleLink_LED_BOQ_Only_${d.finalResW}x${d.finalResH}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-}
     /************************************************************************
-     * Spec color application helper (label vs value colours)
+     * Form and UI Controls
      ************************************************************************/
+    function toggleMeasurementFields(){
+      const unit = document.getElementById('unit').value;
+      const wGroup = document.getElementById('widthGroup');
+      const hGroup = document.getElementById('heightGroup');
+      const dGroup = document.getElementById('diagonalGroup');
+      const wLabel = document.getElementById('widthLabel');
+      const hLabel = document.getElementById('heightLabel');
+
+      wGroup.classList.remove('hidden');
+      hGroup.classList.remove('hidden');
+      dGroup.classList.add('hidden');
+
+      if(unit === 'meters'){
+        wLabel.textContent = 'Desired Width (m)';
+        hLabel.textContent = 'Desired Height (m)';
+        document.getElementById('width').min = 0.5;
+        document.getElementById('height').min = 0.5;
+      } else if(unit === 'feet'){
+        wLabel.textContent = 'Desired Width (ft)';
+        hLabel.textContent = 'Desired Height (ft)';
+        document.getElementById('width').min = 1.0;
+        document.getElementById('height').min = 1.0;
+      } else if(unit === 'inches'){
+        wGroup.classList.add('hidden');
+        hGroup.classList.add('hidden');
+        dGroup.classList.remove('hidden');
+      } else {
+        wLabel.textContent = 'Desired Width (m)';
+        hLabel.textContent = 'Desired Height (m)';
+        document.getElementById('width').min = 0;
+        document.getElementById('height').min = 0;
+      }
+    }
+
     function applySpecColors(){
       const mapping = {
         'Actual Resolution (WxH)': 'value-viz',
         'Total Pixels': 'value-viz',
         'Pixel Density': 'value-viz',
-        'Cabinet Pixels (WxH)': 'value-viz',
-
         'Cabinets (WxH)': 'value-wood',
         'Total Modules': 'value-wood',
-        'Cabinet Size (mm)': 'value-wood',
-        'Installation / Configuration': 'value-wood',
-
-        'Final Area (m²/sq.ft)': 'value-wood',
         'Design Power (Est.)': 'value-wood',
         'Design Weight (Est.)': 'value-wood',
-
         'Aspect Ratio': 'value-muted',
         'Model': 'value-default',
         'Pixel Pitch': 'value-default',
         'Min Viewing Distance': 'value-default',
         'Actual Dimensions (WxH)': 'value-default',
-        'Diagonal': 'value-default'
+        'Diagonal': 'value-default',
+        'Brightness (Nits)': 'value-default',
+        'Module Size (mm)': 'value-default'
       };
 
       document.querySelectorAll('.spec-item').forEach(item=>{
         const keyEl = item.querySelector('span:first-child');
         const valEl = item.querySelector('span:last-child');
         if(!keyEl || !valEl) return;
-        const key = keyEl.textContent.trim();
+
+        const key = keyEl.textContent.trim().replace(':','');
         let cls = mapping[key] || 'value-default';
 
         if(key === 'Design Power (Est.)'){
           const txt = (valEl.textContent || '').replace(/[, ]/g,'');
-          const m = txt.match(/(\d{2,})W/);
-          if(m && parseInt(m[1],10) > 50000){ cls = 'value-alert'; }
+          const m = txt.match(/(\d+)/);
+          if(m && parseInt(m[1]) > 10000){ cls = 'value-alert'; }
         }
 
-        valEl.classList.remove('value-default','value-viz','value-wood','value-alert','value-muted');
+        // Reset all classes and apply the correct one
+        valEl.className = '';
         valEl.classList.add(cls);
+        valEl.classList.add('font-weight-700'); // Ensure bolding is preserved
       });
     }
 
-    /************************************************************************
-     * UI helpers & init
-     ************************************************************************/
     function fullReset(){
-      document.getElementById('productModel').value='';
+      document.getElementById('productModel').value = '';
+      document.getElementById('unit').value = '';
+      document.getElementById('width').value = '';
+      document.getElementById('height').value = '';
+      document.getElementById('diagonal').value = '';
+      document.getElementById('aspectRatio').value = 'auto';
       resetForm();
     }
 
     function resetForm(){
-      document.getElementById('unit').value='';
-      document.getElementById('width').value='';
-      document.getElementById('height').value='';
-      document.getElementById('diagonal').value='';
-      document.getElementById('aspectRatio').value='auto';
-      document.getElementById('errorMessage').style.display='none';
-
       const overlay = document.getElementById('cabinetOverlay');
+      const placeholder = document.getElementById('placeholderMessage');
+      const vizVideo = document.getElementById('vizVideo');
+      const transitionVideo = document.getElementById('transitionVideo');
+
+      // Stop and hide video elements
+      if(vizVideo) { vizVideo.pause(); vizVideo.style.display = 'none'; }
+      if(transitionVideo) { transitionVideo.pause(); transitionVideo.style.display = 'none'; }
+
       if(overlay){
-          overlay.innerHTML = '<div style="grid-column: 1 / -1; grid-row: 1 / -1; background: #f7f9fb; color: #333; display: flex; align-items: center; justify-content: center; font-size: 1rem; font-weight: 600;">Calculate to see visualization</div>';
-          document.getElementById('visDimensions').textContent = '-- m × -- m';
+          // Show placeholder message
+          if(placeholder) {
+            placeholder.style.display = 'flex';
+            // Clear any old cabinet divs before re-adding placeholder
+            overlay.innerHTML = '';
+            overlay.appendChild(placeholder); 
+          }
+          document.getElementById('visDimensions').textContent = '-- ft × -- ft';
+      }
+      
+      // Reset Aspect Ratio on LED Wall container
+      const ledWall = document.getElementById('ledWallElement');
+      if (ledWall) {
+          ledWall.style.aspectRatio = ''; // Clear dynamic aspect ratio
       }
 
       document.getElementById('boqPreviewContainer').innerHTML='';
-      ['spec_model','spec_pitch','spec_dims','spec_res','spec_diag','spec_density','spec_viewing','spec_area','spec_total_pixels','spec_cabs','spec_modules','spec_cabsize','spec_cabpix','ctrl_name','ctrl_longeth_combined','ctrl_sending','ctrl_shorteth','spec_power','spec_weight','aspectRatioText'].forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = '--'; });
+      ['spec_model','spec_pitch','spec_dims','spec_res','spec_diag','spec_density','spec_viewing','spec_area','spec_total_pixels','spec_cabs','spec_modules','spec_cabsize','spec_cabpix','ctrl_name','ctrl_longeth_combined','ctrl_sending','ctrl_shorteth','spec_power','spec_weight','aspectRatioText','spec_modsize','spec_nits'].forEach(id=>{ const el = document.getElementById(id); if(el) el.textContent = '--'; });
       document.querySelectorAll('.hseries-only').forEach(el=>el.style.display='none');
 
       finalCalculationData = {};
@@ -1489,8 +1727,44 @@ function downloadBOQCSV(){
         if(e.target === document.getElementById('contactModal')) closeContactModal();
       });
     });
-  </script>
+
+  
+/* --- PLAYLIST: Videos + Images --- */
+const VIZ_PLAYLIST = [
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-waterfall-forest-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-ocean-waves-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-green-forest-wind-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-sky-clouds-timelapse-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-birds-flying-slowmo-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-underwater-fishes-1080p.mp4" },
+  { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
+  { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
+  { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
+  { type: "image", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
+  { type: "image", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
+];
+
+function loadVisualizationContent() {
+    const vizVideo = document.getElementById("vizVideo");
+    const ledWall = document.getElementById("ledWallElement");
+
+    const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
+
+    if (item.type === "video") {
+        ledWall.style.backgroundImage = "none";
+        vizVideo.style.display = "block";
+        vizVideo.src = item.url;
+        vizVideo.load();
+        vizVideo.play().catch(()=>{});
+    } else {
+        vizVideo.style.display = "none";
+        vizVideo.pause();
+        ledWall.style.backgroundImage = `url('${item.url}')`;
+        ledWall.style.backgroundSize = "cover";
+        ledWall.style.backgroundPosition = "center";
+    }
+}
+
+</script>
 </body>
 </html>
-
-
