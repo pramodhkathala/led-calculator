@@ -516,7 +516,7 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
     const MM_PER_FOOT = 304.8;
     const MM_PER_INCH = 25.4;
     const PIXELS_PER_PORT_DEFAULT = 650000;
-    const GLOBAL_PORT_BUFFER_PCT = 0.05;
+    const GLOBAL_PORT_BUFFER_PCT = 0.03;
     const POWER_BUFFER = 1.15;
     const WEIGHT_BUFFER = 1.15;
     const LINE_HEIGHT_PDF = 3.8; // uniform PDF line spacing
@@ -749,7 +749,7 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
         if(c.type === 'Modular') {
           return c.maxPixels >= totalPixels;
         } else {
-          return c.maxPixels >= totalPixels && c.ports >= Math.ceil(requiredPortsBuffered * 0.9);
+          return c.maxPixels >= totalPixels && c.ports >= requiredPortsBuffered;
         }
       }) || CONTROLLER_MODELS[CONTROLLER_MODELS.length-1];
 
