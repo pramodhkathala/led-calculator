@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,10 +17,53 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
 <div class="header">
 <img src="https://www.peoplelinkvc.com/images/logos/peoplelink-logo-black.webp">
 </div>
-  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+/* --- PLAYLIST: Videos + Images --- */
+const VIZ_PLAYLIST = [
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-waterfall-forest-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-ocean-waves-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-green-forest-wind-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-sky-clouds-timelapse-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-birds-flying-slowmo-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-underwater-fishes-1080p.mp4" },
+  { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
+  { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
+  { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
+  { type: "image", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
+  { type: "image", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
+];
+
+function loadVisualizationContent() {
+    const vizVideo = document.getElementById("vizVideo");
+    const ledWall = document.getElementById("ledWallElement");
+
+    const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
+
+    if (item.type === "video") {
+        ledWall.style.backgroundImage = "none";
+        vizVideo.style.display = "block";
+        vizVideo.src = item.url;
+        vizVideo.load();
+        vizVideo.play().catch(()=>{});
+    } else {
+        vizVideo.style.display = "none";
+        vizVideo.pause();
+        ledWall.style.backgroundImage = `url('${item.url}')`;
+        ledWall.style.backgroundSize = "cover";
+        ledWall.style.backgroundPosition = "center";
+    }
+}
+
+</script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js">
 /* --- PLAYLIST: Videos + Images --- */
 const VIZ_PLAYLIST = [
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-waterfall-forest-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-ocean-waves-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-green-forest-wind-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-sky-clouds-timelapse-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-birds-flying-slowmo-1080p.mp4" },
+  { type: "video", url: "https://cdn.coverr.co/videos/coverr-underwater-fishes-1080p.mp4" },
   { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
   { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
   { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
@@ -1735,6 +1779,3 @@ function loadVisualizationContent() {
 </script>
 </body>
 </html>
-
-
-
