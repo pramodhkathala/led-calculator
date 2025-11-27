@@ -744,7 +744,7 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       const requiredPortsBuffered = Math.max(1, Math.ceil(requiredPorts * (1 + GLOBAL_PORT_BUFFER_PCT)));
       const requiredShortEthernet = Math.max(0, totalCabinets - requiredPortsBuffered);
 
-      // pick suggested controller: smallest that satisfies pixels & ports
+      // pick suggested controller:  smallest one that supports the total pixels & required ports
       let suggested = CONTROLLER_MODELS.find(c => {
         if(c.type === 'Modular') {
           return c.maxPixels >= totalPixels;
@@ -807,7 +807,7 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
         requiredSendCards: finalControllerObj.type === 'Modular' ? requiredSendCards : 0,
         outputCardModel: finalCalculationData.outputCardModel || 'H_20 x RJ45 Sending Card',
         inputCardModel: finalCalculationData.inputCardModel || 'H_2 x HDMI 2.0 Input Card',
-        inputCardQty: finalCalculationData.inputCardQty || 2,
+        inputCardQty: finalCalculationData.inputCardQty || 1,
         splicerSolution: finalCalculationData.splicerSolution || 'NA',
         ledType: productKey.split('_')[0]
       };
@@ -1058,20 +1058,30 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       }
 
       // Ethernet Ports & Short Ethernet
-      list.push({ item:'Ethernet Ports (Controller to Wall)', partcode:'Partner Scope', desc:`Controller to wall ethernet ports required (Long-distance cable Partner Scope)`, qty:data.requiredPortsBuffered, unit:'Ports' });
-      list.push({ item:'Short Ethernet (Between Cabinets)', partcode:'Not Required', desc:'Inter-cabinet CAT6 runs (Included with Cabinet)', qty:data.requiredShortEthernet, unit:'PCS' });
+      list.push({ item:'Network Cables (Long CAT Cable)', partcode:'Partner Scope', desc:'Long CAT/Fiber Cables (Controller to Wall)', qty:data.requiredPortsBuffered, unit:'PCS' });
+      list.push({ item:'Network Cables (Short Between Cabinets)', partcode:'Not Required', desc:'Short CAT Cables (Cabinet to Cabinet - Included)', qty:data.requiredShortEthernet, unit:'PCS' });
 
       const isOutdoor = data.productKey.includes('outdoor');
       const installPart = isOutdoor ? PARTS_CATALOG['ALED-INST-OU'].part : PARTS_CATALOG['ALED-INST-IN'].part;
       const installDesc = isOutdoor ? PARTS_CATALOG['ALED-INST-OU'].desc : PARTS_CATALOG['ALED-INST-IN'].desc;
       list.push({ item:'Installation & Configuration', partcode:installPart, desc:installDesc, qty:data.totalCabinets, unit:'Cabinet' });
 
-      if(isIndoor && data.totalCabinets > 10){
-        list.push({ item:'Transportation - Regional', partcode: PARTS_CATALOG['ALED-TRS-IN-REG'] ? PARTS_CATALOG['ALED-TRS-IN-REG'].part : 'NA', desc: 'Transportation (Indoor) - Per Cabinet', qty: data.totalCabinets, unit: 'Cabinet' });
+ if (isOutdoor) {
+  list.push({
+    item: 'Transportation (Outdoor)',
+    partcode: 'NA',
+    desc: 'Transportation (Outdoor) – LS',
+    qty: data.totalCabinets,
+    unit: 'Cabinet'
+  });
+}
+
+  if(isIndoor && data.totalCabinets > 10){
+        list.push({ item:'Transportation - Regional', partcode: PARTS_CATALOG['ALED-TRS-IN-REG'] ? PARTS_CATALOG['ALED-TRS-IN-REG'].part : 'ALED-TRS-IN-REG', desc: 'Transportation (Indoor) - Per Cabinet', qty: data.totalCabinets, unit: 'Cabinet' });
       }
 
       // Power Runs
-      list.push({ item: 'Power Supply Runs', partcode: 'Partner Scope', desc: 'Dedicated power circuits based on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable Partner Scope)', qty: data.requiredPowerRuns, unit: 'Runs' });
+      list.push({ item: 'Power Supply', partcode: 'Partner Scope', desc: 'Power circuits based on 16A supply; supports ~2.9 kW continuous load per run. (Long-distance cable)', qty: data.requiredPowerRuns, unit: 'PCS' });
 
       return list;
     }
