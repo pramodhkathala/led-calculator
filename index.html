@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<title>PeopleLink LED Video Wall - Project Proposal</title>
+<title>PeopleLink LED Video Wall Configuration</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
@@ -996,8 +996,8 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       }
 
       // Update physical dimensions label (ft)
-      const wFt = (data.finalW_mm / MM_PER_FOOT).toFixed(1);
-      const hFt = (data.finalH_mm / MM_PER_FOOT).toFixed(1);
+      const wFt = (data.finalW_mm / MM_PER_FOOT).toFixed(2);
+      const hFt = (data.finalH_mm / MM_PER_FOOT).toFixed(2);
       document.getElementById('visDimensions').textContent = `${wFt} ft × ${hFt} ft`;
 
       // Dynamic pixel density based on pitch
@@ -1280,7 +1280,9 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       doc.setFont('Helvetica','normal');
       doc.setFontSize(bodyFontSize);
 
+
       // Header / Title
+
       doc.setTextColor(...primaryRGB);
       doc.setFontSize(13);
       doc.setFont('Helvetica','bold');
