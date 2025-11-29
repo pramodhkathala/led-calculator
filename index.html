@@ -1562,8 +1562,8 @@ terms.forEach(t => {
 
       doc.setFontSize(7);
       doc.setTextColor(150,170,200);
-      doc.text('Disclaimer: This document is system-generated. All specifications and calculations must be validated with the Pre-Sales team prior to finalization or execution.', margin, doc.internal.pageSize.getHeight() - 15);
-      doc.text('© 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights revered', pageW/2, doc.internal.pageSize.getHeight() - 8, { align:'center' });
+      doc.text('Disclaimer: This document is system-generated. All specifications and calculations must be validated with the Pre-Sales team prior to finalization or execution.', margin, doc.internal.pageSize.getHeight() - 10);
+      doc.text('© 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights revered', pageW/2, doc.internal.pageSize.getHeight() - 6, { align:'center' });
 
       // Pixel pitch label: converts 1.5625 → "1.56P", 2.0 → "2P"
       const pitchLabel = data.pixelPitch_mm ? data.pixelPitch_mm.toFixed(2).replace(/\.00$/, '') + "P" : "NA";
