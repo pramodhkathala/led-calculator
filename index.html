@@ -398,41 +398,66 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
     Physical LED Wall Visualization
   </div>
 
-  <div class="vis-container">
-    <div class="led-wall-wrapper">
-      <div class="led-wall" id="ledWallElement" aria-hidden="true">
-        
-        
-<video id="vizVideo" style="object-fit:cover;width:100%;height:100%;" loop muted playsinline preload="auto" style="display:none;">
-</video>
+<div class="vis-container">
+  <div class="led-wall-wrapper">
+    
+    <div class="led-wall" id="ledWallElement" aria-hidden="true">
 
+      <!-- IMAGE-ONLY VISUALIZATION (videos removed) -->
 
-        <video id="transitionVideo" muted playsinline preload="auto" style="display:none;">
-          <source src="https://storage.googleapis.com/test-assets-pub/videos/data_transition.mp4" type="video/mp4">
-          <source src="https://storage.googleapis.com/test-assets-pub/videos/data_transition.webm" type="video/webm">
-          Your browser does not support the video tag.
-        </video>
-        
-        <div id="cabinetOverlay">
-          <div id="placeholderMessage" style="
-            grid-column: 1 / -1;
-            grid-row: 1 / -1;
-            background: #eef6fb; /* CHANGED: Light color instead of black (matches page-bg) */
-            color: #374151;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.95rem;
-            font-weight: 500;
-          ">
-            Calculate to see LED Wall Visualization
+      <div id="cabinetOverlay">
+        <div id="placeholderMessage" style="
+          grid-column: 1 / -1;
+          grid-row: 1 / -1;
+          background: #eef6fb;
+          color: #374151;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.95rem;
+          font-weight: 500;
+        ">
+          Calculate to see LED Wall Visualization
+        </div>
+      </div>
+
+    </div> <!-- end .led-wall -->
+
+  </div> <!-- end .led-wall-wrapper -->
+
+  <div id="visDimensions" style="font-size: 0.95rem; font-weight: 600; margin-top: 8px; color:var(--brand);">
+    -- ft × -- ft
+  </div>
+
+  <div id="boqPreviewContainer" style="margin-top: 18px;"></div>
+</div>
+
+<script>
+/* --- IMAGE PLAYLIST (videos removed completely) --- */
+const VIZ_PLAYLIST = [
+  { url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
+  { url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
+  { url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
+  { url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
+  { url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
+];
+
+/* --- LOAD RANDOM VISUALIZATION IMAGE --- */
+function loadVisualizationContent() {
+  const ledWall = document.getElementById("ledWallElement");
+
+  const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
+  
+  ledWall.style.backgroundImage = `url('${item.url}')`;
+  ledWall.style.backgroundSize = "100% 100%";
+  ledWall.style.backgroundPosition = "center";
+}
+</script>
           </div>
         </div>
       </div>
 
       </div>
-
-    <div id="visDimensions" style="font-size: 0.95rem; font-weight: 600; margin-top: 8px; color:var(--brand);">-- ft × -- ft</div>
 
     <div id="boqPreviewContainer" style="margin-top: 18px;"></div>
 
@@ -513,6 +538,16 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       </div>
     </div>
   </div>
+
+<div style="
+    text-align:center;
+    margin-top:20px;
+    font-size:12px;
+    color:#6b7280;
+    padding:15px 0 30px;
+">
+  © 2025 PeopleLink Unified Communications Pvt. Ltd. | All rights reserved
+</div>
 
   <script>
     /************************************************************************
@@ -1741,38 +1776,7 @@ terms.forEach(t => {
       });
     });
 
-  
-/* --- PLAYLIST: Videos + Images --- */
-const VIZ_PLAYLIST = [
-  { type: "image", url: "https://images.unsplash.com/photo-1501785888041-af3ef285b470" },
-  { type: "image", url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee" },
-  { type: "image", url: "https://images.unsplash.com/photo-1502082553048-f009c37129b9" },
-  { type: "image", url: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e" },
-  { type: "image", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e" }
-];
-
-function loadVisualizationContent() {
-    const vizVideo = document.getElementById("vizVideo");
-    const ledWall = document.getElementById("ledWallElement");
-
-    const item = VIZ_PLAYLIST[Math.floor(Math.random() * VIZ_PLAYLIST.length)];
-
-    if (item.type === "video") {
-        ledWall.style.backgroundImage = "none";
-        vizVideo.style.display = "block";
-        vizVideo.src = item.url;
-        vizVideo.load();
-        vizVideo.play().catch(()=>{});
-    } else {
-        vizVideo.style.display = "none";
-        vizVideo.pause();
-        ledWall.style.backgroundImage = `url('${item.url}')`;
-        ledWall.style.backgroundSize = "100% 100%"; // MODIFIED: Image fits the entire wall
-        ledWall.style.backgroundPosition = "center";
-    }
-}
 
 </script>
 </body>
 </html>
-
