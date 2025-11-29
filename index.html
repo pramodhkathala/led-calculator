@@ -1589,7 +1589,7 @@ terms.forEach(t => {
     // NEVER add extra spacing (NO y += 2, NO y += LINE)
     
     // Page break check
-    if (y > doc.internal.pageSize.getHeight() - 30) {
+    if (y > doc.internal.pageSize.getHeight() - 10) {
         doc.addPage();
         y = margin;
     }
@@ -1780,3 +1780,4 @@ terms.forEach(t => {
 </script>
 </body>
 </html>
+
