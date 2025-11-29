@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -489,17 +490,22 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       </div>
       <p style="font-size:12px; margin-top:-6px;">Enter your contact details (optional) to include in the proposal document.</p>
 
-      <div class="input-group">
-        <label for="downloadEmail">Email Address</label>
-        <input type="text" id="downloadEmail" placeholder="email@example.com">
-      </div>
+<div class="input-group">
+  <label for="ticketOrClient">Helpdesk Number OR Client Name *</label>
+  <input type="text" id="ticketOrClient" placeholder="Enter Ticket # OR Client Name">
+</div>
 
-      <div class="input-group">
-        <label for="downloadPhone">Phone Number</label>
-        <input type="text" id="downloadPhone" placeholder="+91-XXXXXXXXXX">
-      </div>
+<div class="input-group">
+  <label for="downloadEmail">Email Address *</label>
+  <input type="text" id="downloadEmail" placeholder="email@example.com">
+</div>
 
-      <div id="contactError" style="color:var(--accent); margin-bottom:6px;"></div>
+<div class="input-group">
+  <label for="downloadPhone">Phone Number *</label>
+  <input type="text" id="downloadPhone" placeholder="+91-XXXXXXXXXX">
+</div>
+
+<div id="contactError" style="color:var(--accent); margin-bottom:6px;"></div>
 
       <div style="text-align:right; margin-top:12px;">
         <button class="btn-secondary" onclick="closeContactModal()">Cancel</button>
@@ -1235,26 +1241,47 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       document.getElementById('contactModal').style.display = 'none';
     }
 
-    function handleDownloadRequest(){
-      const e = document.getElementById('downloadEmail').value.trim();
-      const p = document.getElementById('downloadPhone').value.trim();
+function handleDownloadRequest() {
 
-      document.getElementById('contactError').textContent='';
+    const ticketOrClient = document.getElementById("ticketOrClient").value.trim();
+    const email = document.getElementById("downloadEmail").value.trim();
+    const phone = document.getElementById("downloadPhone").value.trim();
+    const err = document.getElementById("contactError");
 
-      if(e){
-        const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if(!re.test(e)){
-          document.getElementById('contactError').textContent='Invalid email';
-          document.getElementById('contactError').style.display='block';
-          return;
-        }
-      }
+    err.textContent = "";
 
-      contactInfo.email = e;
-      contactInfo.phone = p;
-      closeContactModal();
-      proceedToDownloadPdf();
-    }
+if (!ticketOrClient) {
+    err.textContent = "Enter Helpdesk Number OR Client Name.";
+    return;
+}
+
+    if (!email) { err.textContent = "Email is mandatory."; return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { err.textContent = "Enter valid Email."; return; }
+
+    if (!phone) { err.textContent = "Phone Number is mandatory."; return; }
+    if (!/^[0-9+\-\s]{6,15}$/.test(phone)) { err.textContent = "Enter valid Phone Number."; return; }
+
+// Save to contactInfo (smart detection)
+// If ONLY numbers or Symbols → Helpdesk Number
+// Otherwise → Client Name
+// Normalize input (remove spaces)
+let cleaned = ticketOrClient.trim();
+
+// Smart helpdesk detection
+// If it contains ANY digits → treat as Helpdesk Ticket
+if (/\d/.test(cleaned)) {
+    contactInfo.ticket = cleaned;
+    contactInfo.client = "";
+} else {
+    contactInfo.ticket = "";
+    contactInfo.client = cleaned;
+}
+contactInfo.email = email;
+contactInfo.phone = phone;
+
+    closeContactModal();
+    proceedToDownloadPdf();
+}
 
     // Full PDF generation with LINE_HEIGHT_PDF used consistently (UPDATED)
     function proceedToDownloadPdf(){
@@ -1280,21 +1307,49 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       doc.setFont('Helvetica','normal');
       doc.setFontSize(bodyFontSize);
 
+// ---------------- ZERO-GAP HEADER -----------------
 
-      // Header / Title
+// Title (top)
+doc.setFontSize(13);
+doc.setFont('Helvetica','bold');
+doc.setTextColor(...primaryRGB);
+doc.text('PeopleLink LED Video Wall - Project Proposal', pageW/2, 10, { align:'center' });
 
-      doc.setTextColor(...primaryRGB);
-      doc.setFontSize(13);
-      doc.setFont('Helvetica','bold');
-      doc.text('PeopleLink LED Video Wall - Project Proposal', pageW/2, 12, { align:'center' });
-      
-      doc.setFontSize(bodyFontSize);
-      doc.setFont('Helvetica','normal');
-      doc.setTextColor(60,60,60);
-      doc.text(`Contact: ${contactInfo.email || 'N/A'} | ${contactInfo.phone || 'N/A'}`, pageW - margin, 16, { align: 'right' });
-      doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, 16);
-      doc.line(margin, 20, pageW - margin, 20);
-      y = 24;
+// Normal text
+doc.setFontSize(bodyFontSize);
+doc.setFont('Helvetica','normal');
+doc.setTextColor(60,60,60);
+// Helpdesk OR Client Name (ONLY one should show)
+let ty = 16;
+
+let idLine = "";
+if (contactInfo.ticket) {
+  idLine = `Helpdesk Number: ${contactInfo.ticket}`;
+} else if (contactInfo.client) {
+  idLine = `Client Name: ${contactInfo.client}`;
+}
+
+doc.text(idLine, margin, ty);
+
+doc.text(
+  `Contact: ${contactInfo.email} | ${contactInfo.phone}`,
+  pageW - margin,
+  ty,
+  { align:'right' }
+);
+
+// Generated date (NO GAP → next line)
+ty += 4;
+doc.text(`Generated: ${new Date().toLocaleDateString()}`, margin, ty);
+
+// Divider (NO GAP → immediate)
+ty += 3;
+doc.line(margin, ty, pageW - margin, ty);
+
+// Content starts IMMEDIATELY after line
+y = ty + 6;
+
+// -------------------------------------------------------
 
       // Section 1
       doc.setTextColor(...primaryRGB);
@@ -1381,7 +1436,7 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
       doc.setFontSize(10);
       doc.setFont('Helvetica','bold');
       doc.text('2. Bill of Quantities (BOQ)', margin, y);
-      y += 6;
+      y += 4;
 
       const boqList = generateBOQList(data);
       // Removed price headers
@@ -1487,15 +1542,23 @@ body { font-family: 'Inter', sans-serif; background:#eef6fb; margin:0; padding:2
 	"12) Transportation: Transportation charges are extra and will be applied as per actuals."
       ];
 
-      terms.forEach(t=>{
-        const split = doc.splitTextToSize(t, pageW - margin*2);
-        doc.text(split, margin, y);
-        y += (split.length * LINE);
-        if(y > doc.internal.pageSize.getHeight() - 30){
-          doc.addPage();
-          y = margin;
-        }
-      });
+terms.forEach(t => {
+    const split = doc.splitTextToSize(t, pageW - margin*2);
+
+    // Print all wrapped lines
+    split.forEach(line => {
+        doc.text(line, margin, y);
+        y += LINE;  // ONLY line height
+    });
+
+    // NEVER add extra spacing (NO y += 2, NO y += LINE)
+    
+    // Page break check
+    if (y > doc.internal.pageSize.getHeight() - 30) {
+        doc.addPage();
+        y = margin;
+    }
+});
 
       doc.setFontSize(7);
       doc.setTextColor(150,170,200);
