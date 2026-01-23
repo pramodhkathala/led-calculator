@@ -1,4 +1,6 @@
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -785,14 +787,31 @@ function loadVisualizationContent() {
       const requiredPortsBuffered = Math.max(1, Math.ceil(requiredPorts * (1 + GLOBAL_PORT_BUFFER_PCT)));
       const requiredShortEthernet = Math.max(0, totalCabinets - requiredPortsBuffered);
 
-      // pick suggested controller:  smallest one that supports the total pixels & required ports
-      let suggested = CONTROLLER_MODELS.find(c => {
-        if(c.type === 'Modular') {
-          return c.maxPixels >= totalPixels;
-        } else {
-          return c.maxPixels >= totalPixels && c.ports >= requiredPortsBuffered;
-        }
-      }) || CONTROLLER_MODELS[CONTROLLER_MODELS.length-1];
+      // pick suggested controller: TB40/TB60 allowed only for OUTDOOR or INDOOR 110"
+let suggested = CONTROLLER_MODELS.find(c => {
+
+    const isTB = (c.name === "TB40" || c.name === "TB60");
+    const isOutdoor = productKey.includes("outdoor");
+
+    // Calculate diagonal for indoor rule
+    const diagIn = finalDiagonal_in;
+    const isIndoor110 = (!isOutdoor && diagIn >= 109 && diagIn <= 112);
+
+    // BLOCK TB40/TB60 if NOT outdoor and NOT 110-inch indoor
+    if (isTB && !(isOutdoor || isIndoor110)) {
+        return false;
+    }
+
+    // Existing logic (pixel + port requirement)
+    if (c.type === 'Modular') {
+        return c.maxPixels >= totalPixels;
+    } else {
+        return c.maxPixels >= totalPixels && c.ports >= requiredPortsBuffered;
+    }
+}) 
+|| CONTROLLER_MODELS[CONTROLLER_MODELS.length - 1];
+
+
 
       const outputCardPorts_default = 20;
       let requiredSendCards = Math.max(1, Math.ceil(requiredPortsBuffered / outputCardPorts_default));
