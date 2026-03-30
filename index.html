@@ -601,8 +601,8 @@ function loadVisualizationContent() {
       'VX400': { part:'TP-VWC-NS-VX400', desc:'LED Video Wall Controller: VX400 Pro' },
       'VX600': { part:'TP-VWC-NS-VX600', desc:'LED Video Wall Controller: VX600 Pro' },
       'VX1000': { part:'TP-VWC-NS-VX1000', desc:'LED Video Wall Controller: VX1000 Pro' },
-      '4K prime': { part:'TP-VWC-NS-4K-PRM', desc:'LED Video Wall Controller: 4K Prime' },
-	  '4K prime Pro': { part:'TP-VWC-NS-4K-PRM-PRO', desc:'LED Video Wall Controller: 4K Prime Pro' },
+      '4K Prime': { part:'TP-VWC-NS-4K-PRM', desc:'LED Video Wall Controller: 4K Prime' },
+	  '4K Prime Pro': { part:'TP-VWC-NS-4K-PRM-PRO', desc:'LED Video Wall Controller: 4K Prime Pro' },
       'H2': { part:'TP-XMF-H2', desc:'LED Video Wall Controller (H2)' },
       'H5': { part:'TP-XMF-H5', desc:'LED Video Wall Controller (H5)' },
       'H9': { part:'TP-XMF-H9', desc:'LED Video Wall Controller (H9)' },
@@ -1103,7 +1103,8 @@ let suggested = CONTROLLER_MODELS.find(c => {
       if(data.controllerName.includes('VX600')) ctrlKey='VX600';
       if(data.controllerName.includes('VX400')) ctrlKey='VX400';
       if(data.controllerName.includes('VX1000')) ctrlKey='VX1000';
-      if(data.controllerName.includes('4K Prime') || data.controllerName.includes('4K')) ctrlKey='4K';
+      if(data.controllerName.includes('4K Prime') || data.controllerName.includes('4K Prime')) ctrlKey='4K Prime';
+	  if(data.controllerName.includes('4K Prime Pro') || data.controllerName.includes('4K Prime pro')) ctrlKey='4K Prime Pro';
 
       if(PARTS_CATALOG[ctrlKey]) list.push({ item:'Controller/Processor', partcode:PARTS_CATALOG[ctrlKey].part, desc:PARTS_CATALOG[ctrlKey].desc, qty:1, unit:'PCS' });
       else list.push({ item:'Controller/Processor', partcode:'NA', desc:data.controllerName, qty:1, unit:'PCS' });
