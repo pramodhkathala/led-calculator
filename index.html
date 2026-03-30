@@ -567,9 +567,9 @@ function loadVisualizationContent() {
     const LINE_HEIGHT_PDF = 3.8; // uniform PDF line spacing
 
     const LED_PRODUCTS = {
-      'cob_09': { name:"PeopleLink COB (0.9375 mm)", pitch_mm:0.9375, cabW_mm:600, cabH_mm:337.5, cabPixW:640, cabPixH:360, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-1000", maxPower_W_m2:300 },
-      'cob_125': { name:"PeopleLink COB (1.25 mm)", pitch_mm:1.25, cabW_mm:600, cabH_mm:337.5, cabPixW:480, cabPixH:270, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
-      'cob_15': { name:"PeopleLink COB (1.5625 mm)", pitch_mm:1.5625, cabW_mm:600, cabH_mm:337.5, cabPixW:384, cabPixH:216, moduleW_mm:300, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
+      'cob_09': { name:"PeopleLink COB (0.9375 mm)", pitch_mm:0.9375, cabW_mm:600, cabH_mm:337.5, cabPixW:640, cabPixH:360, moduleW_mm:150, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-1000", maxPower_W_m2:300 },
+      'cob_125': { name:"PeopleLink COB (1.25 mm)", pitch_mm:1.25, cabW_mm:600, cabH_mm:337.5, cabPixW:480, cabPixH:270, moduleW_mm:150, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
+      'cob_15': { name:"PeopleLink COB (1.5625 mm)", pitch_mm:1.5625, cabW_mm:600, cabH_mm:337.5, cabPixW:384, cabPixH:216, moduleW_mm:150, moduleH_mm:168.75, modulesPerCab:8, weight_kg:4.6, nits_range:"600-800", maxPower_W_m2:300 },
       'indoor_186': { name:"PeopleLink SMD Indoor (1.86 mm)", pitch_mm:1.86, cabW_mm:640, cabH_mm:480, cabPixW:344, cabPixH:258, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
       'indoor_20': { name:"PeopleLink SMD Indoor (2.0 mm)", pitch_mm:2.0, cabW_mm:640, cabH_mm:480, cabPixW:320, cabPixH:240, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
       'indoor_25': { name:"PeopleLink SMD Indoor (2.5 mm)", pitch_mm:2.5, cabW_mm:640, cabH_mm:480, cabPixW:256, cabPixH:192, moduleW_mm:320, moduleH_mm:160, modulesPerCab:6, weight_kg:6.24, nits_range:"450-600", maxPower_W_m2:560 },
@@ -587,11 +587,12 @@ function loadVisualizationContent() {
       { name:"VX600 Pro / DSP600 Pro", type:"All-in-One", ports:6, maxPixels:3900000, priority:4 },
       { name:"VX1000 Pro / DSP1000 Pro", type:"All-in-One", ports:10, maxPixels:6500000, priority:5 },
       { name:"4K Prime", type:"All-in-One", ports:16, maxPixels:10400000, priority:6 },
-      { name:"H2", type:"Modular", ports:20, maxPixels:26000000, maxSendCards:2, priority:7 },
-      { name:"H5", type:"Modular", ports:20, maxPixels:39000000, maxSendCards:3, priority:8 },
-      { name:"H9", type:"Modular", ports:20, maxPixels:65000000, maxSendCards:6, priority:9 },
-      { name:"H15", type:"Modular", ports:20, maxPixels:130000000, maxSendCards:12, priority:10 },
-      { name:"H20", type:"Modular", ports:20, maxPixels:260000000, maxSendCards:20, priority:11 }
+	  { name:"4K Prime Pro", type:"All-in-One", ports:20, maxPixels:13000000, priority:7 },
+      { name:"H2", type:"Modular", ports:20, maxPixels:26000000, maxSendCards:2, priority:8 },
+      { name:"H5", type:"Modular", ports:20, maxPixels:39000000, maxSendCards:3, priority:9 },
+      { name:"H9", type:"Modular", ports:20, maxPixels:65000000, maxSendCards:6, priority:10 },
+      { name:"H15", type:"Modular", ports:20, maxPixels:130000000, maxSendCards:12, priority:11 },
+      { name:"H20", type:"Modular", ports:20, maxPixels:260000000, maxSendCards:20, priority:12 }
     ];
 
     const PARTS_CATALOG = {
@@ -601,6 +602,7 @@ function loadVisualizationContent() {
       'VX600': { part:'TP-VWC-NS-VX600', desc:'LED Video Wall Controller: VX600 Pro' },
       'VX1000': { part:'TP-VWC-NS-VX1000', desc:'LED Video Wall Controller: VX1000 Pro' },
       '4K': { part:'TP-VWC-NS-4K-PRM', desc:'LED Video Wall Controller: 4K Prime (PRM)' },
+	  '4K': { part:'TP-VWC-NS-4K-PRM-PRO', desc:'LED Video Wall Controller: 4K Prime Pro (PRM Pro)' },
       'H2': { part:'TP-XMF-H2', desc:'LED Video Wall Controller (H2)' },
       'H5': { part:'TP-XMF-H5', desc:'LED Video Wall Controller (H5)' },
       'H9': { part:'TP-XMF-H9', desc:'LED Video Wall Controller (H9)' },
