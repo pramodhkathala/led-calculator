@@ -1119,22 +1119,8 @@ let suggested = CONTROLLER_MODELS.find(c => {
         const inPart = PARTS_CATALOG[inModel] ? PARTS_CATALOG[inModel].part : 'NA';
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 1, unit:'PCS' });
 
-// Add H Series PSU only for H5 and above (optional)
-if (data.controllerType === 'Modular') {
-
-    const controllerName = data.controllerName;
-    const hValue = parseInt(controllerName.replace('H',''));
-
-    if (hValue >= 5) {
-        list.push({ 
-            item:'Power Supply (H Series)', 
-            partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', 
-            desc: 'H Series PSU (800W) - Optional', 
-            qty: 1, 
-            unit:'PCS' 
-        });
-    }
-}
+list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' }); 
+	  }
 
       // Ethernet Ports & Short Ethernet
       list.push({ item:'Network Cables (Long CAT Cable)', partcode:'Partner Scope', desc:'Long CAT/Fiber Cables (Controller to Wall)', qty:data.requiredPortsBuffered, unit:'PCS' });
