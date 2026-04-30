@@ -1120,6 +1120,28 @@ let suggested = CONTROLLER_MODELS.find(c => {
         list.push({ item:'Input Card(s)', partcode:inPart, desc:inModel, qty:data.inputCardQty || 1, unit:'PCS' });
 
 list.push({ item:'Power Supply (H Series)', partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', desc: 'H Series PSU (800W)', qty: 1, unit:'PCS' }); 
+// Add H Series PSU only for H5 and above (optional)
+if (data.controllerType === 'Modular') {
+
+    const controllerName = data.controllerName || '';
+
+    // Ensure it starts with H and has a number
+    if (controllerName.startsWith('H')) {
+
+        const hValue = Number(controllerName.substring(1)); // safer than replace
+
+        if (!isNaN(hValue) && hValue >= 5) {
+            list.push({ 
+                item:'Power Supply (H Series)', 
+                partcode: PARTS_CATALOG['H_800W_PSU'] ? PARTS_CATALOG['H_800W_PSU'].part : 'NA', 
+                desc: 'H Series PSU (800W) - Optional', 
+                qty: 1, 
+                unit:'PCS' 
+            });
+        }
+    }
+}
+		  
 	  }
 
       // Ethernet Ports & Short Ethernet
